@@ -28,7 +28,6 @@ export class AuthService {
                                     email: user.email,
                                     firstname: user.firstname,
                                     lastname: user.lastname,
-                                    roles: user.roles
                                 } as UserPrincipal;
                             } else {
                                 throw new UnauthorizedException('Password not match');

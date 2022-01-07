@@ -5,5 +5,4 @@ export class UserPrincipal{
     email: string;
     firstname: string;
     lastname: string;
-    roles: RolesType[]
 }

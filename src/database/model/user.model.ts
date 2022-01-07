@@ -3,15 +3,24 @@ import {from, Observable} from "rxjs";
 import {hash, compare} from "bcrypt";
 import {RolesType} from "../../shared/roles-type.enum";
 
+export interface Address extends Object{
+    readonly province: number;
+    readonly district: number;
+    readonly village: number;
+    readonly detail: string;
+}
 interface User extends Document {
     comparePassword(password: string): Observable<boolean>;
-
     readonly username: string;
     readonly email: string;
+    readonly phone: number;
+    readonly gender: "male" | "female";
+    readonly birthday: Date;
+    readonly address: Address;
     readonly password: string;
     readonly firstname: string;
     readonly lastname: string;
-    readonly roles: RolesType[]
+    readonly followedService: Array<any>;
 }
 
 type UserModel = Model<User>;
@@ -22,9 +31,11 @@ const UserSchema = new Schema<User>({
     password: SchemaTypes.String,
     firstname: SchemaTypes.String,
     lastname: SchemaTypes.String,
-    roles: [
-        {type: SchemaTypes.Number, require: false}
-    ]
+    phone: SchemaTypes.Number,
+    gender: SchemaTypes.String,
+    birthday: SchemaTypes.Date,
+    address: SchemaTypes.Mixed,
+    followedService: [SchemaTypes.ObjectId]
 }, {
     timestamps: true
 });
