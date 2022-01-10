@@ -5,4 +5,12 @@ export class JwtPayload{
     email: string;
     firstname: string;
     lastname: string;
+    role: RolesType;
+}
+
+export class JwtEnterprisePayload{
+    username: string;
+    email: string;
+    phone: number;
+    role: RolesType;
 }

@@ -5,4 +5,5 @@ export class UserPrincipal{
     email: string;
     firstname: string;
     lastname: string;
+    role: RolesType;
 }

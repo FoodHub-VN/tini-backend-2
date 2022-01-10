@@ -6,6 +6,7 @@ import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { DatabaseModule } from "./database/database.module";
 import { ConfigModule } from "@nestjs/config";
+import { EnterpriseModule } from './enterprise/enterprise.module';
 
 @Module({
     imports: [
@@ -15,7 +16,8 @@ import { ConfigModule } from "@nestjs/config";
         DatabaseModule,
         ConfigModule.forRoot({
             ignoreEnvFile: true
-        })
+        }),
+        EnterpriseModule
     ],
     controllers: [AppController],
     providers: [AppService],
