@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {AuthenticatedRequest} from "../interface/authenticated-request.interface";
 import {RolesType} from "../../shared/roles-type.enum";
 import {HAS_ROLE} from "../auth.constants";
+import { UserPrincipal } from "../interface/user-principal";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -15,7 +16,7 @@ export class RolesGuard implements CanActivate {
         if (!roles || roles.length == 0) {
             return true;
         }
-        const {user} = context.switchToHttp().getRequest() as AuthenticatedRequest;
+        const {user} = context.switchToHttp().getRequest() as AuthenticatedRequest<UserPrincipal>;
         // return user.roles && user.roles.some((role) => roles.includes(role));
         return true;
     }

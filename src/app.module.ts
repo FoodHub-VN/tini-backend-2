@@ -7,6 +7,11 @@ import { UserModule } from "./user/user.module";
 import { DatabaseModule } from "./database/database.module";
 import { ConfigModule } from "@nestjs/config";
 import { EnterpriseModule } from './enterprise/enterprise.module';
+import { BServiceModule } from './b-service/b-service.module';
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
+import { NestjsFormDataModule } from "nestjs-form-data";
+import { UploadModule } from './upload/upload.module';
 
 @Module({
     imports: [
@@ -17,7 +22,9 @@ import { EnterpriseModule } from './enterprise/enterprise.module';
         ConfigModule.forRoot({
             ignoreEnvFile: true
         }),
-        EnterpriseModule
+        EnterpriseModule,
+        BServiceModule,
+        UploadModule
     ],
     controllers: [AppController],
     providers: [AppService],

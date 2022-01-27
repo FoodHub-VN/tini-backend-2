@@ -18,10 +18,7 @@ export class JwtEnterpriseStrategy extends PassportStrategy(Strategy, "jwt-enter
 
   validate(payload: JwtEnterprisePayload): EnterprisePrincipal {
     return {
-      username: payload.username,
-      email: payload.email,
-      phone: payload.phone,
-      role: payload.role
+      ...payload
     } as EnterprisePrincipal;
   }
 }

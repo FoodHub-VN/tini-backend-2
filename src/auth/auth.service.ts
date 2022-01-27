@@ -28,10 +28,11 @@ export class AuthService {
             map(m => {
               if (m) {
                                 return {
-                                    username: user.username,
-                                    email: user.email,
-                                    firstname: user.firstname,
-                                    lastname: user.lastname,
+                                  username: user.username,
+                                  email: user.email,
+                                  id: user._id,
+                                  firstname: user.firstname,
+                                  lastname: user.lastname,
                                   role: RolesType.CUSTOMER
                                 } as UserPrincipal;
               } else {
@@ -57,6 +58,7 @@ export class AuthService {
                 return {
                   username: ep.username,
                   email: ep.email,
+                  id: ep._id,
                   phone: ep.phone,
                   role: RolesType.PROVIDER
                 } as EnterprisePrincipal;

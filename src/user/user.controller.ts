@@ -22,6 +22,7 @@ import {UpdateProfileDto} from "./dto/update.dto";
 import {HasRole} from "../auth/guard/has-role.decorator";
 import {RolesType} from "../shared/roles-type.enum";
 import {RolesGuard} from "../auth/guard/roles.guard";
+import { UserPrincipal } from "../auth/interface/user-principal";
 
 @Controller({path:"user"})
 export class UserController {
@@ -64,7 +65,7 @@ export class UserController {
     @Get('/profile')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @HasRole([RolesType.ADMIN])
-    profile(@Req() req: AuthenticatedRequest, @Res() res: Response): Observable<Response> {
+    profile(@Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response): Observable<Response> {
         return this.userService.findUserByName(req.user.username).pipe(
             map(user => {
                 if (user) {
@@ -86,7 +87,7 @@ export class UserController {
 
     @Put("/update")
     @UseGuards(JwtAuthGuard)
-    update(@Req() req: AuthenticatedRequest, @Res() res: Response, @Body() body: UpdateProfileDto):Observable<Response>{
+    update(@Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response, @Body() body: UpdateProfileDto):Observable<Response>{
         return this.userService.updateProfile(req.user.username,body).pipe(
             map(user=>{
                 if(user){
