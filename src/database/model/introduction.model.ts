@@ -1,7 +1,7 @@
-import { Document, Model, Schema, SchemaTypes } from "mongoose";
+import { Document, Model, Schema, SchemaTypes, Types } from "mongoose";
 
 interface Introduction extends Document {
-  readonly service: string;
+  readonly service: Types.ObjectId;
   readonly content: string;
 }
 

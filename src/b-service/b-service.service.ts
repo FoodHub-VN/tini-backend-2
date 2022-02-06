@@ -1,25 +1,20 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  NotAcceptableException,
-  NotFoundException,
-  Scope
-} from "@nestjs/common";
-import { SERVICE_MODEL } from "../database/database.constants";
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
+import { INTRODUCTION_MODEL, SERVICE_MODEL } from "../database/database.constants";
 import { Service, ServiceModel } from "../database/model/service.model";
 import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
 import { EnterPriseNewServiceDataDto } from "../enterprise/dto/enterprise-new-service.dto";
-import { from, map, mergeMap, Observable, of } from "rxjs";
-import { ModifyServiceDto } from "./dto/ModifyService.dto";
-import { Schema, Types } from "mongoose";
+import { catchError, from, mergeMap, Observable } from "rxjs";
+import { Types } from "mongoose";
+import { IntroductionModel } from "../database/model/introduction.model";
+import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
   constructor(
     @Inject(SERVICE_MODEL) private serviceModel: ServiceModel,
+    @Inject(INTRODUCTION_MODEL) private introductionModel: IntroductionModel,
     @Inject(REQUEST) private req: AuthenticatedRequest<EnterprisePrincipal>
   ) {
   }
@@ -38,30 +33,42 @@ export class BServiceService {
     // return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id }));
   }
 
-  modifyService(data: ModifyServiceDto, serviceId: string): Observable<Service> {
-
-    const {serviceId: _serviceId, ..._data} = data;
-      return from(this.serviceModel.findOneAndUpdate({_id: Types.ObjectId(serviceId)}, {...data}).exec()).pipe(
-        mergeMap((service)=>{
-          if(!service){
-            throw new NotFoundException("Serivce not found");
-          }
-          else{
-            return from(this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}));
-          }
-        })
-      )
+  modifyService(data: EnterPriseNewServiceDataDto, serviceId: string): Observable<Service> {
+    if (!Types.ObjectId.isValid(serviceId)) {
+      throw new NotFoundException("Service not found");
+    }
+    return from(this.serviceModel.findOneAndUpdate({ _id: Types.ObjectId(serviceId) }, { ...data }).exec()).pipe(
+      mergeMap((service) => {
+        if (!service) {
+          throw new NotFoundException("Service not found");
+        } else {
+          return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec());
+        }
+      }),
+      catchError((err) => {
+        throw new BadRequestException("Fail");
+      })
+    );
   }
 
-  isEnterpriseContainService(enterprise: string, service: string): Observable<boolean> {
-    return from(this.serviceModel.findOne({ $or: [{ _id: service }] }).exec()).pipe(
-      map(s => {
-        if (s.enterprise == enterprise) {
-          return true;
+  addServiceIntroduce(data: AddServiceIntroduceDto, serviceId: string) {
+    console.log(data)
+    if (!Types.ObjectId.isValid(serviceId)) {
+      throw new NotFoundException("Service not found!");
+    }
+    return from(this.introductionModel.findOne({ service: Types.ObjectId(serviceId) }).exec()).pipe(
+      mergeMap((intro) => {
+        if (!intro) {
+          return from(this.introductionModel.create({ service: Types.ObjectId(serviceId), content: data.content }));
+        } else {
+          return from(this.introductionModel.findOneAndUpdate(
+            { service: Types.ObjectId(serviceId) },
+            { content: data.content },
+            { new: true }).exec());
         }
-        else{
-          return false;
-        }
+      }),
+      catchError((err) => {
+        throw new BadRequestException("Add introduce fail!");
       })
     );
   }

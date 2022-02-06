@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpStatus,
   NotFoundException,
+  Param,
   Post,
   Put,
   Res,
@@ -11,13 +13,14 @@ import {
   UseInterceptors
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Express, Request } from "express";
+import { Express, Request, Response } from "express";
 import { diskStorage } from "multer";
 import { map, Observable } from "rxjs";
 import { BServiceService } from "./b-service.service";
-import { ModifyServiceDto } from "./dto/ModifyService.dto";
+import { EnterPriseNewServiceDataDto } from "../enterprise/dto/enterprise-new-service.dto";
+import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
 
-@Controller({ path: "service", scope: Scope.REQUEST })
+@Controller({ path: ":idService", scope: Scope.REQUEST })
 export class BServiceController {
   constructor(private bSService: BServiceService) {
   }
@@ -37,8 +40,11 @@ export class BServiceController {
 
   @Put("modify-service")
   @UseInterceptors(FileInterceptor("avatar"))
-  modifyService(@Body() data: ModifyServiceDto, @Res() res, @UploadedFile() file): Observable<Response> {
-    return this.bSService.modifyService(data, data.serviceId).pipe(
+  modifyService(@Body() data: EnterPriseNewServiceDataDto,
+                @Res() res,
+                @UploadedFile() file,
+                @Param("idService") idService): Observable<Response> {
+    return this.bSService.modifyService(data, idService).pipe(
       map(service => {
         if (!service) {
           throw new NotFoundException(`Not Found service ${data.name}`);
@@ -46,6 +52,20 @@ export class BServiceController {
           return res.status(HttpStatus.OK).send({
             service: service
           });
+        }
+      })
+    );
+  }
+
+  @Post("addIntroduce")
+  addServiceIntroduce(@Body() data: AddServiceIntroduceDto, @Param("idService") idService, @Res() res):Observable<Response> {
+    return this.bSService.addServiceIntroduce(data, idService).pipe(
+      map((intro)=>{
+        if(intro){
+          return res.status(HttpStatus.OK).send({intro: intro});
+        }
+        else{
+          throw new BadRequestException("Cannot create introduction");
         }
       })
     );
