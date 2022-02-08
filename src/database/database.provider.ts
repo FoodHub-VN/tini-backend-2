@@ -46,63 +46,63 @@ export const dbProviders = [
     {
         provide: COMMENT_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<CommentModel>("CommentModel", CommentSchema, "comments");
+            return conn.model<CommentModel>("Comment", CommentSchema, "comments");
         },
         inject: [DB_CONNECTION]
     },
     {
         provide: ENTERPRISE_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<EnterpriseModel>("EnterpriseModel", EnterpriseSchema, "enterprises");
+            return conn.model<EnterpriseModel>("Enterprise", EnterpriseSchema, "enterprises");
         },
         inject: [DB_CONNECTION]
     },
     {
         provide: INTRODUCTION_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<IntroductionModel>("IntroductionModel", IntroductionSchema, "introductions");
+            return conn.model<IntroductionModel>("Introduction", IntroductionSchema, "introductions");
         },
         inject: [DB_CONNECTION]
     },
     {
         provide: NOTIFICATION_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<NotificationModel>("NotificationModel", NotificationSchema, "notidications");
+            return conn.model<NotificationModel>("Notification", NotificationSchema, "notidications");
         },
         inject: [DB_CONNECTION]
     },
     {
         provide: PREMIUM_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<PremiumModel>("PremiumModel", PremiumSchema, "premiums");
+            return conn.model<PremiumModel>("Premium", PremiumSchema, "premiums");
         },
         inject: [DB_CONNECTION]
     },
     {
         provide: PURCHASE_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<PurchaseModel>("PurchaseModel", PurchaseSchema, "purchaseds");
+            return conn.model<PurchaseModel>("Purchase", PurchaseSchema, "purchaseds");
         },
         inject: [DB_CONNECTION]
     },
     {
         provide: SCHEDULE_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<ScheduleModel>("ScheduleModel", ScheduleSchema, "schedules");
+            return conn.model<ScheduleModel>("Schedule", ScheduleSchema, "schedules");
         },
         inject: [DB_CONNECTION]
     },
     {
         provide: SCHEDULE_HISTORY_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<ScheduleHistoryModel>("ScheduleHistoryModel", ScheduleHistorySchema, "schedule_historys");
+            return conn.model<ScheduleHistoryModel>("ScheduleHistory", ScheduleHistorySchema, "schedule_historys");
         },
         inject: [DB_CONNECTION]
     },
     {
         provide: SERVICE_MODEL,
         useFactory: (conn: Connection)=>{
-            return conn.model<ServiceModel>("ServiceModel", ServiceSchema, "services");
+            return conn.model<ServiceModel>("Service", ServiceSchema, "services");
         },
         inject: [DB_CONNECTION]
     }

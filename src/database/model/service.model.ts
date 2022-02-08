@@ -1,5 +1,8 @@
 import { Document, Model, Schema, SchemaTypes } from "mongoose";
 import { Address } from "./user.model";
+import { Inject } from "@nestjs/common";
+import { INTRODUCTION_MODEL } from "../database.constants";
+import { Introduction, IntroductionModel } from "./introduction.model";
 
 interface Service extends Document {
   readonly name: string;
@@ -23,7 +26,7 @@ type ServiceModel = Model<Service>;
 const ServiceSchema = new Schema<Service>({
   name: SchemaTypes.String,
   avatar: SchemaTypes.String,
-  enterprise: SchemaTypes.ObjectId,
+  enterprise: {type: SchemaTypes.ObjectId, ref: 'Enterprise' },
   address: SchemaTypes.Mixed,
   email: SchemaTypes.String,
   phone: SchemaTypes.Number,
@@ -37,4 +40,19 @@ const ServiceSchema = new Schema<Service>({
   textCmtCount: SchemaTypes.Number
 }, { timestamps: true });
 
+async function preDeleteHook(next) {
+  // const conn = this.mongooseCollection.conn;
+  // const introModel = conn.models['Introduction'];
+  console.log(this.model);
+  next();
+  // introModel.find({service: }).exec().then((res)=>{
+  //   console.log(res);
+  // })
+}
+
+ServiceSchema.pre<Service>('remove',async function(next) {
+  const intro = await this.model<IntroductionModel>("Introduction").findOne({ service: this._id }).exec();
+  await intro.remove();
+  return next();
+});
 export { Service, ServiceSchema, ServiceModel };

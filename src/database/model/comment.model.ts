@@ -14,14 +14,14 @@ interface Comment extends Document {
 type CommentModel = Model<Comment>;
 
 const CommentSchema = new Schema<Comment>({
-  user: SchemaTypes.ObjectId,
-  service: SchemaTypes.ObjectId,
+  user: { type: SchemaTypes.ObjectId, ref: "User" },
+  service: { type: SchemaTypes.ObjectId, ref: "Service" },
   rating: SchemaTypes.Number,
   content: SchemaTypes.String,
   title: SchemaTypes.String,
   image: SchemaTypes.String,
   numOfLike: SchemaTypes.Number,
-  userLiked: [SchemaTypes.ObjectId]
+  userLiked: [{ type: SchemaTypes.ObjectId, ref: "User" }]
 }, {timestamps: true});
 
 export { Comment, CommentModel, CommentSchema };

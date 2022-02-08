@@ -10,10 +10,10 @@ interface Purchase extends Document {
 type PurchaseModel = Model<Purchase>;
 
 const PurchaseSchema = new Schema({
-  user: SchemaTypes.ObjectId,
-  enterprise: SchemaTypes.ObjectId,
+  user: { type: SchemaTypes.ObjectId, ref: "User" },
+  enterprise: { type: SchemaTypes.ObjectId, ref: "Enterprise" },
   date: SchemaTypes.Date,
-  premium: SchemaTypes.ObjectId
+  premium: { type: SchemaTypes.ObjectId, ref: "Premium" },
 }, { timestamps: true });
 
 export { Purchase, PurchaseModel, PurchaseSchema };

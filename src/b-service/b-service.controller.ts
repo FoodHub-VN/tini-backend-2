@@ -15,10 +15,11 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express, Request, Response } from "express";
 import { diskStorage } from "multer";
-import { map, Observable } from "rxjs";
+import { catchError, from, map, Observable, of } from "rxjs";
 import { BServiceService } from "./b-service.service";
 import { EnterPriseNewServiceDataDto } from "../enterprise/dto/enterprise-new-service.dto";
 import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
+import { AddServiceOpenTimeDto } from "./dto/AddServiceOpenTime.dto";
 
 @Controller({ path: ":idService", scope: Scope.REQUEST })
 export class BServiceController {
@@ -57,17 +58,46 @@ export class BServiceController {
     );
   }
 
-  @Post("addIntroduce")
-  addServiceIntroduce(@Body() data: AddServiceIntroduceDto, @Param("idService") idService, @Res() res):Observable<Response> {
+  @Post("add-introduce")
+  addServiceIntroduce(@Body() data: AddServiceIntroduceDto,
+                      @Param("idService") idService,
+                      @Res() res):Observable<Response> {
     return this.bSService.addServiceIntroduce(data, idService).pipe(
-      map((intro)=>{
-        if(intro){
-          return res.status(HttpStatus.OK).send({intro: intro});
-        }
-        else{
+      map((intro) => {
+        if (intro) {
+          return res.status(HttpStatus.OK).send({ intro: intro });
+        } else {
           throw new BadRequestException("Cannot create introduction");
         }
       })
     );
   }
+
+  @Post("add-opentime")
+  addServiceOpenTime(@Body() data: AddServiceOpenTimeDto,
+                     @Res() res,
+                     @Param("idService") idService): Observable<Response> {
+    return this.bSService.addServiceOpenTime(data, idService).pipe(
+      map((service)=>{
+        if(!service){
+          throw new NotFoundException("Service not found!");
+        }
+        else{
+          return res.status(HttpStatus.OK).send({ service: service});
+        }
+      })
+    )
+  }
+  @Post('delete')
+  deleteService(@Res() res, @Param('idService') idService): Observable<Response> {
+    return this.bSService.deleteService(idService).pipe(
+      map((service)=>{
+        if(!service){
+          throw new NotFoundException("Service not found");
+        }
+        return res.status(HttpStatus.OK).send({ service: service})
+      })
+    )
+  }
+
 }

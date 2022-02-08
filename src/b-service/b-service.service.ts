@@ -5,10 +5,11 @@ import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
 import { EnterPriseNewServiceDataDto } from "../enterprise/dto/enterprise-new-service.dto";
-import { catchError, from, mergeMap, Observable } from "rxjs";
+import { catchError, from, map, mergeMap, Observable, of } from "rxjs";
 import { Types } from "mongoose";
 import { IntroductionModel } from "../database/model/introduction.model";
 import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
+import { AddServiceOpenTimeDto } from "./dto/AddServiceOpenTime.dto";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
@@ -51,8 +52,7 @@ export class BServiceService {
     );
   }
 
-  addServiceIntroduce(data: AddServiceIntroduceDto, serviceId: string) {
-    console.log(data)
+  addServiceIntroduce(data: AddServiceIntroduceDto, serviceId: string): Observable<any> {
     if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found!");
     }
@@ -69,6 +69,32 @@ export class BServiceService {
       }),
       catchError((err) => {
         throw new BadRequestException("Add introduce fail!");
+      })
+    );
+  }
+
+  addServiceOpenTime(data: AddServiceOpenTimeDto, serviceId: string): Observable<Service>{
+    if(!Types.ObjectId.isValid(serviceId)){
+      throw new NotFoundException("Service not found!");
+    }
+
+    return from(this.serviceModel.findOneAndUpdate(
+      {_id: Types.ObjectId(serviceId)},
+      {openTime: data.openTime, closeTime: data.closeTime}).exec());
+  }
+
+  deleteService(serviceId: string){
+    if(!Types.ObjectId.isValid(serviceId)){
+      throw new NotFoundException("Service not found!");
+    }
+
+    return from(this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec()).pipe(
+      map(service=>{
+        if(!service) throw new NotFoundException("Service not found!");
+        return service;
+      }),
+      mergeMap((service)=>{
+        return from(service.remove())
       })
     );
   }

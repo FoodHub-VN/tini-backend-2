@@ -10,8 +10,8 @@ interface ScheduleHistory extends Document {
 type ScheduleHistoryModel = Model<ScheduleHistory>;
 
 const ScheduleHistorySchema = new Schema({
-  user: SchemaTypes.ObjectId,
-  service: SchemaTypes.ObjectId,
+  user: { type: SchemaTypes.ObjectId, ref: "User" },
+  service: { type: SchemaTypes.ObjectId, ref: "Service" },
   date: SchemaTypes.Date,
   hasRating: SchemaTypes.Boolean
 }, { timestamps: true });

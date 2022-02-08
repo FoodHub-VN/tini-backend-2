@@ -51,6 +51,11 @@ async function preSaveHook(next) {
     next();
 }
 
+async function preDeleteHook(next) {
+    // this.model('')
+    next();
+}
+
 UserSchema.pre<User>('save', preSaveHook);
 
 function comparePasswordMethod(password: string): Observable<boolean> {

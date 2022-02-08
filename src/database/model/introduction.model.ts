@@ -8,7 +8,7 @@ interface Introduction extends Document {
 type IntroductionModel = Model<Introduction>;
 
 const IntroductionSchema = new Schema({
-  service: SchemaTypes.ObjectId,
+  service: { type: SchemaTypes.ObjectId, ref: "Service" },
   content: SchemaTypes.String
 }, { timestamps: true });
 
