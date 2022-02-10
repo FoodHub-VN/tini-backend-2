@@ -1,8 +1,11 @@
 import { Document, Model, Schema, SchemaTypes } from "mongoose";
 import { Address } from "./user.model";
-import { Inject } from "@nestjs/common";
-import { INTRODUCTION_MODEL } from "../database.constants";
 import { Introduction, IntroductionModel } from "./introduction.model";
+import { CommentModel } from "./comment.model";
+import { NotificationModel } from "./notification.model";
+import { ScheduleHistoryModel } from "./schedule-history.model";
+import { PurchaseModel } from "./purchase-history.model";
+import { ScheduleModel } from "./schedule";
 
 interface Service extends Document {
   readonly name: string;
@@ -40,19 +43,46 @@ const ServiceSchema = new Schema<Service>({
   textCmtCount: SchemaTypes.Number
 }, { timestamps: true });
 
-async function preDeleteHook(next) {
-  // const conn = this.mongooseCollection.conn;
-  // const introModel = conn.models['Introduction'];
-  console.log(this.model);
-  next();
-  // introModel.find({service: }).exec().then((res)=>{
-  //   console.log(res);
-  // })
-}
 
-ServiceSchema.pre<Service>('remove',async function(next) {
+ServiceSchema.post<Service>("remove", async function(service) {
+
+  //delete introduction
   const intro = await this.model<IntroductionModel>("Introduction").findOne({ service: this._id }).exec();
   await intro.remove();
-  return next();
+
+  //delete comment
+  const comments = await this.model<CommentModel>("Comment").find({ service: this._id }).exec();
+  await Promise.all(comments.map((comment) => {
+    return comment.remove();
+  }));
+
+  //delete notification
+
+  const notifications = await this.model<NotificationModel>("Notification").find({ service: this._id }).exec();
+  await Promise.all(notifications.map((noti) => {
+    return noti.remove();
+  }));
+
+  //delete order history
+  const scheduleHistories = await this.model<ScheduleHistoryModel>("ScheduleHistory").find({ service: this._id }).exec();
+  await Promise.all(scheduleHistories.map((schedule) => {
+    return schedule.remove();
+  }));
+
+
+  //delete premium
+  const premiumHistory = await this.model<PurchaseModel>("Purchase").find({ service: this._id }).exec();
+  await Promise.all(premiumHistory.map((purchase) => {
+    return purchase.remove();
+  }));
+
+  //delete schedule
+  const schedules = await this.model<ScheduleModel>("Schedule").find({ service: this._id }).exec();
+  await Promise.all(schedules.map((schedule) => {
+    return schedule.remove();
+  }));
+
+  return;
 });
+
 export { Service, ServiceSchema, ServiceModel };

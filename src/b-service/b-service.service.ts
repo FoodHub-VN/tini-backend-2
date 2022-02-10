@@ -5,7 +5,7 @@ import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
 import { EnterPriseNewServiceDataDto } from "../enterprise/dto/enterprise-new-service.dto";
-import { catchError, from, map, mergeMap, Observable, of } from "rxjs";
+import { catchError, from, map, mergeMap, Observable } from "rxjs";
 import { Types } from "mongoose";
 import { IntroductionModel } from "../database/model/introduction.model";
 import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
