@@ -106,26 +106,5 @@ export class EnterpriseController {
 
   //endregion create new service
 
-  //region modify service
-  @Post("/modify-service")
-  @UseInterceptors(FileInterceptor("avatar", {
-    storage: diskStorage({
-      destination: "./upload",
-      filename: (req: Request, file: Express.Multer.File, callback): any => {
-        callback(null, file.originalname);
-      }
-    })
-  }))
-  // @FormDataRequest()
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: "New service from enterprise",
-    type: EnterPriseNewServiceDataDto
-  })
-  modifyService(@Body() data: EnterPriseNewServiceDataDto, @Res() res: Response, @UploadedFile() file: Express.Multer.File):Observable<Response>{
-    console.log(data);
-    return of(res.status(HttpStatus.OK).send());
-  }
 
-  //endregion modify service
 }

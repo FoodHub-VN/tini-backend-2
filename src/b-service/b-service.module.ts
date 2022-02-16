@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
-import { BServiceService } from './b-service.service';
-import { BServiceController } from './b-service.controller';
+import { Module } from "@nestjs/common";
+import { BServiceService } from "./b-service.service";
+import { BServiceController } from "./b-service.controller";
 import { DatabaseModule } from "../database/database.module";
 
 @Module({
@@ -9,4 +9,5 @@ import { DatabaseModule } from "../database/database.module";
   imports: [DatabaseModule],
   exports: [BServiceService]
 })
-export class BServiceModule {}
+export class BServiceModule {
+}

@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
-import { INTRODUCTION_MODEL, SERVICE_MODEL } from "../database/database.constants";
+import { INTRODUCTION_MODEL, SCHEDULE_MODEL, SERVICE_MODEL } from "../database/database.constants";
 import { Service, ServiceModel } from "../database/model/service.model";
 import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
@@ -10,13 +10,15 @@ import { Types } from "mongoose";
 import { IntroductionModel } from "../database/model/introduction.model";
 import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
 import { AddServiceOpenTimeDto } from "./dto/AddServiceOpenTime.dto";
+import { Schedule, ScheduleModel } from "../database/model/schedule";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
   constructor(
     @Inject(SERVICE_MODEL) private serviceModel: ServiceModel,
     @Inject(INTRODUCTION_MODEL) private introductionModel: IntroductionModel,
-    @Inject(REQUEST) private req: AuthenticatedRequest<EnterprisePrincipal>
+    @Inject(REQUEST) private req: AuthenticatedRequest<EnterprisePrincipal>,
+    @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel
   ) {
   }
 
@@ -45,9 +47,6 @@ export class BServiceService {
         } else {
           return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec());
         }
-      }),
-      catchError((err) => {
-        throw new BadRequestException("Fail");
       })
     );
   }
@@ -83,7 +82,7 @@ export class BServiceService {
       {openTime: data.openTime, closeTime: data.closeTime}).exec());
   }
 
-  deleteService(serviceId: string){
+  deleteService(serviceId: string): Observable<Service>{
     if(!Types.ObjectId.isValid(serviceId)){
       throw new NotFoundException("Service not found!");
     }
@@ -97,5 +96,12 @@ export class BServiceService {
         return from(service.remove())
       })
     );
+  }
+
+  getAllSchedule(serviceId: string): Observable<Schedule[]>{
+    if(!Types.ObjectId.isValid(serviceId)){
+      throw new NotFoundException("Service not found!");
+    }
+    return from(this.scheduleModel.find({service: Types.ObjectId(serviceId)}).exec());
   }
 }

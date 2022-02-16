@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpStatus,
   NotFoundException,
   Param,
@@ -9,18 +10,22 @@ import {
   Put,
   Res,
   Scope,
-  UploadedFile,
+  UploadedFile, UseGuards,
   UseInterceptors
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express, Request, Response } from "express";
 import { diskStorage } from "multer";
-import { map, Observable } from "rxjs";
+import { map, Observable, of } from "rxjs";
 import { BServiceService } from "./b-service.service";
 import { EnterPriseNewServiceDataDto } from "../enterprise/dto/enterprise-new-service.dto";
 import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
 import { AddServiceOpenTimeDto } from "./dto/AddServiceOpenTime.dto";
+import { OwnerInterceptor } from "./owner.interceptor";
+import { JwtEnterpriseAuthGuard } from "../auth/guard/jwt-auth.guard";
 
+@UseGuards(JwtEnterpriseAuthGuard)
+@UseInterceptors(OwnerInterceptor)
 @Controller({ path: ":idService", scope: Scope.REQUEST })
 export class BServiceController {
   constructor(private bSService: BServiceService) {
@@ -89,15 +94,23 @@ export class BServiceController {
     )
   }
   @Post('delete')
-  deleteService(@Res() res, @Param('idService') idService): Observable<Response> {
+  deleteService(@Res() res, @Param("idService") idService): Observable<Response> {
     return this.bSService.deleteService(idService).pipe(
-      map((service)=>{
-        if(!service){
+      map((service) => {
+        if (!service) {
           throw new NotFoundException("Service not found");
         }
-        return res.status(HttpStatus.OK).send({ service: service})
+        return res.status(HttpStatus.OK).send({ service: service });
       })
-    )
+    );
   }
 
+  @Get("schedules")
+  getAllSchedule(@Res() res, @Param("idService") idService): Observable<Response> {
+    return this.bSService.getAllSchedule(idService).pipe(
+      map((schedules) => {
+        return res.status(HttpStatus.OK).send({ schedules: schedules });
+      })
+    );
+  }
 }

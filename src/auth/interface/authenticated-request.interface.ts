@@ -1,5 +1,4 @@
-import { EnterprisePrincipal } from "./enterprise-principal";
-import {UserPrincipal} from "./user-principal";
+import { Request } from "express";
 
 export interface AuthenticatedRequest<T> extends Request{
     user?: T;
