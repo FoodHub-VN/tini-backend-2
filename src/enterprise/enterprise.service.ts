@@ -40,4 +40,8 @@ export class EnterpriseService {
     // return from(this.serviceModel.create({...data}));
     return this.bService.createService(data);
   }
+
+  getInfo(): Observable<Enterprise>{
+    return from(this.enterpriseModel.findOne({_id: this.req.user.id}).exec());
+  }
 }

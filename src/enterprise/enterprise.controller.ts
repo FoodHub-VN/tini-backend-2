@@ -1,16 +1,20 @@
 import {
-  BadRequestException,
   Body,
   ConflictException,
   Controller,
-  HttpStatus, Inject,
-  Post, Put,
+  Get,
+  HttpStatus,
+  Inject,
+  NotFoundException,
+  Post,
   Res,
-  Scope, UploadedFile,
-  UseGuards, UseInterceptors, UsePipes
+  Scope,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors
 } from "@nestjs/common";
 import { EnterpriseService } from "./enterprise.service";
-import { catchError, from, map, mergeMap, Observable, of } from "rxjs";
+import { catchError, map, mergeMap, Observable } from "rxjs";
 import { Express, Request, Response } from "express";
 import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
 import { EnterPriseNewServiceDataDto } from "./dto/enterprise-new-service.dto";
@@ -21,8 +25,6 @@ import { AuthenticatedRequest } from "../auth/interface/authenticated-request.in
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
-import { FormDataRequest } from "nestjs-form-data";
-import { ValidationPipe } from "./validator/validator";
 import { ApiBody, ApiConsumes } from "@nestjs/swagger";
 import { ApiImplicitFile } from "@nestjs/swagger/dist/decorators/api-implicit-file.decorator";
 
@@ -96,7 +98,7 @@ export class EnterpriseController {
     return this.enterpriseService.createNewService(data).pipe(
       map(service => {
         console.log(service)
-        return res.status(HttpStatus.OK).send({service: service});
+        return res.status(HttpStatus.OK).send({ service: service });
       }),
       catchError((err) => {
         throw err;
@@ -106,5 +108,20 @@ export class EnterpriseController {
 
   //endregion create new service
 
+
+  // enterprise info
+
+  @Get("")
+  getInfo(@Res() res): Observable<Response> {
+    return this.enterpriseService.getInfo().pipe(
+      map((e) => {
+        if (!e) {
+          throw new NotFoundException("Enterprise not found");
+        } else {
+          return res.status(HttpStatus.OK).send({ enterprise: e });
+        }
+      })
+    );
+  }
 
 }

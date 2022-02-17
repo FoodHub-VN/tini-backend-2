@@ -1,16 +1,16 @@
 import {
+  BadRequestException,
+  CallHandler,
+  ConflictException,
+  ExecutionContext,
+  Inject,
   Injectable,
   NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  UnauthorizedException,
-  Inject, ConflictException
+  UnauthorizedException
 } from "@nestjs/common";
-import { from, map, mergeMap, Observable } from "rxjs";
-import { tap } from 'rxjs/operators';
-import { AuthenticatedRequest } from 'src/auth/interface/authenticated-request.interface';
-import { EnterprisePrincipal } from 'src/auth/interface/enterprise-principal';
-import { Request } from "express";
+import { from, mergeMap, Observable } from "rxjs";
+import { AuthenticatedRequest } from "src/auth/interface/authenticated-request.interface";
+import { EnterprisePrincipal } from "src/auth/interface/enterprise-principal";
 import { Types } from "mongoose";
 import { ServiceModel } from "../database/model/service.model";
 import { ENTERPRISE_MODEL, SERVICE_MODEL } from "src/database/database.constants";
@@ -27,7 +27,10 @@ export class OwnerInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest<AuthenticatedRequest<EnterprisePrincipal>>();
     let enterprise = req.user.id;
     let service = req.params['idService'];
-    if(!(Types.ObjectId.isValid(enterprise) && Types.ObjectId.isValid(service))){
+    if(!Types.ObjectId.isValid(service)){
+      throw new ConflictException("Enterprise doesn't own Service!");
+    }
+    if(!Types.ObjectId.isValid(enterprise)){
       throw new UnauthorizedException();
     }
     return from(this.enterpriseModel.findOne({_id: Types.ObjectId(enterprise)}).exec()).pipe(

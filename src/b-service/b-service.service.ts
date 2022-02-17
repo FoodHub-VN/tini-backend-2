@@ -104,4 +104,11 @@ export class BServiceService {
     }
     return from(this.scheduleModel.find({service: Types.ObjectId(serviceId)}).exec());
   }
+
+  getInfo(serviceId: string): Observable<Service>{
+    if(!Types.ObjectId.isValid(serviceId)){
+      throw new NotFoundException("Service not found!");
+    }
+    return from(this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec());
+  }
 }
