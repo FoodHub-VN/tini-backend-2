@@ -1,25 +1,86 @@
-import { IsEmail, IsNotEmpty, MaxLength, MinLength } from "class-validator";
+import {
+    IsDateString,
+    IsEmail,
+    IsNotEmpty,
+    IsPhoneNumber,
+    IsString,
+    MaxLength,
+    MinLength,
+    ValidateNested
+} from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { Address } from "../../shared/common.type";
+import { plainToClass, Transform, Type } from "class-transformer";
 
-export class RegisterDto {
+export class UserRegisterDto {
     @IsNotEmpty()
+    @IsString()
+    @ApiProperty({
+        type: String,
+        required: true
+    })
     readonly username: string;
 
     @IsNotEmpty()
+    @IsString()
     @IsEmail()
-    //@Matches(/^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i)
+    @ApiProperty({
+        type: String,
+        required: true
+    })
     readonly email: string;
 
     @IsNotEmpty()
+    @IsString()
+    @ApiProperty({
+        type: String,
+        required: true
+    })
     @MinLength(8, { message: " The min length of password is 8 " })
     @MaxLength(20, { message: " The password can't accept more than 20 characters " })
-    // @Matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,20}$/,
-    //     { message: " A password at least contains one numeric digit, one supercase char and one lowercase char" }
-    // )
     readonly password: string;
 
     @IsNotEmpty()
-    readonly firstname?: string;
+    @IsString()
+    @ApiProperty({
+        type: String,
+        required: true
+    })
+    readonly firstname: string;
 
     @IsNotEmpty()
-    readonly lastname?: string;
+    @IsString()
+    @ApiProperty({
+        type: String,
+        required: true
+    })
+    readonly lastname: string;
+
+    @IsNotEmpty()
+    @IsPhoneNumber("VI")
+    @ApiProperty({
+        type: Number,
+        required: true
+    })
+    readonly phone: number;
+
+    @IsNotEmpty()
+    @IsDateString()
+    @ApiProperty({
+        type: Date,
+        required: true
+    })
+    readonly birthday: Date;
+
+    @ValidateNested()
+    @IsNotEmpty()
+    @ApiProperty({
+        type: Address,
+        required: true
+    })
+    @Transform(({ value }) => {
+        return plainToClass(Address, JSON.parse(value))
+    })
+    @Type(() => Address)
+    readonly address: Address;
 }

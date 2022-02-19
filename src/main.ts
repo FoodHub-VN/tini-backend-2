@@ -8,7 +8,7 @@ import { join } from "path";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe({transform: true}));
+  app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true}));
   // app.useStaticAssets(join(__dirname, "..", "upload"));
   // add swagger module
   const config = new DocumentBuilder()

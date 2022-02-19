@@ -1,9 +1,68 @@
-import {IsEmail, IsNotEmpty} from "class-validator";
+import {
+    IsDateString,
+    IsEmail,
+    IsNotEmpty, IsOptional,
+    IsPhoneNumber,
+    IsString,
+    MaxLength,
+    MinLength,
+    ValidateNested
+} from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { Address } from "../../shared/common.type";
+import { plainToClass, Transform, Type } from "class-transformer";
 
 export class UpdateProfileDto{
-    @IsNotEmpty()
-    readonly firstname: string;
-    readonly lastname: string;
+    @IsOptional()
+    @IsString()
     @IsEmail()
-    readonly email: string;
+    @ApiProperty({
+        type: String,
+        required: true
+    })
+    readonly email?: string;
+
+    @IsOptional()
+    @IsString()
+    @ApiProperty({
+        type: String,
+        required: true
+    })
+    readonly firstname?: string;
+
+    @IsOptional()
+    @IsString()
+    @ApiProperty({
+        type: String,
+        required: true
+    })
+    readonly lastname?: string;
+
+    @IsOptional()
+    @IsPhoneNumber("VI")
+    @ApiProperty({
+        type: Number,
+        required: true
+    })
+    readonly phone?: number;
+
+    @IsOptional()
+    @IsDateString()
+    @ApiProperty({
+        type: Date,
+        required: true
+    })
+    readonly birthday?: Date;
+
+    @ValidateNested()
+    @IsOptional()
+    @ApiProperty({
+        type: Address,
+        required: true
+    })
+    @Transform(({ value }) => {
+        return plainToClass(Address, JSON.parse(value))
+    })
+    @Type(() => Address)
+    readonly address?: Address;
 }

@@ -2,7 +2,7 @@ import {Inject, Injectable, NotFoundException, Scope} from '@nestjs/common';
 import {USER_MODEL} from "../database/database.constants";
 import {User, UserModel} from "../database/model/user.model";
 import {EMPTY, from, mergeMap, Observable, of, throwIfEmpty} from "rxjs";
-import {RegisterDto} from "./dto/register.dto";
+import {UserRegisterDto} from "./dto/register.dto";
 import {UpdateProfileDto} from "./dto/update.dto";
 
 
@@ -14,10 +14,10 @@ export class UserService {
     }
 
     findUserByName(username: string): Observable<User> {
-        return from(this.userModel.findOne({username}).exec());
+        return from(this.userModel.findOne({username}, null, {lean: true}).exec());
     }
 
-    register(data: RegisterDto): Observable<User> {
+    register(data: UserRegisterDto): Observable<User> {
         return from(this.userModel.create({...data}));
     }
 

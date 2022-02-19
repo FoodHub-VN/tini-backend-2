@@ -124,4 +124,17 @@ export class EnterpriseController {
     );
   }
 
+  @Get("all-services")
+  getAllService(@Res() res: Response): Observable<Response> {
+    return this.enterpriseService.getAllService().pipe(
+      map((services) => {
+        if (!services) {
+          throw new NotFoundException();
+        } else {
+          return res.status(HttpStatus.OK).send({ services: services });
+        }
+      })
+    );
+  }
+
 }

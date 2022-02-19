@@ -1,7 +1,7 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
 import { ENTERPRISE_MODEL, SERVICE_MODEL } from "../database/database.constants";
 import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
-import { from, map, Observable } from "rxjs";
+import { from, Observable } from "rxjs";
 import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
 import { EnterPriseNewServiceDataDto } from "./dto/enterprise-new-service.dto";
 import { Service, ServiceModel } from "../database/model/service.model";
@@ -36,12 +36,16 @@ export class EnterpriseService {
     return from(this.enterpriseModel.create({ ...data }));
   }
 
-  createNewService(data: EnterPriseNewServiceDataDto): Observable<any>{
+  createNewService(data: EnterPriseNewServiceDataDto): Observable<any> {
     // return from(this.serviceModel.create({...data}));
     return this.bService.createService(data);
   }
 
-  getInfo(): Observable<Enterprise>{
-    return from(this.enterpriseModel.findOne({_id: this.req.user.id}).exec());
+  getInfo(): Observable<Enterprise> {
+    return from(this.enterpriseModel.findOne({ _id: this.req.user.id }).exec());
+  }
+
+  getAllService(): Observable<Service[]> {
+    return from(this.serviceModel.find({ enterprise: this.req.user.id }).exec());
   }
 }
