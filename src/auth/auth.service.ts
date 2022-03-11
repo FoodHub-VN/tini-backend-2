@@ -1,13 +1,14 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { UserPrincipal } from "./interface/user-principal";
-import { from, map, mergeMap, Observable } from "rxjs";
+import { from, map, mergeMap, Observable, of } from "rxjs";
 import { JwtService } from "@nestjs/jwt";
-import { JwtEnterprisePayload, JwtPayload } from "./interface/jwt-payload.interface";
+import { JwtAdminPayload, JwtEnterprisePayload, JwtPayload } from "./interface/jwt-payload.interface";
 import { UserService } from "../user/user.service";
 import { AccessToken } from "./interface/access-token.interface";
 import { EnterprisePrincipal } from "./interface/enterprise-principal";
 import { EnterpriseService } from "../enterprise/enterprise.service";
 import { RolesType } from "../shared/roles-type.enum";
+import { AdminPrincipal } from "./interface/admin-principal";
 
 @Injectable()
 export class AuthService {
@@ -72,6 +73,17 @@ export class AuthService {
     );
   }
 
+  validateAdmin(username: string, password: string): Observable<AdminPrincipal> {
+    if (username == "longhuynh" && password == "longhuynh") {
+      return of({
+        username: "longhuynh",
+        role: RolesType.ADMIN
+      } as AdminPrincipal);
+    } else {
+      throw new UnauthorizedException("Account not correct");
+    }
+  }
+
   login(user: UserPrincipal): Observable<AccessToken> {
     const payload: JwtPayload = { ...user };
     return from(this.jwtService.signAsync(payload)).pipe(
@@ -83,6 +95,14 @@ export class AuthService {
 
   loginEnterprise(enterprise: EnterprisePrincipal): Observable<AccessToken> {
     const payload: JwtEnterprisePayload = { ...enterprise };
+    return from(this.jwtService.signAsync(payload)).pipe(
+      map((access_token) => {
+        return { accessToken: access_token } as AccessToken;
+      })
+    );
+  }
+  loginAdmin(admin: AdminPrincipal): Observable<AccessToken> {
+    const payload: JwtAdminPayload = { ...admin };
     return from(this.jwtService.signAsync(payload)).pipe(
       map((access_token) => {
         return { accessToken: access_token } as AccessToken;

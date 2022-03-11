@@ -12,6 +12,8 @@ import { PassportModule } from "@nestjs/passport";
 import { EnterpriseModule } from "../enterprise/enterprise.module";
 import { LocalEnterpriseStrategy } from "./strategy/local-enterprise.strategy";
 import { JwtEnterpriseStrategy } from "./strategy/jwt-enterprise.strategy";
+import { LocalAdminStrategy } from "./strategy/local-admin.strategy";
+import { JwtAdminStrategy } from "./strategy/jwt-admin.strategy";
 
 @Module({
     imports: [
@@ -38,7 +40,7 @@ import { JwtEnterpriseStrategy } from "./strategy/jwt-enterprise.strategy";
         EnterpriseModule
     ],
     controllers: [AuthController],
-    providers: [AuthService, LocalStrategy, JwtStrategy, LocalEnterpriseStrategy, JwtEnterpriseStrategy],
+    providers: [AuthService, LocalStrategy, JwtStrategy, LocalEnterpriseStrategy, JwtEnterpriseStrategy, LocalAdminStrategy, JwtAdminStrategy],
     exports: [AuthService]
 })
 export class AuthModule {

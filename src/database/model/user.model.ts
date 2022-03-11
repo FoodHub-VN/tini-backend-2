@@ -41,7 +41,7 @@ const UserSchema = new Schema<User>({
     gender: SchemaTypes.String,
     birthday: SchemaTypes.Date,
     address: SchemaTypes.Mixed,
-    followedService: [SchemaTypes.ObjectId]
+    followedService: [{ type: SchemaTypes.ObjectId, ref: 'Service'}]
 }, {
     timestamps: true
 });
@@ -102,6 +102,7 @@ UserSchema.post<User>("remove", async function(user) {
 function comparePasswordMethod(password: string): Observable<boolean> {
     return from(compare(password, this.password));
 }
+
 
 UserSchema.methods.comparePassword = comparePasswordMethod;
 

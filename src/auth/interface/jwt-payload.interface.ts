@@ -16,3 +16,7 @@ export class JwtEnterprisePayload{
     phone: number;
     role: RolesType;
 }
+export class JwtAdminPayload{
+    username: string;
+    role: RolesType;
+}

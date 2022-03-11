@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
@@ -15,7 +16,7 @@ import {
 import { UserService } from "./user.service";
 import { UserRegisterDto } from "./dto/register.dto";
 import { Response } from "express";
-import { map, mergeMap, Observable } from "rxjs";
+import { catchError, from, map, mergeMap, Observable } from "rxjs";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { UpdateProfileDto } from "./dto/update.dto";
@@ -25,6 +26,9 @@ import { RolesGuard } from "../auth/guard/roles.guard";
 import { UserPrincipal } from "../auth/interface/user-principal";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiConsumes } from "@nestjs/swagger";
+import { AddScheduleDto } from "./dto/add-schedule.dto";
+import { DoneScheduleDto } from "./dto/done-schedule.dto";
+import { AddFavoriteDto } from "./dto/add-favorite.dto";
 
 @Controller({ path: "user" })
 export class UserController {
@@ -98,5 +102,79 @@ export class UserController {
         }
       })
     );
+  }
+
+  @Post("/add-schedule")
+  @UseGuards(JwtAuthGuard)
+  addSchedule(@Body() data: AddScheduleDto, @Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response): Observable<Response> {
+    return from(this.userService.addSchedule(req.user.username, data.serviceId, data.timeServe)).pipe(
+      map((schedule) => {
+        if (schedule) {
+          return res.status(HttpStatus.OK).send({ schedule: schedule });
+        } else {
+          throw new BadRequestException();
+        }
+      })
+    );
+  }
+
+  @Post("/done-schedule")
+  @UseGuards(JwtAuthGuard)
+  doneSchedule(@Body() data: DoneScheduleDto, @Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response): Observable<Response> {
+    return this.userService.doneServiceSchedule(req.user.username, data.serviceId).pipe(
+      map((schedule) => {
+        if (schedule) {
+          return res.status(HttpStatus.OK).send({ schedule: schedule });
+        }
+        throw new BadRequestException();
+      })
+    );
+  }
+
+  @Get("schedules")
+  @UseGuards(JwtAuthGuard)
+  getAllSchedule(@Res() res: Response) {
+    return this.userService.getAllSchedule().pipe(
+      map((schedules) => {
+        return res.status(HttpStatus.OK).send({
+          schedules: schedules
+        });
+      }),
+      catchError((err) => {
+        throw new BadRequestException(err);
+      })
+    );
+  }
+
+  @Post("/add-favorite")
+  @UseGuards(JwtAuthGuard)
+  addServiceToFavorite(@Req() req: AuthenticatedRequest<UserPrincipal>,
+                       @Body() data: AddFavoriteDto, @Res()
+                         res: Response): Observable<Response> {
+    return this.userService.addToFavorite(data.serviceId).pipe(
+      map((service)=>{
+        if(service){
+          return res.status(HttpStatus.OK).send({serviceAdded: service});
+        }
+        else {
+          throw new BadRequestException();
+        }
+      })
+    )
+  }
+
+  @Get('/followed-service')
+  @UseGuards(JwtAuthGuard)
+  getFollowedService(@Res() res: Response): Observable<Response>{
+    return this.userService.getFollowedService().pipe(
+      map((services)=>{
+        if(services){
+          return res.status(HttpStatus.OK).send({services: services});
+        }
+        else{
+          throw new NotFoundException();
+        }
+      })
+    )
   }
 }

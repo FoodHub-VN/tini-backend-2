@@ -48,3 +48,25 @@ export class JwtEnterpriseAuthGuard extends AuthGuard("jwt-enterprise") {
         return user;
     }
 }
+
+@Injectable()
+export class JwtAdminAuthGuard extends AuthGuard("jwt-admin") {
+    constructor(private reflector: Reflector) {
+        super();
+    }
+
+    canActivate(
+      context: ExecutionContext
+    ): boolean | Promise<boolean> | Observable<boolean> {
+        const isPublic: boolean = this.reflector.getAllAndOverride(METADATA.PUBLIC, [context.getHandler(), context.getClass()]);
+        if(isPublic) return true;
+        return super.canActivate(context);
+    }
+
+    handleRequest(err, user) {
+        if (!user || err || user.role != RolesType.ADMIN) {
+            throw new UnauthorizedException();
+        }
+        return user;
+    }
+}

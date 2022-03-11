@@ -2,6 +2,7 @@ import { IsDefined, IsEmail, IsNotEmpty, IsNotEmptyObject, IsPhoneNumber, Valida
 import { ApiProperty } from "@nestjs/swagger";
 import { plainToClass, Transform, Type } from "class-transformer";
 import { Address } from "../../shared/common.type";
+import { Types } from "mongoose";
 
 export class EnterPriseNewServiceDataDto {
   @ApiProperty({
@@ -60,5 +61,12 @@ export class EnterPriseNewServiceDataDto {
   @Type(()=>Address)
 
   readonly address: Address;
+
+  @ApiProperty({
+    type: Types.ObjectId,
+    required: true
+  })
+  @IsNotEmpty()
+  readonly category: string
 }
 

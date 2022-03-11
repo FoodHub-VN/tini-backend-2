@@ -12,6 +12,8 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { NestjsFormDataModule } from "nestjs-form-data";
 import { UploadModule } from './upload/upload.module';
+import { SearchModule } from './search/search.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
     imports: [
@@ -24,7 +26,9 @@ import { UploadModule } from './upload/upload.module';
         }),
         EnterpriseModule,
         BServiceModule,
-        UploadModule
+        UploadModule,
+        SearchModule,
+        AdminModule
     ],
     controllers: [AppController],
     providers: [AppService],

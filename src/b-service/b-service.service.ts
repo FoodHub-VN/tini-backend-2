@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
-import { INTRODUCTION_MODEL, SCHEDULE_MODEL, SERVICE_MODEL } from "../database/database.constants";
+import { CATEGORY_MODEL, INTRODUCTION_MODEL, SCHEDULE_MODEL, SERVICE_MODEL } from "../database/database.constants";
 import { Service, ServiceModel } from "../database/model/service.model";
 import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
@@ -11,6 +11,7 @@ import { IntroductionModel } from "../database/model/introduction.model";
 import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
 import { AddServiceOpenTimeDto } from "./dto/AddServiceOpenTime.dto";
 import { Schedule, ScheduleModel } from "../database/model/schedule";
+import { CategoryModel } from "../database/model/category.model";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
@@ -18,18 +19,32 @@ export class BServiceService {
     @Inject(SERVICE_MODEL) private serviceModel: ServiceModel,
     @Inject(INTRODUCTION_MODEL) private introductionModel: IntroductionModel,
     @Inject(REQUEST) private req: AuthenticatedRequest<EnterprisePrincipal>,
-    @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel
+    @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel,
+    @Inject(CATEGORY_MODEL) private categoryModel: CategoryModel
   ) {
   }
 
   createService(data: EnterPriseNewServiceDataDto): Observable<any> {
+    if(!Types.ObjectId.isValid(data.category)){
+      throw new NotFoundException("Category Not found");
+    }
     return from(this.serviceModel.findOne({ $or: [{ name: data.name }] }).exec()).pipe(
       mergeMap(pre => {
         if (pre) {
           // console.log("Existing service before: ", pre);
           throw new ConflictException("Service is already existing: " + pre.name);
         } else {
-          return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id }));
+          return from(this.categoryModel.findOne({_id: Types.ObjectId(data.category)}).exec()).pipe(
+            mergeMap((category)=>{
+              if(!category){
+                throw new ConflictException("Category not found");
+              }
+              else{
+                return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id }));
+              }
+            })
+          )
+
         }
       })
     );

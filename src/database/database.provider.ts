@@ -1,4 +1,5 @@
 import {
+    CATEGORY_MODEL,
     COMMENT_MODEL,
     DB_CONNECTION,
     ENTERPRISE_MODEL,
@@ -24,6 +25,7 @@ import { PurchaseModel, PurchaseSchema } from "./model/purchase-history.model";
 import { ScheduleModel, ScheduleSchema } from "./model/schedule";
 import { ScheduleHistoryModel, ScheduleHistorySchema } from "./model/schedule-history.model";
 import { ServiceModel, ServiceSchema } from "./model/service.model";
+import { CategorySchema } from "./model/category.model";
 
 export const dbProviders = [
     {
@@ -103,6 +105,13 @@ export const dbProviders = [
         provide: SERVICE_MODEL,
         useFactory: (conn: Connection)=>{
             return conn.model<ServiceModel>("Service", ServiceSchema, "services");
+        },
+        inject: [DB_CONNECTION]
+    },
+    {
+        provide: CATEGORY_MODEL,
+        useFactory: (conn: Connection)=>{
+            return conn.model<ServiceModel>("Category", CategorySchema, "categories");
         },
         inject: [DB_CONNECTION]
     }

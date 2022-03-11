@@ -1,6 +1,6 @@
 import { Controller, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { LocalAuthGuard, LocalEnterpriseAuthGuard } from "./guard/local-auth.guard";
+import { LocalAdminAuthGuard, LocalAuthGuard, LocalEnterpriseAuthGuard } from "./guard/local-auth.guard";
 import { Response } from "express";
 import { map, Observable, of } from "rxjs";
 import { JwtAuthGuard, JwtEnterpriseAuthGuard } from "./guard/jwt-auth.guard";
@@ -28,6 +28,19 @@ export class AuthController {
     @Post("/login-enterprise")
     loginEnterprise(@Req() req: any, @Res() res: Response): Observable<any> {
         return this.authService.loginEnterprise(req.user).pipe(
+          map((token) => {
+              return res
+                .header("Authorization", "Bearer " + token.accessToken)
+                .json(token)
+                .send();
+          })
+        );
+    }
+
+    @UseGuards(LocalAdminAuthGuard)
+    @Post("/login-admin")
+    loginAdmin(@Req() req: any, @Res() res: Response): Observable<any> {
+        return this.authService.loginAdmin(req.user).pipe(
           map((token) => {
               return res
                 .header("Authorization", "Bearer " + token.accessToken)

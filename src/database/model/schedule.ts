@@ -1,7 +1,7 @@
 import { Document, Model, Schema, SchemaTypes, Types } from "mongoose";
 
 interface Schedule extends Document {
-  readonly user: string;
+  readonly user: Types.ObjectId;
   readonly service: Types.ObjectId;
   readonly timeServe: Date;
 }
