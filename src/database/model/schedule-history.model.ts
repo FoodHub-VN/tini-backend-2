@@ -1,8 +1,8 @@
-import { Document, Model, Schema, SchemaTypes } from "mongoose";
+import { Document, Model, Schema, SchemaTypes, Types } from "mongoose";
 
 interface ScheduleHistory extends Document {
-  user: string;
-  service: string;
+  user: Types.ObjectId;
+  service: Types.ObjectId;
   date: Date;
   hasRating: boolean;
 }

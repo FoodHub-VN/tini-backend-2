@@ -1,5 +1,11 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { SCHEDULE_HISTORY_MODEL, SCHEDULE_MODEL, SERVICE_MODEL, USER_MODEL } from "../database/database.constants";
+import {
+  COMMENT_MODEL,
+  SCHEDULE_HISTORY_MODEL,
+  SCHEDULE_MODEL,
+  SERVICE_MODEL,
+  USER_MODEL
+} from "../database/database.constants";
 import { User, UserModel } from "../database/model/user.model";
 import { EMPTY, from, map, mergeMap, Observable, of, throwIfEmpty } from "rxjs";
 import { UserRegisterDto } from "./dto/register.dto";
@@ -7,10 +13,12 @@ import { UpdateProfileDto } from "./dto/update.dto";
 import { Schedule, ScheduleModel } from "../database/model/schedule";
 import { Types } from "mongoose";
 import { Service, ServiceModel } from "../database/model/service.model";
-import { ScheduleHistoryModel } from "../database/model/schedule-history.model";
+import { ScheduleHistory, ScheduleHistoryModel } from "../database/model/schedule-history.model";
 import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { UserPrincipal } from "../auth/interface/user-principal";
+import { Comment, CommentModel } from "../database/model/comment.model";
+import { getRatingScore } from "../shared/utility";
 
 
 @Injectable()
@@ -20,7 +28,8 @@ export class UserService {
     @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel,
     @Inject(SERVICE_MODEL) private serviceModel: ServiceModel,
     @Inject(SCHEDULE_HISTORY_MODEL) private scheduleHistory: ScheduleHistoryModel,
-    @Inject(REQUEST) private req: AuthenticatedRequest<UserPrincipal>
+    @Inject(REQUEST) private req: AuthenticatedRequest<UserPrincipal>,
+    @Inject(COMMENT_MODEL) private commentModel: CommentModel
   ) {
   }
 
@@ -167,12 +176,65 @@ export class UserService {
   getFollowedService(): Observable<Service[]> {
     return from(this.userModel.findOne({
       _id: Types.ObjectId(this.req.user.id)
-    }).populate('followedService').exec()).pipe(
+    }).populate("followedService").exec()).pipe(
       map((user) => {
         if (user) {
           return user.followedService as Service[];
         } else {
           throw new NotFoundException("User not found!");
+        }
+      })
+    );
+  }
+
+  getHistorySchedule(): Observable<ScheduleHistory[]> {
+    return from(this.scheduleHistory.find({ user: Types.ObjectId(this.req.user.id) }).populate("service").exec());
+  }
+
+  ratingService(serviceId: string, score: number[], title: string, content: string): Observable<Comment> {
+    if (!Types.ObjectId(serviceId)) {
+      throw new NotFoundException("Service not found");
+    }
+    let ratingScore = getRatingScore(score);
+    return from(this.serviceModel.findOne({ _id: serviceId }).exec()).pipe(
+      mergeMap((service) => {
+        if (!service) {
+          throw new NotFoundException("Service not found!");
+        } else {
+          return from(this.commentModel.create({
+            user: this.req.user.id,
+            service: Types.ObjectId(serviceId),
+            rating: ratingScore,
+            title: title,
+            content: content
+          }));
+        }
+      })
+    );
+  }
+
+  likeComment(commentId: string): Observable<Comment> {
+    if (!Types.ObjectId.isValid(commentId)) {
+      throw new NotFoundException("Comment not found");
+    }
+    let id = Types.ObjectId(commentId);
+    return from(this.commentModel.findOne({ _id: id }).exec()).pipe(
+      mergeMap((comment) => {
+        if (!comment) {
+          throw new NotFoundException("Comment not found");
+        } else {
+          if (comment.userLiked.includes(this.req.user.id)) {
+            let newUserLiked = comment.userLiked.filter((v) => v != this.req.user.id);
+            return from(comment.update({
+              userLiked: newUserLiked,
+              numOfLike: newUserLiked.length
+            }, { new: true }).exec());
+          } else {
+            return from(comment.update({
+              userLiked: [...comment.userLiked, this.req.user.id],
+              numOfLike: comment.userLiked.length + 1
+            }).exec());
+          }
         }
       })
     );

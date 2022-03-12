@@ -14,6 +14,7 @@ import { NestjsFormDataModule } from "nestjs-form-data";
 import { UploadModule } from './upload/upload.module';
 import { SearchModule } from './search/search.module';
 import { AdminModule } from './admin/admin.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
     imports: [
@@ -28,7 +29,8 @@ import { AdminModule } from './admin/admin.module';
         BServiceModule,
         UploadModule,
         SearchModule,
-        AdminModule
+        AdminModule,
+        CommonModule
     ],
     controllers: [AppController],
     providers: [AppService],

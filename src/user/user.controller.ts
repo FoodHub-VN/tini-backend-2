@@ -29,6 +29,8 @@ import { ApiConsumes } from "@nestjs/swagger";
 import { AddScheduleDto } from "./dto/add-schedule.dto";
 import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { AddFavoriteDto } from "./dto/add-favorite.dto";
+import { RatingServiceDto } from "./dto/rating-service.dto";
+import { LikeCommentDto } from "./dto/like-comment.dto";
 
 @Controller({ path: "user" })
 export class UserController {
@@ -173,6 +175,55 @@ export class UserController {
         }
         else{
           throw new NotFoundException();
+        }
+      })
+    )
+  }
+
+  @Get('history-schedule')
+  @UseGuards(JwtAuthGuard)
+  getHistorySchedule(@Res() res: Response): Observable<Response>{
+    return this.userService.getHistorySchedule().pipe(
+      map((histories)=>{
+        if(histories){
+          return res.status(HttpStatus.OK).send({
+            historys: histories
+          })
+        }
+        else{
+          throw new BadRequestException();
+        }
+      })
+    )
+  }
+
+  @Post('rating-service')
+  @UseGuards(JwtAuthGuard)
+  ratingService(@Res()res: Response, @Body() data: RatingServiceDto): Observable<Response>{
+    return this.userService.ratingService(data.serviceId, data.score, data.title, data.content).pipe(
+      map((comment)=>{
+        if(comment){
+          return res.status(HttpStatus.OK).send({
+            comment: comment
+          })
+        }
+        else{
+          throw new BadRequestException();
+        }
+      })
+    )
+  }
+
+  @Post('like-comment')
+  @UseGuards(JwtAuthGuard)
+  likeComment(@Res() res: Response, @Body() data: LikeCommentDto): Observable<Response>{
+    return this.userService.likeComment(data.commentId).pipe(
+      map((comment)=>{
+        if(comment){
+          return res.status(HttpStatus.OK).send({comment: comment});
+        }
+        else{
+          throw new BadRequestException();
         }
       })
     )
