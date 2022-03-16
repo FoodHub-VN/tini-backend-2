@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+  server:
+    image: lv
+    ports:
+      - "3008:3007"
+    links:
+      - mongodb
+    env_file:
+      - ./.env
+    depends_on:
+      - mongodb
+    command: yarn run start:dev
+    environment:
+      - DB_HOST=mongodb
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_NAME=$DB_NAME
+      - DB_PORT=$DB_PORT
+    stdin_open: true
+    tty: true
+  mongodb:
+    image: mongo
+    env_file:
+      - ./.env
+    ports:
+      - "27018:27017"
+    restart: always
+    volumes:
+      - db:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=nestjs-test
+
+volumes:
+  db:

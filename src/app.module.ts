@@ -15,15 +15,22 @@ import { UploadModule } from './upload/upload.module';
 import { SearchModule } from './search/search.module';
 import { AdminModule } from './admin/admin.module';
 import { CommonModule } from './common/common.module';
-
+import mongodbConfig from "./config/mongodb.config";
+const {
+    DB_USER,
+    DB_PASSWORD,
+    DB_HOST,
+    DB_PORT,
+    DB_NAME,
+} = process.env;
 @Module({
     imports: [
-        MongooseModule.forRoot("mongodb://localhost/nestjs-test"),
+        MongooseModule.forRoot(`mongodb://${DB_HOST}:${DB_PORT}`),
         AuthModule,
         UserModule,
         DatabaseModule,
         ConfigModule.forRoot({
-            ignoreEnvFile: true
+            ignoreEnvFile: false
         }),
         EnterpriseModule,
         BServiceModule,

@@ -30,11 +30,8 @@ import { CategorySchema } from "./model/category.model";
 export const dbProviders = [
     {
         provide: DB_CONNECTION,
-        useFactory: (dbConfig: ConfigType<typeof mongodbConfig>): Connection => {
-            return createConnection(dbConfig.uri, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            });
+        useFactory: (dbConfig: ConfigType<typeof mongodbConfig>): any => {
+            return createConnection(dbConfig.uri, {dbName:'nestjs-test'});
         },
         inject: [mongodbConfig.KEY]
     },
