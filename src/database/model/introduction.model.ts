@@ -9,7 +9,10 @@ type IntroductionModel = Model<Introduction>;
 
 const IntroductionSchema = new Schema({
   service: { type: SchemaTypes.ObjectId, ref: "Service" },
-  content: SchemaTypes.String
+  content: {
+    type: SchemaTypes.String,
+    text: true
+  }
 }, { timestamps: true });
 
 export { Introduction, IntroductionSchema, IntroductionModel };

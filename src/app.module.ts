@@ -23,7 +23,6 @@ const {
     DB_PORT,
     DB_NAME,
 } = process.env;
-console.log("long", DB_HOST)
 @Module({
     imports: [
         MongooseModule.forRoot(`mongodb://localhost:27017/`),

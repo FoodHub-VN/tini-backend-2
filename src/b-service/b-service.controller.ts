@@ -26,7 +26,7 @@ import { JwtEnterpriseAuthGuard } from "../auth/guard/jwt-auth.guard";
 
 @UseGuards(JwtEnterpriseAuthGuard)
 @UseInterceptors(OwnerInterceptor)
-@Controller({ path: ":idService", scope: Scope.REQUEST })
+@Controller({ path: "service/:idService", scope: Scope.REQUEST })
 export class BServiceController {
   constructor(private bSService: BServiceService) {
   }

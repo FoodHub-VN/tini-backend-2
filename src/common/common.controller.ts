@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, HttpStatus, Res } from "@nestjs/common";
+import { BadRequestException, Controller, Get, HttpStatus, Res, UseGuards } from "@nestjs/common";
 import { Response } from "express";
 import { map, Observable } from "rxjs";
 import { CommonService } from "./common.service";

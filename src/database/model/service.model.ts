@@ -28,7 +28,10 @@ interface Service extends Document {
 type ServiceModel = Model<Service>;
 
 const ServiceSchema = new Schema<Service>({
-  name: SchemaTypes.String,
+  name: {
+    type: SchemaTypes.String,
+    text: true
+  },
   avatar: SchemaTypes.String,
   enterprise: {type: SchemaTypes.ObjectId, ref: 'Enterprise' },
   address: SchemaTypes.Mixed,

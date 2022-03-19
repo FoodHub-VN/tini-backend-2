@@ -17,8 +17,14 @@ const CommentSchema = new Schema<Comment>({
   user: { type: SchemaTypes.ObjectId, ref: "User" },
   service: { type: SchemaTypes.ObjectId, ref: "Service" },
   rating: SchemaTypes.Number,
-  content: SchemaTypes.String,
-  title: SchemaTypes.String,
+  content: {
+    type: SchemaTypes.String,
+    text: true
+  },
+  title: {
+    type: SchemaTypes.String,
+    text: true
+  },
   image: SchemaTypes.String,
   numOfLike: SchemaTypes.Number,
   userLiked: [{ type: SchemaTypes.ObjectId, ref: "User" }]
