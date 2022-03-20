@@ -1,7 +1,7 @@
 import {
     IsDateString,
     IsEmail,
-    IsNotEmpty,
+    IsNotEmpty, IsOptional,
     IsPhoneNumber,
     IsString,
     MaxLength,
@@ -40,19 +40,19 @@ export class UserRegisterDto {
     @MaxLength(20, { message: " The password can't accept more than 20 characters " })
     readonly password: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @ApiProperty({
         type: String,
-        required: true
+        required: false
     })
     readonly firstname: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @ApiProperty({
         type: String,
-        required: true
+        required: false
     })
     readonly lastname: string;
 
@@ -64,19 +64,19 @@ export class UserRegisterDto {
     })
     readonly phone: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsDateString()
     @ApiProperty({
         type: Date,
-        required: true
+        required: false
     })
     readonly birthday: Date;
 
     @ValidateNested()
-    @IsNotEmpty()
+    @IsOptional()
     @ApiProperty({
         type: Address,
-        required: true
+        required: false
     })
     @Transform(({ value }) => {
         return plainToClass(Address, JSON.parse(value))

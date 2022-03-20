@@ -84,11 +84,11 @@ export class AuthService {
     }
   }
 
-  login(user: UserPrincipal): Observable<AccessToken> {
+  login(user: UserPrincipal): Observable<any> {
     const payload: JwtPayload = { ...user };
     return from(this.jwtService.signAsync(payload)).pipe(
       map((access_token) => {
-        return { accessToken: access_token } as AccessToken;
+        return { accessToken: access_token, user: user };
       })
     );
   }

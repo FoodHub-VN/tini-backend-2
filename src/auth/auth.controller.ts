@@ -15,10 +15,10 @@ export class AuthController {
     @Post("/login")
     login(@Req() req: any, @Res() res: Response): Observable<Response> {
         return this.authService.login(req.user).pipe(
-          map((token) => {
+          map((r) => {
               return res
-                .header("Authorization", "Bearer " + token.accessToken)
-                .json(token)
+                .header("Authorization", "Bearer " + r.accessToken)
+                .json(r)
                 .send();
           })
         );
