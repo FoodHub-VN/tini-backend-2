@@ -56,11 +56,11 @@ export class UserRegisterDto {
     })
     readonly lastname: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsPhoneNumber("VI")
     @ApiProperty({
         type: Number,
-        required: true
+        required: false
     })
     readonly phone: number;
 
@@ -78,9 +78,9 @@ export class UserRegisterDto {
         type: Address,
         required: false
     })
-    @Transform(({ value }) => {
-        return plainToClass(Address, JSON.parse(value))
-    })
+    // @Transform(({ value }) => {
+    //     return plainToClass(Address, JSON.parse(value))
+    // })
     @Type(() => Address)
     readonly address: Address;
 }

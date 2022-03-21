@@ -38,7 +38,6 @@ export class UserController {
   }
 
   @Post("/register")
-  @UseInterceptors(FileInterceptor("avatar"))
   register(@Body() data: UserRegisterDto, @Res() res: Response) {
     const { username, email } = data;
     return this.userService.existByUsername(username).pipe(
