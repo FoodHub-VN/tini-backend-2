@@ -15,6 +15,8 @@ import { UploadModule } from './upload/upload.module';
 import { SearchModule } from './search/search.module';
 import { AdminModule } from './admin/admin.module';
 import { CommonModule } from './common/common.module';
+import { NotificationModule } from './notification/notification.module';
+import { NotificationGateway } from './notification/notification.gateway';
 import mongodbConfig from "./config/mongodb.config";
 const {
     DB_USER,
@@ -37,7 +39,8 @@ const {
         UploadModule,
         SearchModule,
         AdminModule,
-        CommonModule
+        CommonModule,
+        NotificationModule
     ],
     controllers: [AppController],
     providers: [AppService],

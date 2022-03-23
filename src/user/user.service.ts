@@ -34,7 +34,7 @@ export class UserService {
   }
 
   findUserByName(username: string): Observable<User> {
-    return from(this.userModel.findOne({ username }).exec());
+    return from(this.userModel.findOne({ username },null,{lean: true} ).exec());
   }
 
   register(data: UserRegisterDto): Observable<User> {
