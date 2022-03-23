@@ -74,7 +74,7 @@ export class UserController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @HasRole([RolesType.ADMIN])
     profile(@Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response): Observable<Response> {
-        return this.userService.findUserByName(req.user.username).pipe(
+        return this.userService.findUserByName(req.user.username, true).pipe(
             map(user => {
               const { username, password, ...data } = user;
                 if (user) {
