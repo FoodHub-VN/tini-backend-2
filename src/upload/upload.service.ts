@@ -1,14 +1,15 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable, Scope } from "@nestjs/common";
 import { S3 } from "aws-sdk";
 import { ConfigService } from "@nestjs/config";
 import { ManagedUpload } from "aws-sdk/lib/s3/managed_upload";
 import { DeleteObjectOutput, DeleteObjectRequest } from "aws-sdk/clients/s3";
 import { FileUploaded } from "./interface/upload.interface";
 import SendData = ManagedUpload.SendData;
+import { REQUEST } from "@nestjs/core";
 
 const bucketS3 = "bk-service";
 
-@Injectable()
+@Injectable({scope: Scope.REQUEST})
 export class FileUploadService {
   private s3: S3 = null;
 
@@ -20,7 +21,8 @@ export class FileUploadService {
   async upload(file: Express.Multer.File, isPublic = true): Promise<FileUploaded> {
     try {
       const { originalname } = file;
-      const res: SendData = await this.uploadS3(file.buffer, bucketS3, originalname, isPublic);
+      const fileName = Date.now().toString() + "_" + originalname;
+      const res: SendData = await this.uploadS3(file.buffer, bucketS3, fileName, isPublic);
       return { url: res.Location, key: res.Key } as FileUploaded;
     } catch (err) {
       return err;
