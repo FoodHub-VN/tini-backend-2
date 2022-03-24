@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import {
   COMMENT_MODEL,
   SCHEDULE_HISTORY_MODEL,
@@ -7,7 +7,7 @@ import {
   USER_MODEL
 } from "../database/database.constants";
 import { User, UserModel } from "../database/model/user.model";
-import { EMPTY, from, map, mergeMap, Observable, of, throwIfEmpty } from "rxjs";
+import { catchError, EMPTY, from, map, mergeMap, Observable, of, throwIfEmpty } from "rxjs";
 import { UserRegisterDto } from "./dto/register.dto";
 import { UpdateProfileDto } from "./dto/update.dto";
 import { Schedule, ScheduleModel } from "../database/model/schedule";
@@ -19,6 +19,7 @@ import { AuthenticatedRequest } from "../auth/interface/authenticated-request.in
 import { UserPrincipal } from "../auth/interface/user-principal";
 import { Comment, CommentModel } from "../database/model/comment.model";
 import { getRatingScore } from "../shared/utility";
+import { FileUploadService } from "../upload/upload.service";
 
 
 @Injectable()
@@ -29,7 +30,8 @@ export class UserService {
     @Inject(SERVICE_MODEL) private serviceModel: ServiceModel,
     @Inject(SCHEDULE_HISTORY_MODEL) private scheduleHistory: ScheduleHistoryModel,
     @Inject(REQUEST) private req: AuthenticatedRequest<UserPrincipal>,
-    @Inject(COMMENT_MODEL) private commentModel: CommentModel
+    @Inject(COMMENT_MODEL) private commentModel: CommentModel,
+    private uploadService: FileUploadService
   ) {
   }
 
@@ -238,5 +240,57 @@ export class UserService {
         }
       })
     );
+  }
+
+  uploadAvatar(file: Express.Multer.File): Observable<string> {
+    return from(this.userModel.findOne({ _id: this.req.user.id }).exec())
+      .pipe(
+        mergeMap((user) => {
+          if (user) {
+            if (user.avatar) {
+              return from(this.uploadService.delete(user.avatar.key))
+                .pipe(
+                  mergeMap((deleted) => {
+                    return from(this.uploadService.upload(file))
+                      .pipe(
+                        mergeMap((fileUploaded) => {
+                          return from(user.updateOne({ avatar: fileUploaded }, { new: true }).exec())
+                            .pipe(
+                              map(updated => {
+                                if (updated.ok == 1) {
+                                  return fileUploaded.url;
+                                }
+                                throw new BadRequestException("Something wrong!");
+                              })
+                            );
+                        })
+                      );
+                  })
+                );
+            }
+          }
+        }),
+        catchError((err, cau) => {
+          throw new BadRequestException({ err });
+        })
+      );
+  }
+
+  deleteAvatar(file: Express.Multer.File): Observable<boolean> {
+    return from(this.userModel.findOne({ _id: this.req.user.id }).exec())
+      .pipe(
+        mergeMap((user) => {
+          if (user) {
+            return from(this.uploadService.delete(user.avatar.key))
+              .pipe(
+                map((b) => {
+                  return b;
+                })
+              );
+          } else {
+            throw new NotFoundException("User does not exist!");
+          }
+        })
+      );
   }
 }

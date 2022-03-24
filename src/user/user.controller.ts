@@ -10,6 +10,7 @@ import {
   Put,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
   UseInterceptors
 } from "@nestjs/common";
@@ -217,14 +218,29 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   likeComment(@Res() res: Response, @Body() data: LikeCommentDto): Observable<Response>{
     return this.userService.likeComment(data.commentId).pipe(
-      map((comment)=>{
-        if(comment){
-          return res.status(HttpStatus.OK).send({comment: comment});
-        }
-        else{
+      map((comment) => {
+        if (comment) {
+          return res.status(HttpStatus.OK).send({ comment: comment });
+        } else {
           throw new BadRequestException();
         }
       })
     )
+  }
+
+  @Post("upload-avatar")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor("image"))
+  uploadImage(@UploadedFile() file: Express.Multer.File, @Res() res: Response): Observable<Response> {
+    return from(this.userService.uploadAvatar(file))
+      .pipe(
+        map(url => {
+          if (url) {
+            return res.status(HttpStatus.OK).send({ url: url });
+          } else {
+            return res.status(HttpStatus.BAD_REQUEST).send();
+          }
+        })
+      );
   }
 }

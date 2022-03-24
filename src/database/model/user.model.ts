@@ -6,6 +6,7 @@ import { NotificationModel } from "./notification.model";
 import { ScheduleHistoryModel } from "./schedule-history.model";
 import { PurchaseModel } from "./purchase-history.model";
 import { ScheduleModel } from "./schedule";
+import { FileUploaded } from "../../upload/interface/upload.interface";
 
 export interface Address extends Object {
     readonly province: number;
@@ -27,6 +28,7 @@ interface User extends Document {
     readonly firstname: string;
     readonly lastname: string;
     readonly followedService: Array<any>;
+    readonly avatar: FileUploaded | null;
 }
 
 type UserModel = Model<User>;
@@ -41,7 +43,10 @@ const UserSchema = new Schema<User>({
     gender: SchemaTypes.String,
     birthday: SchemaTypes.Date,
     address: SchemaTypes.Mixed,
-    followedService: [{ type: SchemaTypes.ObjectId, ref: 'Service'}]
+    followedService: [{ type: SchemaTypes.ObjectId, ref: 'Service'}],
+    avatar: {
+        type: SchemaTypes.Mixed,
+    }
 }, {
     timestamps: true
 });
