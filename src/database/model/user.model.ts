@@ -25,8 +25,7 @@ interface User extends Document {
     readonly birthday: Date;
     readonly address: Address;
     readonly password: string;
-    readonly firstname: string;
-    readonly lastname: string;
+    readonly fullName: string;
     readonly followedService: Array<any>;
     readonly avatar: FileUploaded | null;
 }
@@ -37,8 +36,7 @@ const UserSchema = new Schema<User>({
     username: SchemaTypes.String,
     email: SchemaTypes.String,
     password: SchemaTypes.String,
-    firstname: SchemaTypes.String,
-    lastname: SchemaTypes.String,
+    fullName: SchemaTypes.String,
     phone: SchemaTypes.Number,
     gender: SchemaTypes.String,
     birthday: SchemaTypes.Date,

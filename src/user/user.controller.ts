@@ -96,9 +96,9 @@ export class UserController {
     update(@Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response, @Body() body: UpdateProfileDto):Observable<Response> {
     console.log(body);
     return this.userService.updateProfile(req.user.username, body).pipe(
-      map(user => {
-        if (user) {
-          return res.status(HttpStatus.OK).send(user);
+      map(u => {
+        if (u) {
+          return res.status(HttpStatus.OK).send({ user: {...u, avatar:u.avatar?.url} });
         } else {
           throw new NotFoundException("User not Found");
         }

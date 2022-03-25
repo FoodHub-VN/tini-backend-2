@@ -32,8 +32,7 @@ export class AuthService {
                                   username: user.username,
                                   email: user.email,
                                   id: user._id,
-                                  firstname: user.firstname,
-                                  lastname: user.lastname,
+                                  fullName: user.fullName,
                                   role: RolesType.CUSTOMER,
                                   avatar: user.avatar?.url
                                 } as UserPrincipal;

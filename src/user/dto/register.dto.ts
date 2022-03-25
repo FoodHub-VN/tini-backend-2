@@ -40,13 +40,6 @@ export class UserRegisterDto {
     @MaxLength(20, { message: " The password can't accept more than 20 characters " })
     readonly password: string;
 
-    @IsOptional()
-    @IsString()
-    @ApiProperty({
-        type: String,
-        required: false
-    })
-    readonly firstname: string;
 
     @IsOptional()
     @IsString()
@@ -54,7 +47,7 @@ export class UserRegisterDto {
         type: String,
         required: false
     })
-    readonly lastname: string;
+    readonly fullName: string;
 
     @IsOptional()
     @IsPhoneNumber("VI")

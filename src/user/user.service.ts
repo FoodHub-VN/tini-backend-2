@@ -56,7 +56,7 @@ export class UserService {
       this.userModel.findOneAndUpdate(
         { username: username },
         { ...data },
-        { new: true }
+        { new: true,lean: true }
       ).exec()
     ).pipe(
       mergeMap((p) => (p ? of(p) : EMPTY)),

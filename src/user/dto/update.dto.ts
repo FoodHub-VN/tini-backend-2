@@ -22,13 +22,6 @@ export class UpdateProfileDto{
     })
     readonly email?: string;
 
-    @IsOptional()
-    @IsString()
-    @ApiProperty({
-        type: String,
-        required: true
-    })
-    readonly firstname?: string;
 
     @IsOptional()
     @IsString()
@@ -36,7 +29,7 @@ export class UpdateProfileDto{
         type: String,
         required: true
     })
-    readonly lastname?: string;
+    readonly fullName?: string;
 
     @IsOptional()
     @IsPhoneNumber("VI")

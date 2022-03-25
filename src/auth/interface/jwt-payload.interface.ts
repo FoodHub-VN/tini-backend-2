@@ -4,8 +4,7 @@ export class JwtPayload{
     username: string;
     email: string;
     id: string;
-    firstname: string;
-    lastname: string;
+    fullName: string;
     role: RolesType;
 }
 
