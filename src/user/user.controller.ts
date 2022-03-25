@@ -81,7 +81,7 @@ export class UserController {
                 if (user) {
                   return res
                     .status(HttpStatus.OK)
-                    .send({user: { ...data, avatar: avatar.url}});
+                    .send({user: { ...data, avatar: avatar?.url}});
                 } else {
                     throw new NotFoundException('User not found!');
                 }
