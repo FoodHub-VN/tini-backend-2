@@ -34,7 +34,8 @@ export class AuthService {
                                   id: user._id,
                                   firstname: user.firstname,
                                   lastname: user.lastname,
-                                  role: RolesType.CUSTOMER
+                                  role: RolesType.CUSTOMER,
+                                  avatar: user.avatar?.url
                                 } as UserPrincipal;
               } else {
                 throw new UnauthorizedException("Password not match");

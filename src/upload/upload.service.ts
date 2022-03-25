@@ -1,11 +1,10 @@
-import { Inject, Injectable, Scope } from "@nestjs/common";
+import { Injectable, Scope } from "@nestjs/common";
 import { S3 } from "aws-sdk";
 import { ConfigService } from "@nestjs/config";
 import { ManagedUpload } from "aws-sdk/lib/s3/managed_upload";
 import { DeleteObjectOutput, DeleteObjectRequest } from "aws-sdk/clients/s3";
 import { FileUploaded } from "./interface/upload.interface";
 import SendData = ManagedUpload.SendData;
-import { REQUEST } from "@nestjs/core";
 
 const bucketS3 = "bk-service";
 

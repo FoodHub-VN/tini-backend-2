@@ -7,7 +7,7 @@ import {
   USER_MODEL
 } from "../database/database.constants";
 import { User, UserModel } from "../database/model/user.model";
-import { catchError, EMPTY, from, map, mergeMap, Observable, of, throwIfEmpty } from "rxjs";
+import { catchError, EMPTY, from, map, mergeMap, Observable, of, throwError, throwIfEmpty } from "rxjs";
 import { UserRegisterDto } from "./dto/register.dto";
 import { UpdateProfileDto } from "./dto/update.dto";
 import { Schedule, ScheduleModel } from "../database/model/schedule";
@@ -267,10 +267,28 @@ export class UserService {
                       );
                   })
                 );
+            } else {
+              return from(this.uploadService.upload(file))
+                .pipe(
+                  mergeMap((fileUploaded) => {
+                    return from(user.updateOne({ avatar: fileUploaded }, { new: true }).exec())
+                      .pipe(
+                        map(updated => {
+                          if (updated.ok == 1) {
+                            return fileUploaded.url;
+                          }
+                          throw new BadRequestException("Something wrong!");
+                        })
+                      );
+                  })
+                );
             }
+          } else {
+            throwError(() => new Error());
           }
         }),
         catchError((err, cau) => {
+          console.log(err);
           throw new BadRequestException({ err });
         })
       );

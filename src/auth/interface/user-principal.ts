@@ -7,4 +7,5 @@ export class UserPrincipal{
     firstname: string;
     lastname: string;
     role: RolesType;
+    avatar: string;
 }

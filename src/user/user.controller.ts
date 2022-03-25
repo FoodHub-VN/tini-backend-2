@@ -17,7 +17,7 @@ import {
 import { UserService } from "./user.service";
 import { UserRegisterDto } from "./dto/register.dto";
 import { Response } from "express";
-import { catchError, from, map, mergeMap, Observable } from "rxjs";
+import { catchError, from, map, mergeMap, Observable, of } from "rxjs";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { UpdateProfileDto } from "./dto/update.dto";
@@ -77,11 +77,11 @@ export class UserController {
     profile(@Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response): Observable<Response> {
         return this.userService.findUserByName(req.user.username, true).pipe(
             map(user => {
-              const {password, ...data } = user;
+              const {password, avatar, ...data } = user;
                 if (user) {
                   return res
                     .status(HttpStatus.OK)
-                    .send({user: data});
+                    .send({user: { ...data, avatar: avatar.url}});
                 } else {
                     throw new NotFoundException('User not found!');
                 }
