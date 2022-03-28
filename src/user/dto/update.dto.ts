@@ -1,7 +1,7 @@
 import {
     IsDateString,
     IsEmail,
-    IsNotEmpty, IsOptional,
+    IsNotEmpty, IsNumber, IsOptional,
     IsPhoneNumber,
     IsString,
     MaxLength,
@@ -34,10 +34,10 @@ export class UpdateProfileDto{
     @IsOptional()
     @IsPhoneNumber("VI")
     @ApiProperty({
-        type: Number,
+        type: String,
         required: true
     })
-    readonly phone?: number;
+    readonly phone?: string;
 
     @IsOptional()
     @IsDateString()
@@ -51,10 +51,7 @@ export class UpdateProfileDto{
     @IsOptional()
     @ApiProperty({
         type: Address,
-        required: true
-    })
-    @Transform(({ value }) => {
-        return plainToClass(Address, JSON.parse(value))
+        required: false
     })
     @Type(() => Address)
     readonly address?: Address;

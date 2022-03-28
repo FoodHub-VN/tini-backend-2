@@ -118,7 +118,8 @@ export class EnterpriseController {
         if (!e) {
           throw new NotFoundException("Enterprise not found");
         } else {
-          return res.status(HttpStatus.OK).send({ enterprise: e });
+          const {password,...data } = e;
+          return res.status(HttpStatus.OK).send({ enterprise: data });
         }
       })
     );

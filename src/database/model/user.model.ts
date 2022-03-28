@@ -20,7 +20,7 @@ interface User extends Document {
 
     readonly username: string;
     readonly email: string;
-    readonly phone: number;
+    readonly phone: string;
     readonly gender: "male" | "female";
     readonly birthday: Date;
     readonly address: Address;
@@ -37,7 +37,7 @@ const UserSchema = new Schema<User>({
     email: SchemaTypes.String,
     password: SchemaTypes.String,
     fullName: SchemaTypes.String,
-    phone: SchemaTypes.Number,
+    phone: SchemaTypes.String,
     gender: SchemaTypes.String,
     birthday: SchemaTypes.Date,
     address: SchemaTypes.Mixed,

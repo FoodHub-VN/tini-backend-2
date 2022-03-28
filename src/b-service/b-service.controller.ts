@@ -114,18 +114,5 @@ export class BServiceController {
     );
   }
 
-  // service info
-  @Get('')
-  getInfo(@Res() res, @Param('idService') idService): Observable<Response> {
-    return this.bSService.getInfo(idService).pipe(
-      map((s)=>{
-        if(!s){
-          throw new NotFoundException("Service not found!");
-        }
-        else{
-          return res.status(HttpStatus.OK).send({service: s});
-        }
-      })
-    );
-  }
+
 }

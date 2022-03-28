@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class Address {
   @ApiProperty({
@@ -25,8 +25,8 @@ export class Address {
 
   @ApiProperty({
     type: String,
-    required: true
+    required: false
   })
-  @IsNotEmpty()
+  @IsOptional()
   readonly detail: string;
 }

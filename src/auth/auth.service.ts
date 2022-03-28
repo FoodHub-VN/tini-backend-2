@@ -93,11 +93,11 @@ export class AuthService {
     );
   }
 
-  loginEnterprise(enterprise: EnterprisePrincipal): Observable<AccessToken> {
+  loginEnterprise(enterprise: EnterprisePrincipal): Observable<any> {
     const payload: JwtEnterprisePayload = { ...enterprise };
     return from(this.jwtService.signAsync(payload)).pipe(
       map((access_token) => {
-        return { accessToken: access_token } as AccessToken;
+        return { accessToken: access_token, enterprise: enterprise };
       })
     );
   }

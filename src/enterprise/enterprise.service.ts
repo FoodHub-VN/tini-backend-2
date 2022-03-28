@@ -42,7 +42,7 @@ export class EnterpriseService {
   }
 
   getInfo(): Observable<Enterprise> {
-    return from(this.enterpriseModel.findOne({ _id: this.req.user.id }).exec());
+    return from(this.enterpriseModel.findOne({ _id: this.req.user.id }, null, {lean: true}).exec());
   }
 
   getAllService(): Observable<Service[]> {

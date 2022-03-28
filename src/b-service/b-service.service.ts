@@ -124,6 +124,6 @@ export class BServiceService {
     if(!Types.ObjectId.isValid(serviceId)){
       throw new NotFoundException("Service not found!");
     }
-    return from(this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec());
+    return from(this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).populate("enterprise", "-password").exec());
   }
 }

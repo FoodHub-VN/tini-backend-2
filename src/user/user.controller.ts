@@ -17,7 +17,7 @@ import {
 import { UserService } from "./user.service";
 import { UserRegisterDto } from "./dto/register.dto";
 import { Response } from "express";
-import { catchError, from, map, mergeMap, Observable, of } from "rxjs";
+import { catchError, from, map, mergeMap, Observable } from "rxjs";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { UpdateProfileDto } from "./dto/update.dto";
@@ -26,7 +26,6 @@ import { RolesType } from "../shared/roles-type.enum";
 import { RolesGuard } from "../auth/guard/roles.guard";
 import { UserPrincipal } from "../auth/interface/user-principal";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ApiConsumes } from "@nestjs/swagger";
 import { AddScheduleDto } from "./dto/add-schedule.dto";
 import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { AddFavoriteDto } from "./dto/add-favorite.dto";
@@ -91,8 +90,6 @@ export class UserController {
 
   @Put("/update-profile")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor("avatar"))
-  @ApiConsumes("multipart/form-data")
     update(@Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response, @Body() body: UpdateProfileDto):Observable<Response> {
     console.log(body);
     return this.userService.updateProfile(req.user.username, body).pipe(
