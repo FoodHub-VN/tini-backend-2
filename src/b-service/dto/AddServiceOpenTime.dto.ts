@@ -7,12 +7,12 @@ export class AddServiceOpenTimeDto{
     required: true
   })
   @IsDate()
-  readonly openTime: Date;
+  readonly openTime: string;
 
   @ApiProperty({
     type: Date,
     required: true
   })
   @IsDate()
-  readonly closeTime: Date;
+  readonly closeTime: string;
 }

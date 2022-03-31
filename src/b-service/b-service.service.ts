@@ -12,6 +12,7 @@ import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
 import { AddServiceOpenTimeDto } from "./dto/AddServiceOpenTime.dto";
 import { Schedule, ScheduleModel } from "../database/model/schedule";
 import { CategoryModel } from "../database/model/category.model";
+import { FileUploadService } from "../upload/upload.service";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
@@ -20,11 +21,12 @@ export class BServiceService {
     @Inject(INTRODUCTION_MODEL) private introductionModel: IntroductionModel,
     @Inject(REQUEST) private req: AuthenticatedRequest<EnterprisePrincipal>,
     @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel,
-    @Inject(CATEGORY_MODEL) private categoryModel: CategoryModel
+    @Inject(CATEGORY_MODEL) private categoryModel: CategoryModel,
+    private uploadService: FileUploadService
   ) {
   }
 
-  createService(data: EnterPriseNewServiceDataDto): Observable<any> {
+  createService(data: EnterPriseNewServiceDataDto, avatar: Express.Multer.File | undefined): Observable<any> {
     if(!Types.ObjectId.isValid(data.category)){
       throw new NotFoundException("Category Not found");
     }
@@ -40,6 +42,16 @@ export class BServiceService {
                 throw new ConflictException("Category not found");
               }
               else{
+                if(avatar){
+                  return from(this.uploadService.upload(avatar)).pipe(
+                    mergeMap((file)=>{
+                      return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id, avatar: file }));
+                    }),
+                    catchError((err)=>{
+                      throw new BadRequestException(err);
+                    })
+                  )
+                }
                 return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id }));
               }
             })

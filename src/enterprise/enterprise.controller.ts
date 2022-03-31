@@ -74,14 +74,7 @@ export class EnterpriseController {
 
   //region create new service
   @Post("/new-service")
-  @UseInterceptors(FileInterceptor("avatar", {
-    storage: diskStorage({
-      destination: "./upload",
-      filename: (req: Request, file: Express.Multer.File, callback): any => {
-        callback(null, file.originalname);
-      }
-    })
-  }))
+  @UseInterceptors(FileInterceptor("avatar"))
   // @FormDataRequest()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -94,8 +87,7 @@ export class EnterpriseController {
     description: 'Avatar of service',
   })
   newService(@Body() data: EnterPriseNewServiceDataDto, @Res() res: Response , @UploadedFile() file: Express.Multer.File): Observable<Response> {
-    console.log(data)
-    return this.enterpriseService.createNewService(data).pipe(
+    return this.enterpriseService.createNewService(data, file).pipe(
       map(service => {
         console.log(service)
         return res.status(HttpStatus.OK).send({ service: service });

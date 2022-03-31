@@ -24,7 +24,7 @@ export class FileUploadService {
       const res: SendData = await this.uploadS3(file.buffer, bucketS3, fileName, isPublic);
       return { url: res.Location, key: res.Key } as FileUploaded;
     } catch (err) {
-      return err;
+      throw err;
     }
   }
 

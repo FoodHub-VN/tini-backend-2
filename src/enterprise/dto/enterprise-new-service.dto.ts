@@ -1,4 +1,12 @@
-import { IsDefined, IsEmail, IsNotEmpty, IsNotEmptyObject, IsPhoneNumber, ValidateNested } from "class-validator";
+import {
+  IsDefined,
+  IsEmail,
+  IsNotEmpty,
+  IsNotEmptyObject,
+  IsOptional,
+  IsPhoneNumber,
+  ValidateNested
+} from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { plainToClass, Transform, Type } from "class-transformer";
 import { Address } from "../../shared/common.type";
@@ -25,27 +33,19 @@ export class EnterPriseNewServiceDataDto {
     required: true
   })
   @IsNotEmpty()
-  @IsPhoneNumber()
-  readonly phone: number;
-
-  @ApiProperty({
-    type: String,
-    required: true
-  })
-  @IsNotEmpty()
-  readonly type: string;
+  readonly phone: string;
 
   @ApiProperty({
     type: Date,
     required: false
   })
-  readonly openTime?: Date;
+  readonly openTime?: string;
 
   @ApiProperty({
     type: Date,
     required: false
   })
-  readonly closeTime?: Date;
+  readonly closeTime?: string;
 
 
   @ApiProperty({
@@ -68,5 +68,19 @@ export class EnterPriseNewServiceDataDto {
   })
   @IsNotEmpty()
   readonly category: string
+
+  @IsOptional()
+  @ApiProperty({
+    type: Number,
+    required: false
+  })
+  readonly openPrice: number;
+
+  @IsOptional()
+  @ApiProperty({
+    type: Number,
+    required: false
+  })
+  readonly closePrice: number;
 }
 

@@ -11,7 +11,7 @@ interface Enterprise extends Document {
   name: string;
   address: Address;
   email: string;
-  phone: number;
+  phone: string;
   premium: string;
 }
 
@@ -23,7 +23,7 @@ const EnterpriseSchema = new Schema<Enterprise>({
   name: SchemaTypes.String,
   address: SchemaTypes.Mixed,
   email: SchemaTypes.String,
-  phone: SchemaTypes.Number,
+  phone: SchemaTypes.String,
   premium: SchemaTypes.ObjectId
 }, {timestamps: true});
 

@@ -35,7 +35,7 @@ export class CommonController {
   }
   // service info
   @Get('/service/:idService')
-  getInfo(@Res() res, @Param('idService') idService): Observable<Response> {
+  getServiceInfo(@Res() res, @Param('idService') idService): Observable<Response> {
     return this.bService.getInfo(idService).pipe(
       map((s)=>{
         if(!s){
@@ -47,4 +47,11 @@ export class CommonController {
       })
     );
   }
+
+  // enterprise info
+
+  // @Get('/enterprise/:idEnterprise')
+  // getEnterpriseInfo(@Res() res, @Param('idEnterprise') idEnterprise): Promise<Response>{
+  //
+  // }
 }
