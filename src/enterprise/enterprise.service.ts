@@ -46,6 +46,6 @@ export class EnterpriseService {
   }
 
   getAllService(): Observable<Service[]> {
-    return from(this.serviceModel.find({ enterprise: this.req.user.id }).exec());
+    return from(this.serviceModel.find({ enterprise: this.req.user.id }).populate("category").exec());
   }
 }

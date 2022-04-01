@@ -15,7 +15,6 @@ interface Service extends Document {
   readonly address: Address;
   readonly email: string;
   readonly phone: string;
-  readonly type: string;
   readonly rankingPoint: number;
   readonly openTime: string;
   readonly closeTime: string;
@@ -38,7 +37,6 @@ const ServiceSchema = new Schema<Service>({
   address: SchemaTypes.Mixed,
   email: SchemaTypes.String,
   phone: SchemaTypes.String,
-  type: SchemaTypes.String,
   rankingPoint: SchemaTypes.Number,
   openTime: SchemaTypes.String,
   closeTime: SchemaTypes.String,

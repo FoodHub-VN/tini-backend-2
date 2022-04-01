@@ -74,13 +74,13 @@ export class EnterPriseNewServiceDataDto {
     type: Number,
     required: false
   })
-  readonly openPrice: number;
+  readonly maxPrice: number;
 
   @IsOptional()
   @ApiProperty({
     type: Number,
     required: false
   })
-  readonly closePrice: number;
+  readonly minPrice: number;
 }
 
