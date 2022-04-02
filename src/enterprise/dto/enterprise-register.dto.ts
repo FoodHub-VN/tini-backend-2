@@ -1,5 +1,5 @@
 
-import { IsEmail, IsNotEmpty, IsPhoneNumber, MaxLength, MinLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class EnterpriseRegisterDto {
@@ -7,6 +7,8 @@ export class EnterpriseRegisterDto {
     type: String,
     required: true
   })
+  @IsNotEmpty()
+  @IsString()
   readonly username: string;
 
   @IsNotEmpty()
@@ -18,6 +20,7 @@ export class EnterpriseRegisterDto {
   @MaxLength(20, { message: " The password can't accept more than 20 characters " })
   readonly password: string;
 
-  @IsPhoneNumber()
+  @IsOptional()
+  @IsString()
   readonly phone: number;
 }

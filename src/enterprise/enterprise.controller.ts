@@ -42,6 +42,7 @@ export class EnterpriseController {
   @Post("/register")
   register(@Body() data: EnterpriseRegisterDto, @Res() res: Response) {
     const { username, email } = data;
+    console.log(username)
     return this.enterpriseService.existEnterpriseByName(username).pipe(
       mergeMap(b => {
           if (b) {
