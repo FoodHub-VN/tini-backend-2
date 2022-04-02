@@ -82,5 +82,14 @@ export class EnterPriseNewServiceDataDto {
     required: false
   })
   readonly minPrice: number;
+
+  @IsOptional()
+  @Transform(({ value })=>{
+    return JSON.parse(value);
+  })
+
+  @Type(()=>Array)
+  readonly removeImg: string[];
+
 }
 

@@ -2,7 +2,12 @@ import { Injectable, Scope } from "@nestjs/common";
 import { S3 } from "aws-sdk";
 import { ConfigService } from "@nestjs/config";
 import { ManagedUpload } from "aws-sdk/lib/s3/managed_upload";
-import { DeleteObjectOutput, DeleteObjectRequest } from "aws-sdk/clients/s3";
+import {
+  DeleteObjectOutput,
+  DeleteObjectRequest,
+  DeleteObjectsRequest, ObjectIdentifier,
+  ObjectIdentifierList
+} from "aws-sdk/clients/s3";
 import { FileUploaded } from "./interface/upload.interface";
 import SendData = ManagedUpload.SendData;
 
@@ -33,7 +38,17 @@ export class FileUploadService {
       await this.deleteS3(bucketS3, key);
       return true;
     } catch (err) {
-      return false;
+      throw err;
+    }
+  }
+
+
+  async deleteMulti(keys: string[]): Promise<any> {
+    try {
+      await this.deleteS3Multi(bucketS3, keys);
+      return true;
+    } catch (err) {
+      throw err;
     }
   }
 
@@ -71,6 +86,25 @@ export class FileUploadService {
     });
   }
 
+
+  async deleteS3Multi(bucket: string, keys: string[]): Promise<DeleteObjectOutput> {
+    const mapDelete: ObjectIdentifierList = keys.map(k => ({Key: k}));
+    const params: DeleteObjectsRequest = {
+      Bucket: bucket,
+      Delete:{
+        Objects: mapDelete
+      }
+    };
+    const s3 = this.getS3();
+    return new Promise((resolve, reject) => {
+      s3.deleteObjects(params, (err, data) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
+      });
+    });
+  }
   getS3() {
     if (this.s3 == null) {
       this.s3 = new S3({

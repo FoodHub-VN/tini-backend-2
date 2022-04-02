@@ -11,6 +11,7 @@ import { FileUploaded } from "../../upload/interface/upload.interface";
 interface Service extends Document {
   readonly name: string;
   readonly avatar: FileUploaded | undefined;
+  readonly images: FileUploaded[] | undefined;
   readonly enterprise: string;
   readonly address: Address;
   readonly email: string;
@@ -33,6 +34,7 @@ const ServiceSchema = new Schema<Service>({
     text: true
   },
   avatar: SchemaTypes.Mixed,
+  images: [SchemaTypes.Mixed],
   enterprise: {type: SchemaTypes.ObjectId, ref: 'Enterprise' },
   address: SchemaTypes.Mixed,
   email: SchemaTypes.String,

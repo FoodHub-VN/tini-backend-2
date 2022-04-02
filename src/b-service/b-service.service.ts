@@ -13,6 +13,7 @@ import { AddServiceOpenTimeDto } from "./dto/AddServiceOpenTime.dto";
 import { Schedule, ScheduleModel } from "../database/model/schedule";
 import { CategoryModel } from "../database/model/category.model";
 import { FileUploadService } from "../upload/upload.service";
+import { FileUploaded } from "../upload/interface/upload.interface";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
@@ -63,19 +64,54 @@ export class BServiceService {
     // return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id }));
   }
 
-  modifyService(data: EnterPriseNewServiceDataDto, serviceId: string): Observable<Service> {
+  async modifyService(data: EnterPriseNewServiceDataDto, serviceId: string, images: Array<Express.Multer.File>|undefined): Promise<Service> {
     if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found");
     }
-    return from(this.serviceModel.findOneAndUpdate({ _id: Types.ObjectId(serviceId) }, { ...data }).exec()).pipe(
-      mergeMap((service) => {
-        if (!service) {
-          throw new NotFoundException("Service not found");
-        } else {
-          return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec());
-        }
-      })
-    );
+    try{
+      const {removeImg, ...__data} = data;
+      let model = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
+      if(removeImg && removeImg.length>0){
+        const res = await this.uploadService.deleteMulti(removeImg);
+        const filterImage = model.images.filter((e)=>{
+          return !removeImg.includes(e.key);
+        })
+        await model.update({images: filterImage}).exec();
+      }
+      if(images && images.length > 0){
+        const promises = [];
+        images.map(image => {
+        promises.push(this.uploadService.upload(image));
+        })
+        const res = await Promise.all<FileUploaded>(promises);
+        model = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
+        model.images.push(...res);
+        await model.save();
+      }
+      const service = await this.serviceModel.findOneAndUpdate({_id: Types.ObjectId(serviceId)}, {...__data}, {new: true}).exec();
+      return service;
+    }
+    catch (e){
+throw e;
+    }
+
+    // return from(this.serviceModel.findOneAndUpdate({ _id: Types.ObjectId(serviceId) }, { ...data }).exec()).pipe(
+    //   mergeMap((service) => {
+    //     if (!service) {
+    //       throw new NotFoundException("Service not found");
+    //     } else {
+    //       if(data.removeImg && data.removeImg.length>0){
+    //         return from(this.uploadService.deleteMulti(data.removeImg))
+    //           .pipe(
+    //             mergeMap(res=>{
+    //               return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec());
+    //             })
+    //           )
+    //       }
+    //       return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec());
+    //     }
+    //   })
+    // );
   }
 
   addServiceIntroduce(data: AddServiceIntroduceDto, serviceId: string): Observable<any> {

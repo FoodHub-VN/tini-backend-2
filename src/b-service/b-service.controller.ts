@@ -10,13 +10,13 @@ import {
   Put,
   Res,
   Scope,
-  UploadedFile, UseGuards,
+  UploadedFile, UploadedFiles, UseGuards,
   UseInterceptors
 } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { Express, Request, Response } from "express";
 import { diskStorage } from "multer";
-import { map, Observable, of } from "rxjs";
+import { from, map, Observable, of } from "rxjs";
 import { BServiceService } from "./b-service.service";
 import { EnterPriseNewServiceDataDto } from "../enterprise/dto/enterprise-new-service.dto";
 import { AddServiceIntroduceDto } from "./dto/AddServiceIntroduce.dto";
@@ -45,16 +45,17 @@ export class BServiceController {
   }
 
   @Put("modify-service")
-  @UseInterceptors(FileInterceptor("avatar"))
+  @UseInterceptors(FilesInterceptor("images"))
   modifyService(@Body() data: EnterPriseNewServiceDataDto,
                 @Res() res,
-                @UploadedFile() file,
+                @UploadedFiles() files: Array<Express.Multer.File>,
                 @Param("idService") idService): Observable<Response> {
-    return this.bSService.modifyService(data, idService).pipe(
+    return from(this.bSService.modifyService(data, idService, files)).pipe(
       map(service => {
         if (!service) {
           throw new NotFoundException(`Not Found service ${data.name}`);
         } else {
+          console.log(service)
           return res.status(HttpStatus.OK).send({
             service: service
           });
