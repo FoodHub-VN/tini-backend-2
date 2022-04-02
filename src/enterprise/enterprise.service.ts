@@ -36,9 +36,9 @@ export class EnterpriseService {
     return from(this.enterpriseModel.create({ ...data }));
   }
 
-  createNewService(data: EnterPriseNewServiceDataDto, avatar: Express.Multer.File | undefined): Observable<any> {
+  createNewService(data: EnterPriseNewServiceDataDto, images: Array<Express.Multer.File> | undefined): Observable<any> {
     // return from(this.serviceModel.create({...data}));
-    return this.bService.createService(data, avatar);
+    return from(this.bService.createService(data, images));
   }
 
   getInfo(): Observable<Enterprise> {

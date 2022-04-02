@@ -9,7 +9,7 @@ import {
   Post,
   Res,
   Scope,
-  UploadedFile,
+  UploadedFile, UploadedFiles,
   UseGuards,
   UseInterceptors
 } from "@nestjs/common";
@@ -23,7 +23,7 @@ import { Public } from "../auth/guard/public.guard.decorator";
 import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { ApiBody, ApiConsumes } from "@nestjs/swagger";
 import { ApiImplicitFile } from "@nestjs/swagger/dist/decorators/api-implicit-file.decorator";
@@ -74,7 +74,7 @@ export class EnterpriseController {
 
   //region create new service
   @Post("/new-service")
-  @UseInterceptors(FileInterceptor("avatar"))
+  @UseInterceptors(FilesInterceptor("images"))
   // @FormDataRequest()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -86,8 +86,8 @@ export class EnterpriseController {
     required: true,
     description: 'Avatar of service',
   })
-  newService(@Body() data: EnterPriseNewServiceDataDto, @Res() res: Response , @UploadedFile() file: Express.Multer.File): Observable<Response> {
-    return this.enterpriseService.createNewService(data, file).pipe(
+  newService(@Body() data: EnterPriseNewServiceDataDto, @Res() res: Response , @UploadedFiles() files: Array<Express.Multer.File>): Observable<Response> {
+    return this.enterpriseService.createNewService(data, files).pipe(
       map(service => {
         console.log(service)
         return res.status(HttpStatus.OK).send({ service: service });

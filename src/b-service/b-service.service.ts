@@ -27,72 +27,96 @@ export class BServiceService {
   ) {
   }
 
-  createService(data: EnterPriseNewServiceDataDto, avatar: Express.Multer.File | undefined): Observable<any> {
-    if(!Types.ObjectId.isValid(data.category)){
+  async createService(data: EnterPriseNewServiceDataDto, images: Array<Express.Multer.File> | undefined): Promise<Service> {
+    if (!Types.ObjectId.isValid(data.category)) {
       throw new NotFoundException("Category Not found");
     }
-    return from(this.serviceModel.findOne({ $or: [{ name: data.name }] }).exec()).pipe(
-      mergeMap(pre => {
-        if (pre) {
-          // console.log("Existing service before: ", pre);
-          throw new ConflictException("Service is already existing: " + pre.name);
-        } else {
-          return from(this.categoryModel.findOne({_id: Types.ObjectId(data.category)}).exec()).pipe(
-            mergeMap((category)=>{
-              if(!category){
-                throw new ConflictException("Category not found");
-              }
-              else{
-                if(avatar){
-                  return from(this.uploadService.upload(avatar)).pipe(
-                    mergeMap((file)=>{
-                      return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id, avatar: file }));
-                    }),
-                    catchError((err)=>{
-                      throw new BadRequestException(err);
-                    })
-                  )
-                }
-                return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id }));
-              }
-            })
-          )
+    try{
+      const serviceExist = await this.serviceModel.findOne({ name: data.name }).exec();
+      if (serviceExist) {
+        throw new ConflictException("Service is already existing: " + serviceExist.name);
+      }
+      const checkCategory = await this.categoryModel.findOne({ _id: Types.ObjectId(data.category) }).exec();
+      if (!checkCategory) {
+        throw new ConflictException("Category not found");
+      }
 
-        }
-      })
-    );
+      if (images && images.length > 0) {
+        let promises = [];
+        images.map(e => {
+          promises.push(this.uploadService.upload(e));
+        });
+        const res = await Promise.all<FileUploaded>(promises);
+        return await this.serviceModel.create({ ...data, enterprise: this.req.user.id, images: res });
+      } else {
+        return await this.serviceModel.create({ ...data, enterprise: this.req.user.id });
+      }
+    }
+    catch (e){
+      throw e;
+    }
+
+
+    // return from(this.serviceModel.findOne({ $or: [{ name: data.name }] }).exec()).pipe(
+    //   mergeMap(pre => {
+    //     if (pre) {
+    //       // console.log("Existing service before: ", pre);
+    //       throw new ConflictException("Service is already existing: " + pre.name);
+    //     } else {
+    //       return from(this.categoryModel.findOne({_id: Types.ObjectId(data.category)}).exec()).pipe(
+    //         mergeMap((category)=>{
+    //           if(!category){
+    //             throw new ConflictException("Category not found");
+    //           }
+    //           else{
+    //             if(avatar){
+    //               return from(this.uploadService.upload(avatar)).pipe(
+    //                 mergeMap((file)=>{
+    //                   return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id, avatar: file }));
+    //                 }),
+    //                 catchError((err)=>{
+    //                   throw new BadRequestException(err);
+    //                 })
+    //               )
+    //             }
+    //             return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id }));
+    //           }
+    //         })
+    //       )
+    //
+    //     }
+    //   })
+    // );
     // return from(this.serviceModel.create({ ...data, enterprise: this.req.user.id }));
   }
 
-  async modifyService(data: EnterPriseNewServiceDataDto, serviceId: string, images: Array<Express.Multer.File>|undefined): Promise<Service> {
+  async modifyService(data: EnterPriseNewServiceDataDto, serviceId: string, images: Array<Express.Multer.File> | undefined): Promise<Service> {
     if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found");
     }
-    try{
-      const {removeImg, ...__data} = data;
-      let model = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
-      if(removeImg && removeImg.length>0){
+    try {
+      const { removeImg, ...__data } = data;
+      let model = await this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec();
+      if (removeImg && removeImg.length > 0) {
         const res = await this.uploadService.deleteMulti(removeImg);
-        const filterImage = model.images.filter((e)=>{
+        const filterImage = model.images.filter((e) => {
           return !removeImg.includes(e.key);
-        })
-        await model.update({images: filterImage}).exec();
+        });
+        await model.update({ images: filterImage }).exec();
       }
-      if(images && images.length > 0){
+      if (images && images.length > 0) {
         const promises = [];
         images.map(image => {
-        promises.push(this.uploadService.upload(image));
-        })
+          promises.push(this.uploadService.upload(image));
+        });
         const res = await Promise.all<FileUploaded>(promises);
-        model = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
+        model = await this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec();
         model.images.push(...res);
         await model.save();
       }
-      const service = await this.serviceModel.findOneAndUpdate({_id: Types.ObjectId(serviceId)}, {...__data}, {new: true}).exec();
-      return service;
-    }
-    catch (e){
-throw e;
+      return await this.serviceModel.findOneAndUpdate({ _id: Types.ObjectId(serviceId) }, { ...__data }, { new: true }).exec();
+    } catch (e) {
+      throw e;
     }
 
     // return from(this.serviceModel.findOneAndUpdate({ _id: Types.ObjectId(serviceId) }, { ...data }).exec()).pipe(
@@ -135,43 +159,43 @@ throw e;
     );
   }
 
-  addServiceOpenTime(data: AddServiceOpenTimeDto, serviceId: string): Observable<Service>{
-    if(!Types.ObjectId.isValid(serviceId)){
+  addServiceOpenTime(data: AddServiceOpenTimeDto, serviceId: string): Observable<Service> {
+    if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found!");
     }
 
     return from(this.serviceModel.findOneAndUpdate(
-      {_id: Types.ObjectId(serviceId)},
-      {openTime: data.openTime, closeTime: data.closeTime}).exec());
+      { _id: Types.ObjectId(serviceId) },
+      { openTime: data.openTime, closeTime: data.closeTime }).exec());
   }
 
-  deleteService(serviceId: string): Observable<Service>{
-    if(!Types.ObjectId.isValid(serviceId)){
+  deleteService(serviceId: string): Observable<Service> {
+    if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found!");
     }
 
-    return from(this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec()).pipe(
-      map(service=>{
-        if(!service) throw new NotFoundException("Service not found!");
+    return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec()).pipe(
+      map(service => {
+        if (!service) throw new NotFoundException("Service not found!");
         return service;
       }),
-      mergeMap((service)=>{
-        return from(service.remove())
+      mergeMap((service) => {
+        return from(service.remove());
       })
     );
   }
 
-  getAllSchedule(serviceId: string): Observable<Schedule[]>{
-    if(!Types.ObjectId.isValid(serviceId)){
+  getAllSchedule(serviceId: string): Observable<Schedule[]> {
+    if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found!");
     }
-    return from(this.scheduleModel.find({service: Types.ObjectId(serviceId)}).exec());
+    return from(this.scheduleModel.find({ service: Types.ObjectId(serviceId) }).exec());
   }
 
-  getInfo(serviceId: string): Observable<Service>{
-    if(!Types.ObjectId.isValid(serviceId)){
+  getInfo(serviceId: string): Observable<Service> {
+    if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found!");
     }
-    return from(this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).populate("enterprise", "-password").exec());
+    return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).populate("enterprise", "-password").exec());
   }
 }
