@@ -162,6 +162,23 @@ export class UserController {
     )
   }
 
+  @Post('/remove-favorite')
+  @UseGuards(JwtAuthGuard)
+  removeServiceFromFavorite(@Req() req: AuthenticatedRequest<UserPrincipal>,
+                            @Body() data: AddFavoriteDto,
+                            @Res() res: Response
+                            ) : Observable<Response>{
+    return from(this.userService.removeFavorite(data.serviceId)).pipe(
+      map(s=>{
+        return res.status(HttpStatus.OK).send();
+      }),
+      catchError((e)=> {
+        throw e;
+      })
+    )
+
+  }
+
   @Get('/followed-service')
   @UseGuards(JwtAuthGuard)
   getFollowedService(@Res() res: Response): Observable<Response>{

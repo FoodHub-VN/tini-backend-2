@@ -175,6 +175,54 @@ export class UserService {
     );
   }
 
+  async removeFavorite(serviceId: string): Promise<any>{
+    if (!Types.ObjectId.isValid(serviceId)) {
+      throw new NotFoundException("Service not Found");
+    }
+    try{
+      const model = await this.userModel.findOne({_id: Types.ObjectId(this.req.user.id)}).exec();
+      if(!model) throw new NotFoundException();
+      if(!model.followedService.includes(serviceId)) {
+        throw new ConflictException("This service hasn't been added to favorite!");
+      }
+      const serviceModel = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
+      if(!serviceModel)  throw new NotFoundException("Service not found!");
+      return model.updateOne({followedService: model.followedService.filter((v)=>v!=serviceId)},{new: true}).exec();
+      // return from(this.userModel.findOne({ _id: Types.ObjectId(this.req.user.id) }).exec()).pipe(
+      //   mergeMap((user) => {
+      //     if (user) {
+      //       if (user.followedService.includes(serviceId)) {
+      //         throw new ConflictException("This service has already been added to favorite!");
+      //       } else {
+      //         return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec()).pipe(
+      //           mergeMap((service) => {
+      //             if (!service) {
+      //               throw new NotFoundException("Service not found!");
+      //             } else {
+      //               return from(user.update({ followedService: [...user.followedService, serviceId] }).exec()).pipe(
+      //                 map((user) => {
+      //                   if (user) {
+      //                     return service;
+      //                   } else {
+      //                     throw new NotFoundException();
+      //                   }
+      //                 })
+      //               );
+      //             }
+      //           })
+      //         );
+      //       }
+      //     } else {
+      //       throw new NotFoundException();
+      //     }
+      //   })
+      // );
+    }
+    catch (e) {
+      throw e;
+    }
+  }
+
   getFollowedService(): Observable<Service[]> {
     return from(this.userModel.findOne({
       _id: Types.ObjectId(this.req.user.id)
