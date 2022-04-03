@@ -3,25 +3,25 @@ import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class Address {
   @ApiProperty({
-    type: Number,
+    type: String,
     required: true
   })
   @IsNotEmpty()
-  readonly province: number;
+  readonly province: string;
 
   @ApiProperty({
-    type: Number,
+    type: String,
     required: true
   })
   @IsNotEmpty()
-  readonly district: number;
+  readonly district: string;
 
   @ApiProperty({
-    type: Number,
+    type: String,
     required: true
   })
   @IsNotEmpty()
-  readonly village: number;
+  readonly village: string;
 
   @ApiProperty({
     type: String,
