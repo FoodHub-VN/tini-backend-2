@@ -91,5 +91,11 @@ export class EnterPriseNewServiceDataDto {
   @Type(()=>Array)
   readonly removeImg: string[];
 
+  @IsOptional()
+  @ApiProperty({
+    type: String,
+    required: false
+  })
+  readonly introduction: string;
 }
 
