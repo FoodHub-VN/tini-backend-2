@@ -66,7 +66,7 @@ export const dbProviders = [
     {
         provide: NOTIFICATION_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<NotificationModel>("Notification", NotificationSchema, "notidications");
+            return conn.model<NotificationModel>("Notification", NotificationSchema, "notifications");
         },
         inject: [DB_CONNECTION]
     },

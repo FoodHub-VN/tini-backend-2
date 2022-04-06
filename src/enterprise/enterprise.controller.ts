@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
@@ -14,7 +15,7 @@ import {
   UseInterceptors
 } from "@nestjs/common";
 import { EnterpriseService } from "./enterprise.service";
-import { catchError, map, mergeMap, Observable } from "rxjs";
+import { catchError, from, map, mergeMap, Observable, of } from "rxjs";
 import { Express, Request, Response } from "express";
 import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
 import { EnterPriseNewServiceDataDto } from "./dto/enterprise-new-service.dto";
@@ -129,6 +130,18 @@ export class EnterpriseController {
         }
       })
     );
+  }
+
+  @Get("notifications")
+  getNotifications(@Res() res: Response): Observable<Response>{
+    return from(this.enterpriseService.getAllNotifications()).pipe(
+      map((noti)=>{
+        return res.status(HttpStatus.OK).send({noti: noti});
+      }),
+      catchError((e)=>{
+        throw new BadRequestException(e);
+      })
+    )
   }
 
 }

@@ -1,5 +1,5 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
-import { ENTERPRISE_MODEL, SERVICE_MODEL } from "../database/database.constants";
+import { ENTERPRISE_MODEL, NOTIFICATION_MODEL, SERVICE_MODEL } from "../database/database.constants";
 import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
 import { from, Observable } from "rxjs";
 import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
@@ -9,6 +9,7 @@ import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
 import { BServiceService } from "../b-service/b-service.service";
+import { Notification, NotificationModel } from "../database/model/notification.model";
 
 @Injectable({scope: Scope.REQUEST})
 export class EnterpriseService {
@@ -16,7 +17,8 @@ export class EnterpriseService {
     @Inject(ENTERPRISE_MODEL) private enterpriseModel: EnterpriseModel,
     @Inject(SERVICE_MODEL) private serviceModel: ServiceModel,
     @Inject(BServiceService) private bService: BServiceService,
-    @Inject(REQUEST) private req: AuthenticatedRequest<EnterprisePrincipal>
+    @Inject(REQUEST) private req: AuthenticatedRequest<EnterprisePrincipal>,
+    @Inject(NOTIFICATION_MODEL) private notiModel: NotificationModel
   ) {
   }
 
@@ -47,5 +49,17 @@ export class EnterpriseService {
 
   getAllService(): Observable<Service[]> {
     return from(this.serviceModel.find({ enterprise: this.req.user.id }).populate("category").exec());
+  }
+
+  async getAllNotifications(): Promise<Notification[]>{
+    try{
+      const service = await this.serviceModel.find({enterprise: this.req.user.id}).exec();
+      const notiModel = await this.notiModel.find({service: {$in: service.map(s=>s._id)}}, null, {lean: true})
+        .populate(["service", "user"])
+        .exec()
+      return notiModel;
+    }catch (e){
+      throw e;
+    }
   }
 }

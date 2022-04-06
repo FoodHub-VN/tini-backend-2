@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import {
   COMMENT_MODEL,
+  NOTIFICATION_MODEL,
   SCHEDULE_HISTORY_MODEL,
   SCHEDULE_MODEL,
   SERVICE_MODEL,
@@ -20,6 +21,8 @@ import { UserPrincipal } from "../auth/interface/user-principal";
 import { Comment, CommentModel } from "../database/model/comment.model";
 import { getRatingScore } from "../shared/utility";
 import { FileUploadService } from "../upload/upload.service";
+import { NotificationModel } from "../database/model/notification.model";
+import { NotiType } from "../shared/NotiType.type";
 
 
 @Injectable()
@@ -31,6 +34,7 @@ export class UserService {
     @Inject(SCHEDULE_HISTORY_MODEL) private scheduleHistory: ScheduleHistoryModel,
     @Inject(REQUEST) private req: AuthenticatedRequest<UserPrincipal>,
     @Inject(COMMENT_MODEL) private commentModel: CommentModel,
+    @Inject(NOTIFICATION_MODEL) private notiModel: NotificationModel,
     private uploadService: FileUploadService
   ) {
   }
@@ -156,9 +160,16 @@ export class UserService {
                   throw new NotFoundException("Service not found!");
                 } else {
                   return from(user.update({ followedService: [...user.followedService, serviceId] }).exec()).pipe(
-                    map((user) => {
-                      if (user) {
-                        return service;
+                    mergeMap((u) => {
+                      if (u) {
+                        return from(this.notiModel.create({
+                          user: user._id,
+                          service: service._id,
+                          type: NotiType.FOLLOWED,
+                          date: Date.now()
+                        })).pipe(
+                          map(noti=>service)
+                        )
                       } else {
                         throw new NotFoundException();
                       }
@@ -187,6 +198,12 @@ export class UserService {
       }
       const serviceModel = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
       if(!serviceModel)  throw new NotFoundException("Service not found!");
+      await this.notiModel.create({
+        user: model._id,
+        service: serviceModel._id,
+        type: NotiType.UNFOLLOWED,
+        date: Date.now()
+      })
       return model.updateOne({followedService: model.followedService.filter((v)=>v!=serviceId)},{new: true}).exec();
       // return from(this.userModel.findOne({ _id: Types.ObjectId(this.req.user.id) }).exec()).pipe(
       //   mergeMap((user) => {
