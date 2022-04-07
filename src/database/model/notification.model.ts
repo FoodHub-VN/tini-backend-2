@@ -7,6 +7,7 @@ interface Notification extends Document {
   content: string;
   type: NotiType;
   extraData: string[];
+  hadRead: boolean;
   date: number;
 }
 
@@ -15,6 +16,7 @@ type NotificationModel = Model<Notification>;
 const NotificationSchema = new Schema({
   user: { type: Types.ObjectId, ref: "User" },
   service: { type: Types.ObjectId, ref: "Service" },
+  hadRead: SchemaTypes.Boolean,
   content: SchemaTypes.String,
   type: SchemaTypes.Number,
   extraData: [SchemaTypes.String],

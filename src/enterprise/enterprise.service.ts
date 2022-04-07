@@ -1,4 +1,4 @@
-import { Inject, Injectable, Scope } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
 import { ENTERPRISE_MODEL, NOTIFICATION_MODEL, SERVICE_MODEL } from "../database/database.constants";
 import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
 import { from, Observable } from "rxjs";
@@ -10,6 +10,7 @@ import { AuthenticatedRequest } from "../auth/interface/authenticated-request.in
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
 import { BServiceService } from "../b-service/b-service.service";
 import { Notification, NotificationModel } from "../database/model/notification.model";
+import { Types } from "mongoose";
 
 @Injectable({scope: Scope.REQUEST})
 export class EnterpriseService {
@@ -26,6 +27,9 @@ export class EnterpriseService {
     return from(this.enterpriseModel.findOne({ username: name }).exec());
   }
 
+  findEnterpriseWithPassByName(name: string): Observable<Enterprise> {
+    return from(this.enterpriseModel.findOne({ username: name }).select("+password").exec());
+  }
   existEnterpriseByName(name: string): Observable<boolean> {
     return from(this.enterpriseModel.exists({ username: name }));
   }
@@ -59,6 +63,23 @@ export class EnterpriseService {
         .exec()
       return notiModel;
     }catch (e){
+      throw e;
+    }
+  }
+
+  async readNoti(notiId: string): Promise<any>{
+    if(!Types.ObjectId.isValid(notiId)){
+      throw new NotFoundException("Notification not found!");
+    }
+    try{
+      const notiModel: any = await this.notiModel.findOne({_id: notiId}).populate("service").exec();
+      if(!notiModel || notiModel.service.enterprise!=this.req.user.id){
+        throw new NotFoundException("Notification not found!");
+      }
+      await notiModel.updateOne({hadRead: true}).exec();
+      return true;
+    }
+    catch (e) {
       throw e;
     }
   }

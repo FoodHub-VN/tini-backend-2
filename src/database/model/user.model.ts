@@ -35,7 +35,7 @@ type UserModel = Model<User>;
 const UserSchema = new Schema<User>({
     username: SchemaTypes.String,
     email: SchemaTypes.String,
-    password: SchemaTypes.String,
+    password: {type: SchemaTypes.String, select: false },
     fullName: SchemaTypes.String,
     phone: SchemaTypes.String,
     gender: SchemaTypes.String,

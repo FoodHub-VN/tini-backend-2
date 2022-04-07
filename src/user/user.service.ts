@@ -21,8 +21,9 @@ import { UserPrincipal } from "../auth/interface/user-principal";
 import { Comment, CommentModel } from "../database/model/comment.model";
 import { getRatingScore } from "../shared/utility";
 import { FileUploadService } from "../upload/upload.service";
-import { NotificationModel } from "../database/model/notification.model";
+import { Notification, NotificationModel } from "../database/model/notification.model";
 import { NotiType } from "../shared/NotiType.type";
+import { NotificationGateway } from "../notification/notification.gateway";
 
 
 @Injectable()
@@ -35,10 +36,13 @@ export class UserService {
     @Inject(REQUEST) private req: AuthenticatedRequest<UserPrincipal>,
     @Inject(COMMENT_MODEL) private commentModel: CommentModel,
     @Inject(NOTIFICATION_MODEL) private notiModel: NotificationModel,
-    private uploadService: FileUploadService
+    private uploadService: FileUploadService,
+    private notiSocket: NotificationGateway
   ) {
   }
-
+  findUserWithPassByName(username: string, lean = false): Observable<User> {
+    return from(this.userModel.findOne({ username },null,{lean}).select("+password").exec());
+  }
   findUserByName(username: string, lean = false): Observable<User> {
     return from(this.userModel.findOne({ username },null,{lean}).exec());
   }
@@ -162,13 +166,18 @@ export class UserService {
                   return from(user.update({ followedService: [...user.followedService, serviceId] }).exec()).pipe(
                     mergeMap((u) => {
                       if (u) {
-                        return from(this.notiModel.create({
+                        let noti = {
                           user: user._id,
                           service: service._id,
+                          hadRead: false,
                           type: NotiType.FOLLOWED,
                           date: Date.now()
-                        })).pipe(
-                          map(noti=>service)
+                        };
+                        return from(this.notiModel.create(noti)).pipe(
+                          map(n=>{
+                            this.notiSocket.sendNotificationToClient(service.enterprise, noti);
+                            return service;
+                          })
                         )
                       } else {
                         throw new NotFoundException();
@@ -201,6 +210,7 @@ export class UserService {
       await this.notiModel.create({
         user: model._id,
         service: serviceModel._id,
+        hadRead: false,
         type: NotiType.UNFOLLOWED,
         date: Date.now()
       })

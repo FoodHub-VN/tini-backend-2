@@ -19,7 +19,7 @@ type EnterpriseModel = Model<Enterprise>;
 
 const EnterpriseSchema = new Schema<Enterprise>({
   username: SchemaTypes.String,
-  password: SchemaTypes.String,
+  password: {type: SchemaTypes.String, select: false },
   name: SchemaTypes.String,
   address: SchemaTypes.Mixed,
   email: SchemaTypes.String,

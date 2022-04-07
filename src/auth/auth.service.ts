@@ -20,7 +20,7 @@ export class AuthService {
   }
 
   validateUser(username: string, password: string): Observable<UserPrincipal> {
-    return this.userService.findUserByName(username).pipe(
+    return this.userService.findUserWithPassByName(username).pipe(
       mergeMap(user => {
         if (!user) {
           throw  new UnauthorizedException("Username not match");
@@ -48,7 +48,7 @@ export class AuthService {
   }
 
   validateEnterprise(username: string, password: string): Observable<EnterprisePrincipal> {
-    return this.enterpriseService.findEnterpriseByName(username).pipe(
+    return this.enterpriseService.findEnterpriseWithPassByName(username).pipe(
       mergeMap(ep => {
         if (!ep) {
           throw new UnauthorizedException("Enterprise not found");

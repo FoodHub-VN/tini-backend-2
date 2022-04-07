@@ -10,13 +10,13 @@ import {
   Post,
   Res,
   Scope,
-  UploadedFile, UploadedFiles,
+  UploadedFiles,
   UseGuards,
   UseInterceptors
 } from "@nestjs/common";
 import { EnterpriseService } from "./enterprise.service";
-import { catchError, from, map, mergeMap, Observable, of } from "rxjs";
-import { Express, Request, Response } from "express";
+import { catchError, from, map, mergeMap, Observable } from "rxjs";
+import { Express, Response } from "express";
 import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
 import { EnterPriseNewServiceDataDto } from "./dto/enterprise-new-service.dto";
 import { JwtEnterpriseAuthGuard } from "../auth/guard/jwt-auth.guard";
@@ -24,10 +24,10 @@ import { Public } from "../auth/guard/public.guard.decorator";
 import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
-import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import { ApiBody, ApiConsumes } from "@nestjs/swagger";
 import { ApiImplicitFile } from "@nestjs/swagger/dist/decorators/api-implicit-file.decorator";
+import { ReadNotiDto } from "./dto/read-noti.dto";
 
 
 @UseGuards(JwtEnterpriseAuthGuard)
@@ -140,6 +140,17 @@ export class EnterpriseController {
       }),
       catchError((e)=>{
         throw new BadRequestException(e);
+      })
+    )
+  }
+
+  @Post("readNoti")
+  readNoti(@Res() res: Response, @Body() data: ReadNotiDto): Observable<Response> {
+    return from(this.enterpriseService.readNoti(data.notiId)).pipe(
+      map(r=>{
+        if(r){
+          return res.status(HttpStatus.OK).send();
+        }
       })
     )
   }
