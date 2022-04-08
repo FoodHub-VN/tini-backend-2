@@ -16,6 +16,9 @@ import jwtConfig from "../config/jwtConfig.config";
           secret: config.secretKey,
           signOptions: {
             expiresIn: config.expiresIn
+          },
+          verifyOptions: {
+            ignoreExpiration: true
           }
         } as JwtModuleOptions;
       },

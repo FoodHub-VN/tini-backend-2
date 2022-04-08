@@ -21,7 +21,7 @@ import { UserPrincipal } from "../auth/interface/user-principal";
 import { Comment, CommentModel } from "../database/model/comment.model";
 import { getRatingScore } from "../shared/utility";
 import { FileUploadService } from "../upload/upload.service";
-import { Notification, NotificationModel } from "../database/model/notification.model";
+import { NotificationModel } from "../database/model/notification.model";
 import { NotiType } from "../shared/NotiType.type";
 import { NotificationGateway } from "../notification/notification.gateway";
 
@@ -174,9 +174,14 @@ export class UserService {
                           date: Date.now()
                         };
                         return from(this.notiModel.create(noti)).pipe(
-                          map(n=>{
-                            this.notiSocket.sendNotificationToClient(service.enterprise, noti);
-                            return service;
+                          mergeMap(n => {
+                            return from(n.populate([{ path: "user" }, { path: "service" }]).execPopulate())
+                              .pipe(
+                                map(d => {
+                                  this.notiSocket.sendNotificationToClient(service.enterprise, d);
+                                  return service;
+                                })
+                              );
                           })
                         )
                       } else {
@@ -207,13 +212,15 @@ export class UserService {
       }
       const serviceModel = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
       if(!serviceModel)  throw new NotFoundException("Service not found!");
-      await this.notiModel.create({
+      const newNoti = await this.notiModel.create({
         user: model._id,
         service: serviceModel._id,
         hadRead: false,
         type: NotiType.UNFOLLOWED,
         date: Date.now()
       })
+      const newNotiDetail = await newNoti.populate([{ path: "user" }, { path: "service" }]).execPopulate();
+      this.notiSocket.sendNotificationToClient(serviceModel.enterprise, newNotiDetail);
       return model.updateOne({followedService: model.followedService.filter((v)=>v!=serviceId)},{new: true}).exec();
       // return from(this.userModel.findOne({ _id: Types.ObjectId(this.req.user.id) }).exec()).pipe(
       //   mergeMap((user) => {

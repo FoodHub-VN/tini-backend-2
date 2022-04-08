@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
 import { ENTERPRISE_MODEL, NOTIFICATION_MODEL, SERVICE_MODEL } from "../database/database.constants";
 import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
 import { from, Observable } from "rxjs";
@@ -80,6 +80,16 @@ export class EnterpriseService {
       return true;
     }
     catch (e) {
+      throw e;
+    }
+  }
+
+  async readAllNoti(): Promise<any>{
+    try {
+      const services = await this.serviceModel.find({ enterprise: this.req.user.id }).exec();
+      await this.notiModel.updateMany({ service: { $in: services.map(s => s._id) } }, { hadRead: true }).exec();
+      return true;
+    } catch (e) {
       throw e;
     }
   }

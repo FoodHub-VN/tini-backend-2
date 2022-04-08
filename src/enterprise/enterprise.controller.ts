@@ -154,5 +154,18 @@ export class EnterpriseController {
       })
     )
   }
+  @Post("readAllNoti")
+  readAllNoti(@Res() res: Response): Observable<Response>{
+    return from(this.enterpriseService.readAllNoti()).pipe(
+      map(b=>{
+        if(b){
+          return res.status(HttpStatus.OK).send();
+        }
+      }),
+      catchError((e)=>{
+        throw new BadRequestException("Something wrong!");
+      })
+    )
+  }
 
 }

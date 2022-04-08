@@ -68,6 +68,6 @@ export class NotificationGateway implements OnGatewayInit, OnGatewayConnection, 
     if(!socketId){
       return;
     }
-    this.server.to(socketId).emit("hello", noti);
+    this.server.to(socketId).emit("noti", noti);
   }
 }
