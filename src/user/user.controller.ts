@@ -10,7 +10,7 @@ import {
   Put,
   Req,
   Res,
-  UploadedFile,
+  UploadedFile, UploadedFiles,
   UseGuards,
   UseInterceptors
 } from "@nestjs/common";
@@ -25,7 +25,7 @@ import { HasRole } from "../auth/guard/has-role.decorator";
 import { RolesType } from "../shared/roles-type.enum";
 import { RolesGuard } from "../auth/guard/roles.guard";
 import { UserPrincipal } from "../auth/interface/user-principal";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { AddScheduleDto } from "./dto/add-schedule.dto";
 import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { AddFavoriteDto } from "./dto/add-favorite.dto";
@@ -213,17 +213,18 @@ export class UserController {
 
   @Post('rating-service')
   @UseGuards(JwtAuthGuard)
-  ratingService(@Res()res: Response, @Body() data: RatingServiceDto): Observable<Response>{
-    return this.userService.ratingService(data.serviceId, data.score, data.title, data.content).pipe(
+  @UseInterceptors(FilesInterceptor("images"))
+  ratingService(@Res()res: Response, @Body() data: RatingServiceDto, @UploadedFiles() files: Array<Express.Multer.File>): Observable<Response>{
+    return from(this.userService.ratingService(data.serviceId, data.score, data.title, data.content, files)).pipe(
       map((comment)=>{
         if(comment){
           return res.status(HttpStatus.OK).send({
             comment: comment
           })
         }
-        else{
-          throw new BadRequestException();
-        }
+      }),
+      catchError((e)=>{
+        throw new BadRequestException('Something wrong!');
       })
     )
   }

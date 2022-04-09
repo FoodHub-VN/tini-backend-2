@@ -24,6 +24,7 @@ import { FileUploadService } from "../upload/upload.service";
 import { NotificationModel } from "../database/model/notification.model";
 import { NotiType } from "../shared/NotiType.type";
 import { NotificationGateway } from "../notification/notification.gateway";
+import { FileUploaded } from "../upload/interface/upload.interface";
 
 
 @Injectable()
@@ -275,26 +276,33 @@ export class UserService {
     return from(this.scheduleHistory.find({ user: Types.ObjectId(this.req.user.id) }).populate("service").exec());
   }
 
-  ratingService(serviceId: string, score: number[], title: string, content: string): Observable<Comment> {
+  async ratingService(serviceId: string, score: number[], title: string, content: string, images: Array<Express.Multer.File> | undefined): Promise<Comment> {
     if (!Types.ObjectId(serviceId)) {
       throw new NotFoundException("Service not found");
     }
-    let ratingScore = getRatingScore(score);
-    return from(this.serviceModel.findOne({ _id: serviceId }).exec()).pipe(
-      mergeMap((service) => {
-        if (!service) {
-          throw new NotFoundException("Service not found!");
-        } else {
-          return from(this.commentModel.create({
-            user: this.req.user.id,
-            service: Types.ObjectId(serviceId),
-            rating: ratingScore,
-            title: title,
-            content: content
-          }));
-        }
+    try {
+      let ratingScore = getRatingScore(score);
+      var uploads;
+      if(images && images.length>0){
+        const promises = [];
+        images.map(i=>{
+          promises.push(this.uploadService.upload(i));
+        })
+        uploads = await Promise.all<FileUploaded>(promises);
+      }
+      const comment = await this.commentModel.create({
+        user: this.req.user.id,
+        service: Types.ObjectId(serviceId),
+        rating: ratingScore,
+        title: title,
+        content: content,
+        images: uploads
       })
-    );
+      return comment;
+    }
+    catch (e) {
+      throw e;
+    }
   }
 
   likeComment(commentId: string): Observable<Comment> {

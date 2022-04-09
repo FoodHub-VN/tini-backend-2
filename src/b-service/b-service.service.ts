@@ -1,5 +1,11 @@
 import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
-import { CATEGORY_MODEL, INTRODUCTION_MODEL, SCHEDULE_MODEL, SERVICE_MODEL } from "../database/database.constants";
+import {
+  CATEGORY_MODEL,
+  COMMENT_MODEL,
+  INTRODUCTION_MODEL,
+  SCHEDULE_MODEL,
+  SERVICE_MODEL
+} from "../database/database.constants";
 import { Service, ServiceModel } from "../database/model/service.model";
 import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
@@ -14,6 +20,7 @@ import { Schedule, ScheduleModel } from "../database/model/schedule";
 import { CategoryModel } from "../database/model/category.model";
 import { FileUploadService } from "../upload/upload.service";
 import { FileUploaded } from "../upload/interface/upload.interface";
+import { Comment, CommentModel } from "../database/model/comment.model";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
@@ -23,6 +30,7 @@ export class BServiceService {
     @Inject(REQUEST) private req: AuthenticatedRequest<EnterprisePrincipal>,
     @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel,
     @Inject(CATEGORY_MODEL) private categoryModel: CategoryModel,
+    @Inject(COMMENT_MODEL) private commentModel : CommentModel,
     private uploadService: FileUploadService
   ) {
   }
@@ -197,5 +205,13 @@ export class BServiceService {
       throw new NotFoundException("Service not found!");
     }
     return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).populate("enterprise", "-password").exec());
+  }
+
+  async getComment(serviceId: string): Promise<Comment[]>{
+    if (!Types.ObjectId.isValid(serviceId)) {
+      throw new NotFoundException("Service not found!");
+    }
+    const comment = await this.commentModel.find({service: serviceId}).exec();
+    return comment;
   }
 }

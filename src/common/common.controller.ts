@@ -9,7 +9,7 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { Response } from "express";
-import { map, Observable } from "rxjs";
+import { catchError, from, map, Observable } from "rxjs";
 import { CommonService } from "./common.service";
 import { BServiceService } from "../b-service/b-service.service";
 
@@ -46,6 +46,18 @@ export class CommonController {
         }
       })
     );
+  }
+
+  @Get("/service/:idService/comments")
+  getCommentService(@Res() res: Response, @Param('idService') idService): Observable<Response> {
+    return from(this.bService.getComment(idService)).pipe(
+      map(comments => {
+        return res.status(HttpStatus.OK).send({comments: comments});
+      }),
+      catchError((e)=> {
+        throw new BadRequestException("Something wrong!");
+      })
+    )
   }
 
   // enterprise info

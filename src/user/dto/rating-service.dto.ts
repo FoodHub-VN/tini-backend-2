@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { plainToClass, Transform, Type } from "class-transformer";
+import { Address } from "../../shared/common.type";
 
 export class RatingServiceDto{
   @ApiProperty({
@@ -16,6 +18,10 @@ export class RatingServiceDto{
   })
   @IsArray()
   @IsNotEmpty()
+  @Transform(({ value })=>{
+    return JSON.parse(value);
+  })
+  @Type(()=>Array)
   readonly score: number[];
 
 
@@ -23,13 +29,13 @@ export class RatingServiceDto{
     type: String,
     required: false
   })
-  @IsOptional()
+  @IsNotEmpty()
   readonly title: string;
 
   @ApiProperty({
     type: String,
     required: false
   })
-  @IsOptional()
+  @IsNotEmpty()
   readonly content: string;
 }
