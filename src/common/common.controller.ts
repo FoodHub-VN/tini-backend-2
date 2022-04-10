@@ -36,7 +36,7 @@ export class CommonController {
   // service info
   @Get('/service/:idService')
   getServiceInfo(@Res() res, @Param('idService') idService): Observable<Response> {
-    return this.bService.getInfo(idService).pipe(
+    return from(this.bService.getInfo(idService)).pipe(
       map((s)=>{
         if(!s){
           throw new NotFoundException("Service not found!");

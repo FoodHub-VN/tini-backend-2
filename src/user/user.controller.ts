@@ -80,7 +80,7 @@ export class UserController {
                 if (user) {
                   return res
                     .status(HttpStatus.OK)
-                    .send({user: { ...data, avatar: avatar?.url}});
+                    .send({user: { ...data, avatar: avatar}});
                 } else {
                     throw new NotFoundException('User not found!');
                 }
@@ -249,13 +249,41 @@ export class UserController {
   uploadImage(@UploadedFile() file: Express.Multer.File, @Res() res: Response): Observable<Response> {
     return from(this.userService.uploadAvatar(file))
       .pipe(
-        map(url => {
-          if (url) {
-            return res.status(HttpStatus.OK).send({ url: url });
+        map(file => {
+          if (file) {
+            return res.status(HttpStatus.OK).send({ avatar: file });
           } else {
             return res.status(HttpStatus.BAD_REQUEST).send();
           }
         })
       );
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get("notifications")
+  getNotifications(@Res() res: Response): Observable<Response>{
+    return from(this.userService.getAllNotifications()).pipe(
+      map((noti)=>{
+        return res.status(HttpStatus.OK).send({noti: noti});
+      }),
+      catchError((e)=>{
+        console.log(e);
+        throw new BadRequestException(e);
+      })
+    )
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post("readAllNoti")
+  readAllNoti(@Res() res: Response): Observable<Response>{
+    return from(this.userService.readAllNoti()).pipe(
+      map(b=>{
+        if(b){
+          return res.status(HttpStatus.OK).send();
+        }
+      }),
+      catchError((e)=>{
+        throw new BadRequestException("Something wrong!");
+      })
+    )
   }
 }

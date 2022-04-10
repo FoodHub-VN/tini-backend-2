@@ -39,12 +39,14 @@ export class EnterPriseNewServiceDataDto {
     type: Date,
     required: false
   })
+  @IsOptional()
   readonly openTime?: string;
 
   @ApiProperty({
     type: Date,
     required: false
   })
+  @IsOptional()
   readonly closeTime?: string;
 
 

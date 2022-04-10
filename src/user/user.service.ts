@@ -21,7 +21,7 @@ import { UserPrincipal } from "../auth/interface/user-principal";
 import { Comment, CommentModel } from "../database/model/comment.model";
 import { getRatingScore } from "../shared/utility";
 import { FileUploadService } from "../upload/upload.service";
-import { NotificationModel } from "../database/model/notification.model";
+import { Notification, NotificationModel } from "../database/model/notification.model";
 import { NotiType } from "../shared/NotiType.type";
 import { NotificationGateway } from "../notification/notification.gateway";
 import { FileUploaded } from "../upload/interface/upload.interface";
@@ -180,6 +180,7 @@ export class UserService {
                               .pipe(
                                 map(d => {
                                   this.notiSocket.sendNotificationToClient(service.enterprise, d);
+                                  this.notiSocket.sendNotificationToClient(user._id, d);
                                   return service;
                                 })
                               );
@@ -222,6 +223,7 @@ export class UserService {
       })
       const newNotiDetail = await newNoti.populate([{ path: "user" }, { path: "service" }]).execPopulate();
       this.notiSocket.sendNotificationToClient(serviceModel.enterprise, newNotiDetail);
+      this.notiSocket.sendNotificationToClient(model._id, newNotiDetail);
       return model.updateOne({followedService: model.followedService.filter((v)=>v!=serviceId)},{new: true}).exec();
       // return from(this.userModel.findOne({ _id: Types.ObjectId(this.req.user.id) }).exec()).pipe(
       //   mergeMap((user) => {
@@ -332,7 +334,7 @@ export class UserService {
     );
   }
 
-  uploadAvatar(file: Express.Multer.File): Observable<string> {
+  uploadAvatar(file: Express.Multer.File): Observable<FileUploaded> {
     return from(this.userModel.findOne({ _id: this.req.user.id }).exec())
       .pipe(
         mergeMap((user) => {
@@ -348,7 +350,7 @@ export class UserService {
                             .pipe(
                               map(updated => {
                                 if (updated.ok == 1) {
-                                  return fileUploaded.url;
+                                  return fileUploaded;
                                 }
                                 throw new BadRequestException("Something wrong!");
                               })
@@ -365,7 +367,7 @@ export class UserService {
                       .pipe(
                         map(updated => {
                           if (updated.ok == 1) {
-                            return fileUploaded.url;
+                            return fileUploaded;
                           }
                           throw new BadRequestException("Something wrong!");
                         })
@@ -400,5 +402,23 @@ export class UserService {
           }
         })
       );
+  }
+  async getAllNotifications(): Promise<Notification[]>{
+    try{
+      const notiModel = await this.notiModel.find({user: this.req.user.id}, null, {lean: true})
+        .populate(["service", "user"])
+        .exec()
+      return notiModel;
+    }catch (e){
+      throw e;
+    }
+  }
+  async readAllNoti(): Promise<any>{
+    try {
+      await this.notiModel.updateMany({ user: this.req.user.id }, { hadRead: true }).exec();
+      return true;
+    } catch (e) {
+      throw e;
+    }
   }
 }

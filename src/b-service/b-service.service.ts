@@ -39,6 +39,7 @@ export class BServiceService {
     if (!Types.ObjectId.isValid(data.category)) {
       throw new NotFoundException("Category Not found");
     }
+    console.log(data);
     try{
       const serviceExist = await this.serviceModel.findOne({ name: data.name }).exec();
       if (serviceExist) {
@@ -200,11 +201,12 @@ export class BServiceService {
     return from(this.scheduleModel.find({ service: Types.ObjectId(serviceId) }).exec());
   }
 
-  getInfo(serviceId: string): Observable<Service> {
+  async getInfo(serviceId: string): Promise<Service> {
     if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found!");
     }
-    return from(this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).populate("enterprise", "-password").exec());
+    const service = await this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).populate("enterprise", "-password").exec()
+    return service;
   }
 
   async getComment(serviceId: string): Promise<Comment[]>{
