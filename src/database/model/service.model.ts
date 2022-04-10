@@ -7,6 +7,7 @@ import { ScheduleHistoryModel } from "./schedule-history.model";
 import { PurchaseModel } from "./purchase-history.model";
 import { ScheduleModel } from "./schedule";
 import { FileUploaded } from "../../upload/interface/upload.interface";
+import { ScoreModel } from "./scores.model";
 
 interface Service extends Document {
   readonly name: string;
@@ -90,6 +91,11 @@ ServiceSchema.post<Service>("remove", async function(service) {
     return schedule.remove();
   }));
 
+  //delete scores
+  const scores = await this.model<ScoreModel>("Score").find({ service: this._id }).exec();
+  await Promise.all(scores.map((score) => {
+    return score.remove();
+  }));
   return;
 });
 

@@ -3,7 +3,7 @@ import {
   CATEGORY_MODEL,
   COMMENT_MODEL,
   INTRODUCTION_MODEL,
-  SCHEDULE_MODEL,
+  SCHEDULE_MODEL, SCORE_MODEL,
   SERVICE_MODEL
 } from "../database/database.constants";
 import { Service, ServiceModel } from "../database/model/service.model";
@@ -21,6 +21,7 @@ import { CategoryModel } from "../database/model/category.model";
 import { FileUploadService } from "../upload/upload.service";
 import { FileUploaded } from "../upload/interface/upload.interface";
 import { Comment, CommentModel } from "../database/model/comment.model";
+import { ScoreModel } from "../database/model/scores.model";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
@@ -31,6 +32,7 @@ export class BServiceService {
     @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel,
     @Inject(CATEGORY_MODEL) private categoryModel: CategoryModel,
     @Inject(COMMENT_MODEL) private commentModel : CommentModel,
+    @Inject(SCORE_MODEL) private scoreModel : ScoreModel,
     private uploadService: FileUploadService
   ) {
   }
@@ -215,5 +217,33 @@ export class BServiceService {
     }
     const comment = await this.commentModel.find({service: serviceId}).exec();
     return comment;
+  }
+
+  async getServiceScore(serviceId: string): Promise<Array<number>>{
+    if (!Types.ObjectId.isValid(serviceId)) {
+      throw new NotFoundException("Service not found!");
+    }
+    try{
+      const scores = await this.scoreModel.find({service: serviceId}).exec();
+      if(scores.length<=0){
+        return [7,7,7,7,7];
+      }
+      const leanScore = scores.map(s=>s.scores);
+      let resScore = [0,0,0,0,0];
+      console.log(leanScore);
+      leanScore.forEach((e)=>{
+        resScore[0] = resScore[0] + e[0];
+        resScore[1] = resScore[1] + e[1];
+        resScore[2] = resScore[2] + e[2];
+        resScore[3] = resScore[3] + e[3];
+        resScore[4] = resScore[4] + e[4];
+      })
+      resScore.forEach((e, i)=>{resScore[i] = resScore[i]/leanScore.length});
+      return resScore;
+    }
+    catch (e) {
+      console.log(e);
+      return [7,7,7,7,7];
+    }
   }
 }

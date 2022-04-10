@@ -8,7 +8,7 @@ import {
     PREMIUM_MODEL,
     PURCHASE_MODEL,
     SCHEDULE_HISTORY_MODEL,
-    SCHEDULE_MODEL,
+    SCHEDULE_MODEL, SCORE_MODEL,
     SERVICE_MODEL,
     USER_MODEL
 } from "./database.constants";
@@ -26,6 +26,7 @@ import { ScheduleModel, ScheduleSchema } from "./model/schedule";
 import { ScheduleHistoryModel, ScheduleHistorySchema } from "./model/schedule-history.model";
 import { ServiceModel, ServiceSchema } from "./model/service.model";
 import { CategorySchema } from "./model/category.model";
+import { ScoreModel, ScoreSchema } from "./model/scores.model";
 
 export const dbProviders = [
     {
@@ -109,6 +110,13 @@ export const dbProviders = [
         provide: CATEGORY_MODEL,
         useFactory: (conn: Connection)=>{
             return conn.model<ServiceModel>("Category", CategorySchema, "categories");
+        },
+        inject: [DB_CONNECTION]
+    },
+    {
+        provide: SCORE_MODEL,
+        useFactory: (conn: Connection)=>{
+            return conn.model<ScoreModel>("Score", ScoreSchema, "scores");
         },
         inject: [DB_CONNECTION]
     }

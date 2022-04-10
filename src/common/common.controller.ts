@@ -74,7 +74,18 @@ export class CommonController {
       })
     )
   }
-
+  @Get("/service/:idService/scores")
+  getServiceScore(@Res() res: Response, @Param('idService') idService): Observable<Response> {
+    return from(this.bService.getServiceScore(idService)).pipe(
+      map(score => {
+        return res.status(HttpStatus.OK).send({score});
+      }),
+      catchError((e)=> {
+        console.log(e);
+        throw new BadRequestException("Something wrong!");
+      })
+    )
+  }
   // enterprise info
 
   // @Get('/enterprise/:idEnterprise')

@@ -3,7 +3,7 @@ import {
   COMMENT_MODEL,
   NOTIFICATION_MODEL,
   SCHEDULE_HISTORY_MODEL,
-  SCHEDULE_MODEL,
+  SCHEDULE_MODEL, SCORE_MODEL,
   SERVICE_MODEL,
   USER_MODEL
 } from "../database/database.constants";
@@ -25,6 +25,7 @@ import { Notification, NotificationModel } from "../database/model/notification.
 import { NotiType } from "../shared/NotiType.type";
 import { NotificationGateway } from "../notification/notification.gateway";
 import { FileUploaded } from "../upload/interface/upload.interface";
+import { ScoreModel } from "../database/model/scores.model";
 
 
 @Injectable()
@@ -37,6 +38,7 @@ export class UserService {
     @Inject(REQUEST) private req: AuthenticatedRequest<UserPrincipal>,
     @Inject(COMMENT_MODEL) private commentModel: CommentModel,
     @Inject(NOTIFICATION_MODEL) private notiModel: NotificationModel,
+    @Inject(SCORE_MODEL) private scoreModel: ScoreModel,
     private uploadService: FileUploadService,
     private notiSocket: NotificationGateway
   ) {
@@ -295,6 +297,7 @@ export class UserService {
         })
         uploads = await Promise.all<FileUploaded>(promises);
       }
+      await this.scoreModel.create({service: Types.ObjectId(serviceId), userRate: this.req.user.id, scores: score});
       const comment = await this.commentModel.create({
         user: this.req.user.id,
         service: Types.ObjectId(serviceId),
