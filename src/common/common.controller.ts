@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  BadRequestException, Body,
   Controller,
   Get,
   HttpStatus,
@@ -12,12 +12,15 @@ import { Response } from "express";
 import { catchError, from, map, Observable } from "rxjs";
 import { CommonService } from "./common.service";
 import { BServiceService } from "../b-service/b-service.service";
+import { UserInfoDto } from "./dto/user-info.dto";
+import { UserService } from "../user/user.service";
 
 @Controller('')
 export class CommonController {
   constructor(
     private readonly commonService: CommonService,
-    private readonly bService: BServiceService
+    private readonly bService: BServiceService,
+    private readonly userService: UserService
   ) {
   }
   @Get('/categories')
@@ -56,6 +59,18 @@ export class CommonController {
       }),
       catchError((e)=> {
         throw new BadRequestException("Something wrong!");
+      })
+    )
+  }
+
+  @Get('user-info')
+  getUserInfo(@Res() res: Response, @Body() userInfo: UserInfoDto): Observable<Response>{
+    return from(this.userService.findUserById(userInfo.userId)).pipe(
+      map(u=>{
+        return res.status(HttpStatus.OK).send({user: u});
+      }),
+      catchError((e)=>{
+        throw new BadRequestException('Something wrong!');
       })
     )
   }

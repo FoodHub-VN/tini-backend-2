@@ -48,6 +48,9 @@ export class UserService {
     return from(this.userModel.findOne({ username },null,{lean}).exec());
   }
 
+  async findUserById(userId: string): Promise<User>{
+    return await this.userModel.findOne({_id: userId}, null, {lean: true}).exec();
+  }
   register(data: UserRegisterDto): Observable<User> {
     return from(this.userModel.create({ ...data }));
   }
