@@ -22,6 +22,7 @@ import { FileUploadService } from "../upload/upload.service";
 import { FileUploaded } from "../upload/interface/upload.interface";
 import { Comment, CommentModel } from "../database/model/comment.model";
 import { ScoreModel } from "../database/model/scores.model";
+import { getRatingScore } from "../shared/utility";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
@@ -215,7 +216,7 @@ export class BServiceService {
     if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found!");
     }
-    const comment = await this.commentModel.find({service: serviceId}).exec();
+    const comment = await this.commentModel.find({service: serviceId}).populate(["user", "service"]).exec();
     return comment;
   }
 
@@ -223,10 +224,11 @@ export class BServiceService {
     if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found!");
     }
+    const defaultScore =[7,7,7,7,7,];
     try{
       const scores = await this.scoreModel.find({service: serviceId}).exec();
       if(scores.length<=0){
-        return [7,7,7,7,7];
+        return [...defaultScore, getRatingScore(defaultScore)];
       }
       const leanScore = scores.map(s=>s.scores);
       let resScore = [0,0,0,0,0];
@@ -239,11 +241,11 @@ export class BServiceService {
         resScore[4] = resScore[4] + e[4];
       })
       resScore.forEach((e, i)=>{resScore[i] = resScore[i]/leanScore.length});
-      return resScore;
+      return [...resScore, getRatingScore(resScore)];
     }
     catch (e) {
       console.log(e);
-      return [7,7,7,7,7];
+      return [...defaultScore, getRatingScore(defaultScore)];
     }
   }
 }

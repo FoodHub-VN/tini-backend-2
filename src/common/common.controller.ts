@@ -4,7 +4,7 @@ import {
   Get,
   HttpStatus,
   NotFoundException,
-  Param,
+  Param, Query,
   Res,
   UseGuards
 } from "@nestjs/common";
@@ -63,9 +63,9 @@ export class CommonController {
     )
   }
 
-  @Get('user-info')
-  getUserInfo(@Res() res: Response, @Body() userInfo: UserInfoDto): Observable<Response>{
-    return from(this.userService.findUserById(userInfo.userId)).pipe(
+  @Get('user-info/:userId')
+  getUserInfo(@Res() res: Response, @Param("userId") userId: string): Observable<Response>{
+    return from(this.userService.findUserById(userId)).pipe(
       map(u=>{
         return res.status(HttpStatus.OK).send({user: u});
       }),
