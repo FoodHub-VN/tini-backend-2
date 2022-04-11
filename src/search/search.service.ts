@@ -23,12 +23,13 @@ export class SearchService {
             }
           },
           { score: { $meta: "textScore" } })
-        .sort({score: { $meta: "textScore" }})
+        .sort({ score: { $meta: "textScore" } })
+        .populate("category")
         .exec()
       );
     }
     else{
-      return from(this.serviceModel.find().exec());
+      return from(this.serviceModel.find().populate("category").exec());
     }
 
   }
