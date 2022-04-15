@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
+import { ConflictException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
 import { ENTERPRISE_MODEL, NOTIFICATION_MODEL, SERVICE_MODEL } from "../database/database.constants";
 import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
 import { from, Observable } from "rxjs";
@@ -88,6 +88,19 @@ export class EnterpriseService {
     try {
       const services = await this.serviceModel.find({ enterprise: this.req.user.id }).exec();
       await this.notiModel.updateMany({ service: { $in: services.map(s => s._id) } }, { hadRead: true }).exec();
+      return true;
+    } catch (e) {
+      throw e;
+    }
+  }
+  
+  async buyPremium(id: string): Promise<any>{
+    try{
+      const model = await this.enterpriseModel.findOne({_id: this.req.user.id}).exec();
+      if(parseInt(model.premium) >= parseInt(id)){
+        throw new ConflictException("Premium is lower than previous");
+      }
+      await model.update({premium: id}).exec();
       return true;
     } catch (e) {
       throw e;

@@ -290,14 +290,17 @@ export class UserService {
     try {
       let ratingScore = getRatingScore(score);
       var uploads;
+      const service = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
       if(images && images.length>0){
         const promises = [];
         images.map(i=>{
           promises.push(this.uploadService.upload(i));
         })
         uploads = await Promise.all<FileUploaded>(promises);
+        await service.update({imgCmtCount: service.imgCmtCount?service.imgCmtCount+images.length: 1}).exec();
       }
       await this.scoreModel.create({service: Types.ObjectId(serviceId), userRate: this.req.user.id, scores: score});
+      await service.update({textCmtCount: service.textCmtCount?service.textCmtCount+1: 1}).exec();
       const comment = await this.commentModel.create({
         user: this.req.user.id,
         service: Types.ObjectId(serviceId),

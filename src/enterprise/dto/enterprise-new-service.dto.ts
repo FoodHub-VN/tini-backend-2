@@ -99,5 +99,12 @@ export class EnterPriseNewServiceDataDto {
     required: false
   })
   readonly introduction: string;
+
+  @IsOptional()
+  @ApiProperty({
+    type: String,
+    required: false
+  })
+  readonly shortIntroduction: string;
 }
 

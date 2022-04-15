@@ -168,4 +168,15 @@ export class EnterpriseController {
     )
   }
 
+  @Post("buyPremium")
+  buyPremium(@Res() res: Response, @Body() data: any): Observable<Response>{
+    return from(this.enterpriseService.buyPremium(data.id))
+      .pipe(
+        map(e=>{
+          return res.status(HttpStatus.OK).send();
+        })
+      )
+      ;
+  }
+
 }

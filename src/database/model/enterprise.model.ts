@@ -24,7 +24,7 @@ const EnterpriseSchema = new Schema<Enterprise>({
   address: SchemaTypes.Mixed,
   email: SchemaTypes.String,
   phone: SchemaTypes.String,
-  premium: SchemaTypes.ObjectId
+  premium: SchemaTypes.String
 }, {timestamps: true});
 
 async function preSaveHook(next) {

@@ -26,6 +26,7 @@ interface Service extends Document {
   readonly textCmtCount: number;
   readonly category: string;
   readonly introduction: string;
+  readonly shortIntroduction: string;
 }
 
 type ServiceModel = Model<Service>;
@@ -49,6 +50,7 @@ const ServiceSchema = new Schema<Service>({
   imgCmtCount: SchemaTypes.Number,
   textCmtCount: SchemaTypes.Number,
   introduction: SchemaTypes.String,
+  shortIntroduction: SchemaTypes.String,
   category: {type: SchemaTypes.ObjectId, ref: 'Category'},
 }, { timestamps: true });
 
