@@ -28,6 +28,8 @@ import { FilesInterceptor } from "@nestjs/platform-express";
 import { ApiBody, ApiConsumes } from "@nestjs/swagger";
 import { ApiImplicitFile } from "@nestjs/swagger/dist/decorators/api-implicit-file.decorator";
 import { ReadNotiDto } from "./dto/read-noti.dto";
+import { DeleteScheduleDto } from "./dto/delete-schedule.dto";
+import { DoneScheduleDto } from "./dto/done-schedule.dto";
 
 
 @UseGuards(JwtEnterpriseAuthGuard)
@@ -178,5 +180,40 @@ export class EnterpriseController {
       )
       ;
   }
+
+  @Get('allSchedule')
+  getSchedules(@Res() res: Response) : Observable<Response>{
+    return from(this.enterpriseService.getSchedules())
+      .pipe(
+        map(s=>res.status(HttpStatus.OK).send({schedules: s})),
+        catchError((e)=>{
+          throw e;
+        })
+      )
+  }
+
+  @Post('deleteSchedule')
+  deleteSchedule(@Res() res: Response, @Body() data: DeleteScheduleDto) : Observable<Response>{
+    return from(this.enterpriseService.deleteSchedule(data.id)).pipe(
+      map(r=>{
+        return res.status(HttpStatus.OK).send();
+      }),
+      catchError(e=>{
+        throw e;
+      })
+    )
+  }
+  @Post('doneSchedule')
+  doneSchedule(@Res() res: Response, @Body() data: DoneScheduleDto) : Observable<Response>{
+    return from(this.enterpriseService.doneSchedule(data.id)).pipe(
+      map(r=>{
+        return res.status(HttpStatus.OK).send();
+      }),
+      catchError(e=>{
+        throw e;
+      })
+    )
+  }
+
 
 }

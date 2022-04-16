@@ -128,18 +128,11 @@ export class UserService {
               } else {
                 return from(this.scheduleModel.findOne({ service: Types.ObjectId(serviceId), user: user._id })).pipe(
                   mergeMap((schedule) => {
-                    if (!schedule) {
-                      return from(this.scheduleModel.create({
-                        user: user._id,
-                        service: Types.ObjectId(serviceId),
-                        timeServe: time
-                      }));
-                    } else {
-                      return from(this.scheduleModel.findOneAndUpdate({
-                        user: user._id,
-                        service: Types.ObjectId(serviceId)
-                      }, { timeServe: time }, { new: true }));
-                    }
+                    return from(this.scheduleModel.create({
+                      user: user._id,
+                      service: Types.ObjectId(serviceId),
+                      timeServe: time
+                    }));
                   })
                 );
               }
@@ -151,7 +144,7 @@ export class UserService {
   }
 
   getAllSchedule(): Observable<Schedule[]> {
-    return from(this.scheduleModel.find({ user: Types.ObjectId(this.req.user.id) }).exec());
+    return from(this.scheduleModel.find({ user: Types.ObjectId(this.req.user.id) }).populate("service").exec());
   }
 
   addToFavorite(serviceId: string): Observable<Service> {

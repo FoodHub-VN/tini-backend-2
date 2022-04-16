@@ -1,5 +1,11 @@
-import { ConflictException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
-import { ENTERPRISE_MODEL, NOTIFICATION_MODEL, SERVICE_MODEL } from "../database/database.constants";
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
+import {
+  ENTERPRISE_MODEL,
+  NOTIFICATION_MODEL,
+  SCHEDULE_HISTORY_MODEL,
+  SCHEDULE_MODEL,
+  SERVICE_MODEL
+} from "../database/database.constants";
 import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
 import { from, Observable } from "rxjs";
 import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
@@ -11,6 +17,10 @@ import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
 import { BServiceService } from "../b-service/b-service.service";
 import { Notification, NotificationModel } from "../database/model/notification.model";
 import { Types } from "mongoose";
+import { ScheduleModel } from "../database/model/schedule";
+import { NotificationGateway } from "../notification/notification.gateway";
+import { NotiType } from "../shared/NotiType.type";
+import { ScheduleHistoryModel } from "../database/model/schedule-history.model";
 
 @Injectable({scope: Scope.REQUEST})
 export class EnterpriseService {
@@ -19,7 +29,10 @@ export class EnterpriseService {
     @Inject(SERVICE_MODEL) private serviceModel: ServiceModel,
     @Inject(BServiceService) private bService: BServiceService,
     @Inject(REQUEST) private req: AuthenticatedRequest<EnterprisePrincipal>,
-    @Inject(NOTIFICATION_MODEL) private notiModel: NotificationModel
+    @Inject(NOTIFICATION_MODEL) private notiModel: NotificationModel,
+    @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel,
+    @Inject(SCHEDULE_HISTORY_MODEL) private scheduleHistoryModel: ScheduleHistoryModel,
+    private notiSocket: NotificationGateway
   ) {
   }
 
@@ -103,6 +116,71 @@ export class EnterpriseService {
       await model.update({premium: id}).exec();
       return true;
     } catch (e) {
+      throw e;
+    }
+  }
+
+  async getSchedules(): Promise<any>{
+    try{
+      const services = await this.serviceModel.find({enterprise: this.req.user.id}).exec();
+      const schedule = await this.scheduleModel.find({service: {$in: services.map(s => s.id)}}).populate(["user","service"]).exec();
+      return schedule;
+    }catch (e) {
+      throw e;
+    }
+  }
+
+  async deleteSchedule(id: string): Promise<any>{
+    if(!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException("Schedule not found!");
+    }
+    try{
+      const schedule = await this.scheduleModel.findOne({_id: id}).exec();
+      if(!schedule) throw new NotFoundException("Schedule not found!");
+      const newNoti = await this.notiModel.create({
+        user: schedule.user,
+        service: schedule.service,
+        hadRead: false,
+        type: NotiType.ENTERPRISE_DELETE_SCHEDULE,
+        date: Date.now()
+      })
+      const newNotiDetail = await newNoti.populate([{ path: "user" }, { path: "service" }]).execPopulate();
+      this.notiSocket.sendNotificationToClient(this.req.user.id, newNotiDetail);
+      this.notiSocket.sendNotificationToClient(schedule.user.toString(), newNotiDetail);
+      await schedule.remove();
+      return true;
+    }
+    catch (e){
+      throw e;
+    }
+  }
+  async doneSchedule(id: string): Promise<any>{
+    if(!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException("Schedule not found!");
+    }
+    try{
+      const schedule = await this.scheduleModel.findOne({_id: id}).exec();
+      if(!schedule) throw new NotFoundException("Schedule not found!");
+      const newNoti = await this.notiModel.create({
+        user: schedule.user,
+        service: schedule.service,
+        hadRead: false,
+        type: NotiType.ENTERPRISE_DONE_SCHEDULE,
+        date: Date.now()
+      })
+      const newNotiDetail = await newNoti.populate([{ path: "user" }, { path: "service" }]).execPopulate();
+      this.notiSocket.sendNotificationToClient(this.req.user.id, newNotiDetail);
+      this.notiSocket.sendNotificationToClient(schedule.user.toString(), newNotiDetail);
+      await schedule.remove();
+      await this.scheduleHistoryModel.create({
+        user: schedule.user,
+        service: schedule.service,
+        date: Date.now(),
+        hasRating: false
+      })
+      return true;
+    }
+    catch (e){
       throw e;
     }
   }
