@@ -9,7 +9,7 @@ import {
   NotFoundException,
   Post,
   Res,
-  Scope,
+  Scope, UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors
@@ -19,17 +19,18 @@ import { catchError, from, map, mergeMap, Observable } from "rxjs";
 import { Express, Response } from "express";
 import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
 import { EnterPriseNewServiceDataDto } from "./dto/enterprise-new-service.dto";
-import { JwtEnterpriseAuthGuard } from "../auth/guard/jwt-auth.guard";
+import { JwtAuthGuard, JwtEnterpriseAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { Public } from "../auth/guard/public.guard.decorator";
 import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
-import { FilesInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { ApiBody, ApiConsumes } from "@nestjs/swagger";
 import { ApiImplicitFile } from "@nestjs/swagger/dist/decorators/api-implicit-file.decorator";
 import { ReadNotiDto } from "./dto/read-noti.dto";
 import { DeleteScheduleDto } from "./dto/delete-schedule.dto";
 import { DoneScheduleDto } from "./dto/done-schedule.dto";
+import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
 
 
 @UseGuards(JwtEnterpriseAuthGuard)
@@ -215,5 +216,36 @@ export class EnterpriseController {
     )
   }
 
+  @Post("upload-avatar")
+  @UseInterceptors(FileInterceptor("image"))
+  uploadImage(@UploadedFile() file: Express.Multer.File, @Res() res: Response): Observable<Response> {
+    return from(this.enterpriseService.uploadAvatar(file))
+      .pipe(
+        map(file => {
+          if (file) {
+            return res.status(HttpStatus.OK).send({ avatar: file });
+          } else {
+            return res.status(HttpStatus.BAD_REQUEST).send();
+          }
+        })
+      );
+  }
+  @Post('update-profile')
+  updateProfile(@Res() res: Response, @Body() data: EnterpriseEditDto): Observable<Response> {
+    return from(this.enterpriseService.updateProfile(data))
+      .pipe(
+        map(r=>res.status(HttpStatus.OK).send(r)),
+        catchError((e)=>{
+          throw e;
+        })
+      )
+  }
+  @Get('get-overview-analysis')
+  getOverviewAnalysis(@Res() res: Response): Observable<Response> {
+    return from(this.enterpriseService.getOverviewAnalysis())
+      .pipe(
+        map(r=>res.status(HttpStatus.OK).send(r))
+      )
+  }
 
 }

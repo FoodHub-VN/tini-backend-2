@@ -4,10 +4,10 @@ import {
   NOTIFICATION_MODEL,
   SCHEDULE_HISTORY_MODEL,
   SCHEDULE_MODEL,
-  SERVICE_MODEL
+  SERVICE_MODEL, USER_MODEL
 } from "../database/database.constants";
 import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
-import { from, Observable } from "rxjs";
+import { catchError, from, map, mergeMap, Observable, throwError } from "rxjs";
 import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
 import { EnterPriseNewServiceDataDto } from "./dto/enterprise-new-service.dto";
 import { Service, ServiceModel } from "../database/model/service.model";
@@ -21,6 +21,10 @@ import { ScheduleModel } from "../database/model/schedule";
 import { NotificationGateway } from "../notification/notification.gateway";
 import { NotiType } from "../shared/NotiType.type";
 import { ScheduleHistoryModel } from "../database/model/schedule-history.model";
+import { FileUploaded } from "../upload/interface/upload.interface";
+import { FileUploadService } from "../upload/upload.service";
+import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
+import { UserModel } from "../database/model/user.model";
 
 @Injectable({scope: Scope.REQUEST})
 export class EnterpriseService {
@@ -32,6 +36,8 @@ export class EnterpriseService {
     @Inject(NOTIFICATION_MODEL) private notiModel: NotificationModel,
     @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel,
     @Inject(SCHEDULE_HISTORY_MODEL) private scheduleHistoryModel: ScheduleHistoryModel,
+    @Inject(USER_MODEL)private userModel: UserModel,
+    private uploadService: FileUploadService,
     private notiSocket: NotificationGateway
   ) {
   }
@@ -179,6 +185,96 @@ export class EnterpriseService {
         hasRating: false
       })
       return true;
+    }
+    catch (e){
+      throw e;
+    }
+  }
+  uploadAvatar(file: Express.Multer.File): Observable<FileUploaded> {
+    return from(this.enterpriseModel.findOne({ _id: this.req.user.id }).exec())
+      .pipe(
+        mergeMap((user) => {
+          if (user) {
+            if (user.avatar) {
+              return from(this.uploadService.delete(user.avatar.key))
+                .pipe(
+                  mergeMap((deleted) => {
+                    return from(this.uploadService.upload(file))
+                      .pipe(
+                        mergeMap((fileUploaded) => {
+                          return from(user.updateOne({ avatar: fileUploaded }, { new: true }).exec())
+                            .pipe(
+                              map(updated => {
+                                if (updated.ok == 1) {
+                                  return fileUploaded;
+                                }
+                                throw new BadRequestException("Something wrong!");
+                              })
+                            );
+                        })
+                      );
+                  })
+                );
+            } else {
+              return from(this.uploadService.upload(file))
+                .pipe(
+                  mergeMap((fileUploaded) => {
+                    return from(user.updateOne({ avatar: fileUploaded }, { new: true }).exec())
+                      .pipe(
+                        map(updated => {
+                          if (updated.ok == 1) {
+                            return fileUploaded;
+                          }
+                          throw new BadRequestException("Something wrong!");
+                        })
+                      );
+                  })
+                );
+            }
+          } else {
+            throwError(() => new Error());
+          }
+        }),
+        catchError((err, cau) => {
+          console.log(err);
+          throw new BadRequestException({ err });
+        })
+      );
+  }
+
+  async updateProfile(data: EnterpriseEditDto): Promise<Enterprise>{
+    try{
+      const model = await this.enterpriseModel.findOne({_id: this.req.user.id}).exec();
+      if(model){
+        await model.update({...data}).exec();
+        return model;
+      }
+      else{
+        throw new NotFoundException("Enterprise not found!");
+      }
+    }
+    catch (e) {
+      throw e;
+    }
+  }
+  async getOverviewAnalysis(): Promise<any>{
+    try{
+      //số lượng dịch vụ
+      const service = await this.serviceModel.find({enterprise: this.req.user.id}).exec();
+
+      //so nguoi theo doi
+
+      const numOfFollow = await this.userModel.aggregate([{
+        $unwind: "$followedService"
+      },{
+        $match:{
+          followedService: {$in: service.map(e=>e._id)}
+        }
+      }]).exec()
+
+      //so lan giao dich
+      const numOfDoneSchedule = await this.scheduleHistoryModel.count({service: {$in: service.map(e=>e._id)}})
+      return {numOfService: service.length, numOfFollow: numOfFollow.length, numOfDoneSchedule: numOfDoneSchedule}
     }
     catch (e){
       throw e;

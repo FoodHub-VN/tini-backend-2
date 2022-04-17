@@ -4,9 +4,10 @@ import { EnterpriseController } from './enterprise.controller';
 import { DatabaseModule } from "../database/database.module";
 import { BServiceModule } from "../b-service/b-service.module";
 import { NestjsFormDataModule } from "nestjs-form-data";
+import { UploadModule } from "../upload/upload.module";
 
 @Module({
-  imports:[DatabaseModule, BServiceModule, NestjsFormDataModule],
+  imports:[DatabaseModule, BServiceModule, NestjsFormDataModule, UploadModule],
   providers: [EnterpriseService],
   controllers: [EnterpriseController],
   exports: [EnterpriseService]

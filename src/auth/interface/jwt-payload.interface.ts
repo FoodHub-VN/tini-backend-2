@@ -13,7 +13,7 @@ export class JwtEnterprisePayload{
     email: string;
     id: string;
     phone: string;
-    name: string;
+    fullName: string;
     role: RolesType;
 }
 export class JwtAdminPayload{

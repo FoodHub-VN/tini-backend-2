@@ -60,7 +60,7 @@ export class AuthService {
                   username: ep.username,
                   email: ep.email,
                   id: ep._id,
-                  name: ep.name,
+                  fullName: ep.fullName,
                   phone: ep.phone,
                   role: RolesType.PROVIDER
                 } as EnterprisePrincipal;

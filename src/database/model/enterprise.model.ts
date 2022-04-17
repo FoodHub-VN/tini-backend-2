@@ -2,17 +2,18 @@ import { Document, Model, Schema, SchemaTypes } from "mongoose";
 import { from, Observable } from "rxjs";
 import { Address } from "./user.model";
 import { compare, hash } from "bcrypt";
+import { FileUploaded } from "../../upload/interface/upload.interface";
 
 interface Enterprise extends Document {
   comparePassword(password: string): Observable<boolean>;
-
   username: string;
   password: string;
-  name: string;
+  fullName: string;
   address: Address;
   email: string;
   phone: string;
   premium: string;
+  avatar: FileUploaded;
 }
 
 type EnterpriseModel = Model<Enterprise>;
@@ -20,11 +21,12 @@ type EnterpriseModel = Model<Enterprise>;
 const EnterpriseSchema = new Schema<Enterprise>({
   username: SchemaTypes.String,
   password: {type: SchemaTypes.String, select: false },
-  name: SchemaTypes.String,
+  fullName: SchemaTypes.String,
   address: SchemaTypes.Mixed,
   email: SchemaTypes.String,
   phone: SchemaTypes.String,
-  premium: SchemaTypes.String
+  premium: SchemaTypes.String,
+  avatar: SchemaTypes.Mixed
 }, {timestamps: true});
 
 async function preSaveHook(next) {
