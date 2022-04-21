@@ -144,7 +144,7 @@ export class UserService {
   }
 
   getAllSchedule(): Observable<Schedule[]> {
-    return from(this.scheduleModel.find({ user: Types.ObjectId(this.req.user.id) }).populate("service").exec());
+    return from(this.scheduleModel.find({ user: Types.ObjectId(this.req.user.id) }).populate(["service"]).exec());
   }
 
   addToFavorite(serviceId: string): Observable<Service> {
