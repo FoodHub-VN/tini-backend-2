@@ -143,6 +143,21 @@ export class UserService {
     );
   }
 
+  async removeSchedule(scheduleId: string): Promise<any>{
+    if(!Types.ObjectId.isValid(scheduleId)){
+      throw new NotFoundException("Schedule not found!");
+    }
+    try{
+      const schedule = await this.scheduleModel.findOne({_id: Types.ObjectId(scheduleId)}).exec();
+      await schedule.remove();
+      return true;
+    }
+    catch (e) {
+      throw e;
+    }
+
+  }
+
   getAllSchedule(): Observable<Schedule[]> {
     return from(this.scheduleModel.find({ user: Types.ObjectId(this.req.user.id) }).populate(["service"]).exec());
   }

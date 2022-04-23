@@ -1,11 +1,12 @@
-import { BadRequestException, Body, Controller, Get, HttpStatus, NotFoundException, Query, Res } from "@nestjs/common";
+import { BadRequestException, Controller, Get, HttpStatus, Query, Req, Res } from "@nestjs/common";
 import { SearchService } from "./search.service";
-import { QuickSearchDto } from "./quick-search.dto";
 import { Response } from "express";
-import { delay, from, map, Observable } from "rxjs";
-import { Public } from "../auth/guard/public.guard.decorator";
+import { from, map, Observable } from "rxjs";
+import { Filter } from "./interface/filter.interface";
+import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
+import { UserPrincipal } from "../auth/interface/user-principal";
 
-@Controller('search')
+@Controller("search")
 export class SearchController {
   constructor(
     private readonly searchService: SearchService
@@ -13,18 +14,27 @@ export class SearchController {
   }
 
   @Get()
-  quickSearch(@Query('text') searchText, @Res() res: Response): Observable<Response> {
-      return from(this.searchService.quickSearch(searchText))
-        .pipe(
-          map((services)=>{
-            if(services){
-              return res.status(HttpStatus.OK).send({
-                searchText: searchText,
-                services: services
-              })
-            }
-            else{
-              throw new BadRequestException();
+  search(@Res() res: Response,
+         @Query("text") searchText: string,
+         @Query("category") category: string,
+         @Query("quan") quan: string,
+         @Query("huyen") huyen: string,
+         @Req() req: AuthenticatedRequest<UserPrincipal>
+  ): Observable<Response> {
+    let filter: Filter = {};
+    category && (filter.category = category.toString());
+    quan && (filter.quan = quan.toString());
+    huyen && (filter.huyen = huyen.toString());
+    return from(this.searchService.deepSearch(searchText, filter))
+      .pipe(
+        map((services) => {
+          if (services) {
+            return res.status(HttpStatus.OK).send({
+              searchText: searchText,
+              services: services
+            });
+          } else {
+            throw new BadRequestException();
             }
           })
         )

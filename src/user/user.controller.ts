@@ -117,6 +117,18 @@ export class UserController {
     );
   }
 
+  @Post('unschedule')
+  @UseGuards(JwtAuthGuard)
+  unSchedule(@Body() data: any, @Res() res: Response): Observable<Response>{
+    return from(this.userService.removeSchedule(data.id))
+      .pipe(
+        map(r=>res.status(HttpStatus.OK).send()),
+        catchError((err)=>{
+          throw err;
+        })
+      )
+  }
+
   @Post("/done-schedule")
   @UseGuards(JwtAuthGuard)
   doneSchedule(@Body() data: DoneScheduleDto, @Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response): Observable<Response> {

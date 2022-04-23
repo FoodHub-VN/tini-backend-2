@@ -9,10 +9,10 @@ import { ScheduleModel } from "./schedule";
 import { FileUploaded } from "../../upload/interface/upload.interface";
 
 export interface Address extends Object {
-    readonly province: string;
-    readonly district: string;
-    readonly village: string;
-    readonly detail: string;
+     province: string;
+     district: string;
+     village: string;
+     detail: string;
 }
 
 interface User extends Document {

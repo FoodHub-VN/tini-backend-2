@@ -10,23 +10,23 @@ import { FileUploaded } from "../../upload/interface/upload.interface";
 import { ScoreModel } from "./scores.model";
 
 interface Service extends Document {
-  readonly name: string;
-  readonly avatar: FileUploaded | undefined;
-  readonly images: FileUploaded[] | undefined;
-  readonly enterprise: string;
-  readonly address: Address;
-  readonly email: string;
-  readonly phone: string;
-  readonly rankingPoint: number;
-  readonly openTime: string;
-  readonly closeTime: string;
-  readonly maxPrice: number;
-  readonly minPrice: number;
-  readonly imgCmtCount: number;
-  readonly textCmtCount: number;
-  readonly category: string;
-  readonly introduction: string;
-  readonly shortIntroduction: string;
+   name: string;
+   avatar: FileUploaded | undefined;
+   images: FileUploaded[] | undefined;
+   enterprise: string;
+   address: Address;
+   email: string;
+   phone: string;
+   rankingPoint: number;
+   openTime: string;
+   closeTime: string;
+   maxPrice: number;
+   minPrice: number;
+   imgCmtCount: number;
+   textCmtCount: number;
+   category: string;
+   introduction: string;
+   shortIntroduction: string;
 }
 
 type ServiceModel = Model<Service>;
