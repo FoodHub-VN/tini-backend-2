@@ -1,0 +1,13 @@
+export declare const DB_CONNECTION = "DATABASE_CONNECTION";
+export declare const USER_MODEL = "USER_MODEL";
+export declare const COMMENT_MODEL = "COMMENT_MODEL";
+export declare const ENTERPRISE_MODEL = "ENTERPRISE_MODEL";
+export declare const INTRODUCTION_MODEL = "INTRODUCTION_MODEL";
+export declare const NOTIFICATION_MODEL = "NOTIFICATION_MODEL";
+export declare const PREMIUM_MODEL = "PREMIUM_MODEL";
+export declare const PURCHASE_MODEL = "PURCHASE_MODEL";
+export declare const SCHEDULE_MODEL = "SCHEDULE_MODEL";
+export declare const SCHEDULE_HISTORY_MODEL = "SCHEDULE_HISTORY_MODEL";
+export declare const SERVICE_MODEL = "SERVICE_MODEL";
+export declare const CATEGORY_MODEL = "CATEGORY_MODEL";
+export declare const SCORE_MODEL = "SCORE_MODEL";

@@ -1,0 +1,48 @@
+/// <reference types="multer" />
+import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
+import { Observable } from "rxjs";
+import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
+import { EnterPriseNewServiceDataDto } from "./dto/enterprise-new-service.dto";
+import { Service, ServiceModel } from "../database/model/service.model";
+import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
+import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
+import { BServiceService } from "../b-service/b-service.service";
+import { Notification, NotificationModel } from "../database/model/notification.model";
+import { ScheduleModel } from "../database/model/schedule";
+import { NotificationGateway } from "../notification/notification.gateway";
+import { ScheduleHistoryModel } from "../database/model/schedule-history.model";
+import { FileUploaded } from "../upload/interface/upload.interface";
+import { FileUploadService } from "../upload/upload.service";
+import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
+import { UserModel } from "../database/model/user.model";
+export declare class EnterpriseService {
+    private enterpriseModel;
+    private serviceModel;
+    private bService;
+    private req;
+    private notiModel;
+    private scheduleModel;
+    private scheduleHistoryModel;
+    private userModel;
+    private uploadService;
+    private notiSocket;
+    constructor(enterpriseModel: EnterpriseModel, serviceModel: ServiceModel, bService: BServiceService, req: AuthenticatedRequest<EnterprisePrincipal>, notiModel: NotificationModel, scheduleModel: ScheduleModel, scheduleHistoryModel: ScheduleHistoryModel, userModel: UserModel, uploadService: FileUploadService, notiSocket: NotificationGateway);
+    findEnterpriseByName(name: string): Observable<Enterprise>;
+    findEnterpriseWithPassByName(name: string): Observable<Enterprise>;
+    existEnterpriseByName(name: string): Observable<boolean>;
+    existEnterpriseByMail(mail: string): Observable<boolean>;
+    register(data: EnterpriseRegisterDto): Observable<Enterprise>;
+    createNewService(data: EnterPriseNewServiceDataDto, images: Array<Express.Multer.File> | undefined): Observable<any>;
+    getInfo(): Observable<Enterprise>;
+    getAllService(): Observable<Service[]>;
+    getAllNotifications(): Promise<Notification[]>;
+    readNoti(notiId: string): Promise<any>;
+    readAllNoti(): Promise<any>;
+    buyPremium(id: string): Promise<any>;
+    getSchedules(): Promise<any>;
+    deleteSchedule(id: string): Promise<any>;
+    doneSchedule(id: string): Promise<any>;
+    uploadAvatar(file: Express.Multer.File): Observable<FileUploaded>;
+    updateProfile(data: EnterpriseEditDto): Promise<Enterprise>;
+    getOverviewAnalysis(): Promise<any>;
+}

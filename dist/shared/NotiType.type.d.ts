@@ -1,0 +1,8 @@
+export declare enum NotiType {
+    FOLLOWED = 0,
+    UNFOLLOWED = 1,
+    USER_SCHEDULE = 2,
+    USER_UNSCHEDULE = 3,
+    ENTERPRISE_DELETE_SCHEDULE = 4,
+    ENTERPRISE_DONE_SCHEDULE = 5
+}
