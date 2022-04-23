@@ -18,22 +18,16 @@ import { CommonModule } from './common/common.module';
 import { NotificationModule } from './notification/notification.module';
 import { NotificationGateway } from './notification/notification.gateway';
 import mongodbConfig from "./config/mongodb.config";
-const {
-    DB_USER,
-    DB_PASSWORD,
-    DB_HOST,
-    DB_PORT,
-    DB_NAME,
-} = process.env;
+
 @Module({
     imports: [
-        MongooseModule.forRoot(`mongodb://localhost:27017/`),
-        AuthModule,
-        UserModule,
-        DatabaseModule,
         ConfigModule.forRoot({
             ignoreEnvFile: false
         }),
+        MongooseModule.forRoot(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`),
+        AuthModule,
+        UserModule,
+        DatabaseModule,
         EnterpriseModule,
         BServiceModule,
         UploadModule,
