@@ -5,6 +5,7 @@ services:
     image: lv2
     ports:
       - "3008:3007"
+      - "8080:8080"
     links:
       - mongodb
     env_file:
