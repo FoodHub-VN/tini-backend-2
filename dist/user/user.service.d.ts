@@ -42,6 +42,7 @@ export declare class UserService {
     getFollowedService(): Observable<Service[]>;
     getHistorySchedule(): Observable<ScheduleHistory[]>;
     ratingService(serviceId: string, score: number[], title: string, content: string, images: Array<Express.Multer.File> | undefined): Promise<Comment>;
+    deleteRating(id: string): Promise<any>;
     likeComment(commentId: string): Observable<Comment>;
     uploadAvatar(file: Express.Multer.File): Observable<FileUploaded>;
     deleteAvatar(file: Express.Multer.File): Observable<boolean>;

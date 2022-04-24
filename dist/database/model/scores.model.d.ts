@@ -3,6 +3,7 @@ interface Score extends Document {
     readonly service: string;
     readonly scores: Array<number>;
     readonly userRate: string;
+    readonly commentId: string;
 }
 declare type ScoreModel = Model<Score>;
 declare const ScoreSchema: Schema<Score, Model<Score, any, any>, undefined, {}>;

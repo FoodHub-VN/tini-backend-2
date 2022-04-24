@@ -39,6 +39,7 @@ const read_noti_dto_1 = require("./dto/read-noti.dto");
 const delete_schedule_dto_1 = require("./dto/delete-schedule.dto");
 const done_schedule_dto_1 = require("./dto/done-schedule.dto");
 const enterprise_edit_dto_1 = require("./dto/enterprise-edit.dto");
+const payment_url_dto_1 = require("./dto/payment-url.dto");
 let EnterpriseController = class EnterpriseController {
     constructor(enterpriseService, req) {
         this.enterpriseService = enterpriseService;
@@ -120,12 +121,6 @@ let EnterpriseController = class EnterpriseController {
             throw new common_1.BadRequestException("Something wrong!");
         }));
     }
-    buyPremium(res, data) {
-        return (0, rxjs_1.from)(this.enterpriseService.buyPremium(data.id))
-            .pipe((0, rxjs_1.map)(e => {
-            return res.status(common_1.HttpStatus.OK).send();
-        }));
-    }
     getSchedules(res) {
         return (0, rxjs_1.from)(this.enterpriseService.getSchedules())
             .pipe((0, rxjs_1.map)(s => res.status(common_1.HttpStatus.OK).send({ schedules: s })), (0, rxjs_1.catchError)((e) => {
@@ -166,6 +161,37 @@ let EnterpriseController = class EnterpriseController {
     getOverviewAnalysis(res) {
         return (0, rxjs_1.from)(this.enterpriseService.getOverviewAnalysis())
             .pipe((0, rxjs_1.map)(r => res.status(common_1.HttpStatus.OK).send(r)));
+    }
+    getPaymentUrl(req, ip, res, data) {
+        return (0, rxjs_1.from)(this.enterpriseService.getPaymentUrl(data.idOffer))
+            .pipe((0, rxjs_1.map)(r => res.status(common_1.HttpStatus.OK).send({ url: r })), (0, rxjs_1.catchError)((e) => {
+            throw e;
+        }));
+    }
+    confirmPayment(amount, transactionNo, responseCode, orderId, req, res) {
+        console.log("Transaction", amount, transactionNo, responseCode, orderId);
+        var vnp_Params = req.query;
+        var secureHash = vnp_Params['vnp_SecureHash'];
+        delete vnp_Params['vnp_SecureHash'];
+        delete vnp_Params['vnp_SecureHashType'];
+        vnp_Params = Object.keys(vnp_Params).sort().reduce(function (result, key) {
+            result[key] = vnp_Params[key];
+            return result;
+        }, {});
+        var config = require('config');
+        var secretKey = config.get('vnp_HashSecret');
+        var querystring = require('qs');
+        var signData = querystring.stringify(vnp_Params, { encode: true, format: "RFC1738" });
+        var crypto = require("crypto");
+        var hmac = crypto.createHmac("sha512", secretKey);
+        var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
+        if (secureHash === signed) {
+            res.status(200).json({ RspCode: '00', Message: 'success' });
+        }
+        else {
+            res.status(200).json({ RspCode: '97', Message: 'Fail checksum' });
+        }
+        this.enterpriseService.handleConfirmTransaction(amount, transactionNo, responseCode, orderId);
     }
 };
 __decorate([
@@ -234,14 +260,6 @@ __decorate([
     __metadata("design:returntype", rxjs_1.Observable)
 ], EnterpriseController.prototype, "readAllNoti", null);
 __decorate([
-    (0, common_1.Post)("buyPremium"),
-    __param(0, (0, common_1.Res)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", rxjs_1.Observable)
-], EnterpriseController.prototype, "buyPremium", null);
-__decorate([
     (0, common_1.Get)('allSchedule'),
     __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -274,7 +292,7 @@ __decorate([
     __metadata("design:returntype", rxjs_1.Observable)
 ], EnterpriseController.prototype, "uploadImage", null);
 __decorate([
-    (0, common_1.Post)('update-profile'),
+    (0, common_1.Post)("update-profile"),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -282,12 +300,35 @@ __decorate([
     __metadata("design:returntype", rxjs_1.Observable)
 ], EnterpriseController.prototype, "updateProfile", null);
 __decorate([
-    (0, common_1.Get)('get-overview-analysis'),
+    (0, common_1.Get)("get-overview-analysis"),
     __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", rxjs_1.Observable)
 ], EnterpriseController.prototype, "getOverviewAnalysis", null);
+__decorate([
+    (0, common_1.Post)("payment-url"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Ip)()),
+    __param(2, (0, common_1.Res)()),
+    __param(3, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, Object, payment_url_dto_1.PaymentDtoUrl]),
+    __metadata("design:returntype", void 0)
+], EnterpriseController.prototype, "getPaymentUrl", null);
+__decorate([
+    (0, common_1.Get)("vnp_ipn"),
+    (0, public_guard_decorator_1.Public)(),
+    __param(0, (0, common_1.Query)("vnp_Amount")),
+    __param(1, (0, common_1.Query)("vnp_TransactionNo")),
+    __param(2, (0, common_1.Query)("vnp_ResponseCode")),
+    __param(3, (0, common_1.Query)("vnp_TxnRef")),
+    __param(4, (0, common_1.Req)()),
+    __param(5, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number, Number, String, Object, Object]),
+    __metadata("design:returntype", void 0)
+], EnterpriseController.prototype, "confirmPayment", null);
 EnterpriseController = __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtEnterpriseAuthGuard),
     (0, common_1.Controller)({ path: "enterprise", scope: common_1.Scope.REQUEST }),

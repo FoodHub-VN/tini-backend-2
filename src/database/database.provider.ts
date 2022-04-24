@@ -6,7 +6,7 @@ import {
     INTRODUCTION_MODEL,
     NOTIFICATION_MODEL,
     PREMIUM_MODEL,
-    PURCHASE_MODEL,
+    PURCHASE_MODEL, PURCHASE_TEMP_MODEL,
     SCHEDULE_HISTORY_MODEL,
     SCHEDULE_MODEL, SCORE_MODEL,
     SERVICE_MODEL,
@@ -27,6 +27,7 @@ import { ScheduleHistoryModel, ScheduleHistorySchema } from "./model/schedule-hi
 import { ServiceModel, ServiceSchema } from "./model/service.model";
 import { CategorySchema } from "./model/category.model";
 import { ScoreModel, ScoreSchema } from "./model/scores.model";
+import { PurchaseTempModel, PurchaseTempSchema } from "./model/purchase-temp";
 
 export const dbProviders = [
     {
@@ -117,6 +118,13 @@ export const dbProviders = [
         provide: SCORE_MODEL,
         useFactory: (conn: Connection)=>{
             return conn.model<ScoreModel>("Score", ScoreSchema, "scores");
+        },
+        inject: [DB_CONNECTION]
+    },
+    {
+        provide: PURCHASE_TEMP_MODEL,
+        useFactory: (conn: Connection)=>{
+            return conn.model<PurchaseTempModel>("PurchaseTemp", PurchaseTempSchema, "purchase_temps");
         },
         inject: [DB_CONNECTION]
     }

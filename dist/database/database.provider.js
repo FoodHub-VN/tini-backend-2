@@ -16,6 +16,7 @@ const schedule_history_model_1 = require("./model/schedule-history.model");
 const service_model_1 = require("./model/service.model");
 const category_model_1 = require("./model/category.model");
 const scores_model_1 = require("./model/scores.model");
+const purchase_temp_1 = require("./model/purchase-temp");
 exports.dbProviders = [
     {
         provide: database_constants_1.DB_CONNECTION,
@@ -105,6 +106,13 @@ exports.dbProviders = [
         provide: database_constants_1.SCORE_MODEL,
         useFactory: (conn) => {
             return conn.model("Score", scores_model_1.ScoreSchema, "scores");
+        },
+        inject: [database_constants_1.DB_CONNECTION]
+    },
+    {
+        provide: database_constants_1.PURCHASE_TEMP_MODEL,
+        useFactory: (conn) => {
+            return conn.model("PurchaseTemp", purchase_temp_1.PurchaseTempSchema, "purchase_temps");
         },
         inject: [database_constants_1.DB_CONNECTION]
     }

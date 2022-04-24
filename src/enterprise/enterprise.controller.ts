@@ -6,10 +6,14 @@ import {
   Get,
   HttpStatus,
   Inject,
+  Ip,
   NotFoundException,
   Post,
+  Query,
+  Req,
   Res,
-  Scope, UploadedFile,
+  Scope,
+  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors
@@ -19,7 +23,7 @@ import { catchError, from, map, mergeMap, Observable } from "rxjs";
 import { Express, Response } from "express";
 import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
 import { EnterPriseNewServiceDataDto } from "./dto/enterprise-new-service.dto";
-import { JwtAuthGuard, JwtEnterpriseAuthGuard } from "../auth/guard/jwt-auth.guard";
+import { JwtEnterpriseAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { Public } from "../auth/guard/public.guard.decorator";
 import { REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
@@ -31,15 +35,19 @@ import { ReadNotiDto } from "./dto/read-noti.dto";
 import { DeleteScheduleDto } from "./dto/delete-schedule.dto";
 import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
+import { PaymentDtoUrl } from "./dto/payment-url.dto";
+import querystring from "qs";
 
 
 @UseGuards(JwtEnterpriseAuthGuard)
 @Controller({ path: "enterprise", scope: Scope.REQUEST})
 export class EnterpriseController {
+
   constructor(
     private enterpriseService: EnterpriseService,
     @Inject(REQUEST) req: AuthenticatedRequest<EnterprisePrincipal>
   ) {
+
   }
 
   @Public()
@@ -171,17 +179,6 @@ export class EnterpriseController {
     )
   }
 
-  @Post("buyPremium")
-  buyPremium(@Res() res: Response, @Body() data: any): Observable<Response>{
-    return from(this.enterpriseService.buyPremium(data.id))
-      .pipe(
-        map(e=>{
-          return res.status(HttpStatus.OK).send();
-        })
-      )
-      ;
-  }
-
   @Get('allSchedule')
   getSchedules(@Res() res: Response) : Observable<Response>{
     return from(this.enterpriseService.getSchedules())
@@ -230,22 +227,75 @@ export class EnterpriseController {
         })
       );
   }
-  @Post('update-profile')
+
+  @Post("update-profile")
   updateProfile(@Res() res: Response, @Body() data: EnterpriseEditDto): Observable<Response> {
     return from(this.enterpriseService.updateProfile(data))
       .pipe(
-        map(r=>res.status(HttpStatus.OK).send(r)),
-        catchError((e)=>{
+        map(r => res.status(HttpStatus.OK).send(r)),
+        catchError((e) => {
           throw e;
         })
-      )
+      );
   }
-  @Get('get-overview-analysis')
+
+  @Get("get-overview-analysis")
   getOverviewAnalysis(@Res() res: Response): Observable<Response> {
     return from(this.enterpriseService.getOverviewAnalysis())
       .pipe(
-        map(r=>res.status(HttpStatus.OK).send(r))
-      )
+        map(r => res.status(HttpStatus.OK).send(r))
+      );
+  }
+
+  @Post("payment-url")
+  getPaymentUrl(@Req() req: AuthenticatedRequest<EnterprisePrincipal>, @Ip() ip, @Res() res: Response, @Body() data: PaymentDtoUrl) {
+    return from(this.enterpriseService.getPaymentUrl(data.idOffer))
+      .pipe(
+        map(r => res.status(HttpStatus.OK).send({ url: r })),
+        catchError((e) => {
+          throw e;
+        })
+      );
+  }
+
+  @Get("vnp_ipn")
+  @Public()
+  confirmPayment(
+    @Query("vnp_Amount") amount: number,
+    @Query("vnp_TransactionNo") transactionNo: number,
+    @Query("vnp_ResponseCode") responseCode: number,
+    @Query("vnp_TxnRef") orderId: string,
+    @Req() req: AuthenticatedRequest<EnterprisePrincipal>,
+    @Res() res: Response
+  ) {
+    console.log("Transaction", amount, transactionNo, responseCode, orderId);
+    var vnp_Params = req.query;
+    var secureHash = vnp_Params['vnp_SecureHash'];
+
+    delete vnp_Params['vnp_SecureHash'];
+    delete vnp_Params['vnp_SecureHashType'];
+
+    vnp_Params = Object.keys(vnp_Params).sort().reduce(function (result, key) {
+      result[key] = vnp_Params[key];
+      return result;
+    }, {});
+    var config = require('config');
+    var secretKey = config.get('vnp_HashSecret');
+    var querystring = require('qs');
+    var signData = querystring.stringify(vnp_Params, { encode: true, format:"RFC1738" });
+    var crypto = require("crypto");
+    var hmac = crypto.createHmac("sha512", secretKey);
+    var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
+
+
+    if(secureHash === signed){
+      //Kiem tra du lieu co hop le khong, cap nhat trang thai don hang va gui ket qua cho VNPAY theo dinh dang duoi
+      res.status(200).json({RspCode: '00', Message: 'success'})
+    }
+    else {
+      res.status(200).json({RspCode: '97', Message: 'Fail checksum'})
+    }
+    this.enterpriseService.handleConfirmTransaction(amount, transactionNo, responseCode, orderId);
   }
 
 }

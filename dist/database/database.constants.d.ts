@@ -11,3 +11,4 @@ export declare const SCHEDULE_HISTORY_MODEL = "SCHEDULE_HISTORY_MODEL";
 export declare const SERVICE_MODEL = "SERVICE_MODEL";
 export declare const CATEGORY_MODEL = "CATEGORY_MODEL";
 export declare const SCORE_MODEL = "SCORE_MODEL";
+export declare const PURCHASE_TEMP_MODEL = "PURCHASE_TEMP_MODEL";

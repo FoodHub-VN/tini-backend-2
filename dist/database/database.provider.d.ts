@@ -12,6 +12,7 @@ import { ScheduleModel } from "./model/schedule";
 import { ScheduleHistoryModel } from "./model/schedule-history.model";
 import { ServiceModel } from "./model/service.model";
 import { ScoreModel } from "./model/scores.model";
+import { PurchaseTempModel } from "./model/purchase-temp";
 export declare const dbProviders: ({
     provide: string;
     useFactory: (dbConfig: ConfigType<typeof mongodbConfig>) => any;
@@ -59,5 +60,9 @@ export declare const dbProviders: ({
 } | {
     provide: string;
     useFactory: (conn: Connection) => import("mongoose").Model<ScoreModel, {}, {}>;
+    inject: string[];
+} | {
+    provide: string;
+    useFactory: (conn: Connection) => import("mongoose").Model<PurchaseTempModel, {}, {}>;
     inject: string[];
 })[];

@@ -15,6 +15,8 @@ import { FileUploaded } from "../upload/interface/upload.interface";
 import { FileUploadService } from "../upload/upload.service";
 import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
 import { UserModel } from "../database/model/user.model";
+import { ConfigService } from "@nestjs/config";
+import { PurchaseTempModel } from "../database/model/purchase-temp";
 export declare class EnterpriseService {
     private enterpriseModel;
     private serviceModel;
@@ -26,7 +28,10 @@ export declare class EnterpriseService {
     private userModel;
     private uploadService;
     private notiSocket;
-    constructor(enterpriseModel: EnterpriseModel, serviceModel: ServiceModel, bService: BServiceService, req: AuthenticatedRequest<EnterprisePrincipal>, notiModel: NotificationModel, scheduleModel: ScheduleModel, scheduleHistoryModel: ScheduleHistoryModel, userModel: UserModel, uploadService: FileUploadService, notiSocket: NotificationGateway);
+    private readonly configService;
+    private purchaseTempModel;
+    private premiumConfig;
+    constructor(enterpriseModel: EnterpriseModel, serviceModel: ServiceModel, bService: BServiceService, req: AuthenticatedRequest<EnterprisePrincipal>, notiModel: NotificationModel, scheduleModel: ScheduleModel, scheduleHistoryModel: ScheduleHistoryModel, userModel: UserModel, uploadService: FileUploadService, notiSocket: NotificationGateway, configService: ConfigService, purchaseTempModel: PurchaseTempModel);
     findEnterpriseByName(name: string): Observable<Enterprise>;
     findEnterpriseWithPassByName(name: string): Observable<Enterprise>;
     existEnterpriseByName(name: string): Observable<boolean>;
@@ -38,11 +43,13 @@ export declare class EnterpriseService {
     getAllNotifications(): Promise<Notification[]>;
     readNoti(notiId: string): Promise<any>;
     readAllNoti(): Promise<any>;
-    buyPremium(id: string): Promise<any>;
+    buyPremium(enterprise: string, idOffer: string): Promise<any>;
     getSchedules(): Promise<any>;
     deleteSchedule(id: string): Promise<any>;
     doneSchedule(id: string): Promise<any>;
     uploadAvatar(file: Express.Multer.File): Observable<FileUploaded>;
     updateProfile(data: EnterpriseEditDto): Promise<Enterprise>;
     getOverviewAnalysis(): Promise<any>;
+    getPaymentUrl(offerId: string): Promise<any>;
+    handleConfirmTransaction(amount: number, transactionNo: number, responseCode: number, orderId: string): Promise<any>;
 }

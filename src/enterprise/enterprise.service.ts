@@ -1,7 +1,15 @@
-import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException, Query,
+  Scope
+} from "@nestjs/common";
 import {
   ENTERPRISE_MODEL,
-  NOTIFICATION_MODEL,
+  NOTIFICATION_MODEL, PURCHASE_TEMP_MODEL,
   SCHEDULE_HISTORY_MODEL,
   SCHEDULE_MODEL,
   SERVICE_MODEL, USER_MODEL
@@ -25,9 +33,19 @@ import { FileUploaded } from "../upload/interface/upload.interface";
 import { FileUploadService } from "../upload/upload.service";
 import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
 import { UserModel } from "../database/model/user.model";
+import { parseInt } from "lodash";
+import moment from "moment";
+import querystring from "qs";
+import crypto from "crypto";
+import { Premium } from "../shared/premium";
+import path from "path";
+import * as fs from "fs";
+import { ConfigService } from "@nestjs/config";
+import { PurchaseTempModel } from "../database/model/purchase-temp";
 
 @Injectable({scope: Scope.REQUEST})
 export class EnterpriseService {
+  private premiumConfig: Record<string, Premium>;
   constructor(
     @Inject(ENTERPRISE_MODEL) private enterpriseModel: EnterpriseModel,
     @Inject(SERVICE_MODEL) private serviceModel: ServiceModel,
@@ -38,8 +56,12 @@ export class EnterpriseService {
     @Inject(SCHEDULE_HISTORY_MODEL) private scheduleHistoryModel: ScheduleHistoryModel,
     @Inject(USER_MODEL)private userModel: UserModel,
     private uploadService: FileUploadService,
-    private notiSocket: NotificationGateway
+    private notiSocket: NotificationGateway,
+    private readonly configService: ConfigService,
+    @Inject(PURCHASE_TEMP_MODEL) private purchaseTempModel: PurchaseTempModel
   ) {
+    var path = require("path");
+    this.premiumConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "../../res/json/premium.json"), 'utf-8'));
   }
 
   findEnterpriseByName(name: string): Observable<Enterprise> {
@@ -113,13 +135,13 @@ export class EnterpriseService {
     }
   }
   
-  async buyPremium(id: string): Promise<any>{
+  async buyPremium(enterprise: string, idOffer: string): Promise<any>{
     try{
-      const model = await this.enterpriseModel.findOne({_id: this.req.user.id}).exec();
-      if(parseInt(model.premium) >= parseInt(id)){
+      const model = await this.enterpriseModel.findOne({_id: Types.ObjectId(enterprise)}).exec();
+      if(parseInt(model.premium) >= parseInt(idOffer)){
         throw new ConflictException("Premium is lower than previous");
       }
-      await model.update({premium: id}).exec();
+      await model.update({premium: idOffer}).exec();
       return true;
     } catch (e) {
       throw e;
@@ -279,5 +301,80 @@ export class EnterpriseService {
     catch (e){
       throw e;
     }
+  }
+  async getPaymentUrl(offerId: string): Promise<any>{
+    const oldOffer = (await this.enterpriseModel.findOne({_id: this.req.user.id}).exec()).premium;
+    if(oldOffer && parseInt(oldOffer)>=parseInt(offerId)){
+      throw new BadRequestException("New offer is bad than previous");
+    }
+    console.log(offerId);
+    let offer = this.premiumConfig[offerId];
+    if(!offer) throw new NotFoundException("Offer not found");
+    var tmnCode = this.configService.get<string>('TMN_CODE');
+    var secretKey = this.configService.get<string>('HASH_SECRET');
+    var vnpUrl = this.configService.get<string>('VNP_URL');
+    var returnUrl = this.configService.get<string>("RETURN_URL");
+    var moment = require("moment");
+    var dateCreate = moment().format("YYYYMMDDHHmmss");
+    var orderId = this.req.user.id +'_'+ moment().format("YYYYMMDDHHmmss")+'_'+offerId;
+
+    var orderInfo = "THanh toan";
+    var locale = "vn";
+    var currCode = 'VND';
+    var vnp_Params = {};
+    vnp_Params['vnp_Version'] = '2.1.0';
+    vnp_Params['vnp_Command'] = 'pay';
+    vnp_Params['vnp_TmnCode'] = tmnCode;
+    vnp_Params['vnp_Locale'] = locale;
+    vnp_Params['vnp_CurrCode'] = currCode;
+    vnp_Params['vnp_TxnRef'] = orderId;
+    vnp_Params['vnp_OrderInfo'] = orderInfo;
+    // vnp_Params['vnp_OrderType'] = orderType;
+    vnp_Params['vnp_Amount'] = offer.price*100;
+    vnp_Params['vnp_ReturnUrl'] = returnUrl;
+    vnp_Params['vnp_IpAddr'] = this.req.ip;
+    vnp_Params['vnp_CreateDate'] = dateCreate;
+    vnp_Params = Object.keys(vnp_Params).sort().reduce(function (result, key) {
+      result[key] = vnp_Params[key];
+      return result;
+    }, {});
+
+    var querystring = require('qs');
+    var signData = querystring.stringify(vnp_Params, { encode: true, format:"RFC1738" });
+    var crypto = require("crypto");
+    var hmac = crypto.createHmac("sha512", secretKey);
+    var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
+    vnp_Params['vnp_SecureHash'] = signed;
+    vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: true, format:"RFC1738" });
+
+    // await this.purchaseTempModel.create({
+    //   enterprise: this.req.user.id,
+    //   premium: offerId,
+    //   code: orderId
+    // });
+    return vnpUrl;
+  }
+
+  async handleConfirmTransaction( amount: number,
+                                  transactionNo: number,
+                                  responseCode: number,
+                                  orderId: string): Promise<any>{
+    try{
+      var offset = orderId.split("_");
+      if(offset.length<3) return;
+      var clientId = offset[0];
+      var offerId = offset[2];
+      if(responseCode == 0){
+        await this.buyPremium(clientId, offerId);
+        this.notiSocket.sendNotificationToClient(clientId, {success: true, offerId});
+      }
+      else{
+        this.notiSocket.sendNotificationToClient(clientId, {success: false});
+      }
+    }
+    catch (e) {
+      throw e;
+    }
+
   }
 }

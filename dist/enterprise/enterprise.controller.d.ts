@@ -10,6 +10,7 @@ import { ReadNotiDto } from "./dto/read-noti.dto";
 import { DeleteScheduleDto } from "./dto/delete-schedule.dto";
 import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
+import { PaymentDtoUrl } from "./dto/payment-url.dto";
 export declare class EnterpriseController {
     private enterpriseService;
     constructor(enterpriseService: EnterpriseService, req: AuthenticatedRequest<EnterprisePrincipal>);
@@ -20,11 +21,12 @@ export declare class EnterpriseController {
     getNotifications(res: Response): Observable<Response>;
     readNoti(res: Response, data: ReadNotiDto): Observable<Response>;
     readAllNoti(res: Response): Observable<Response>;
-    buyPremium(res: Response, data: any): Observable<Response>;
     getSchedules(res: Response): Observable<Response>;
     deleteSchedule(res: Response, data: DeleteScheduleDto): Observable<Response>;
     doneSchedule(res: Response, data: DoneScheduleDto): Observable<Response>;
     uploadImage(file: Express.Multer.File, res: Response): Observable<Response>;
     updateProfile(res: Response, data: EnterpriseEditDto): Observable<Response>;
     getOverviewAnalysis(res: Response): Observable<Response>;
+    getPaymentUrl(req: AuthenticatedRequest<EnterprisePrincipal>, ip: any, res: Response, data: PaymentDtoUrl): Observable<Response<any, Record<string, any>>>;
+    confirmPayment(amount: number, transactionNo: number, responseCode: number, orderId: string, req: AuthenticatedRequest<EnterprisePrincipal>, res: Response): void;
 }

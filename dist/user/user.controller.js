@@ -39,6 +39,7 @@ const done_schedule_dto_1 = require("./dto/done-schedule.dto");
 const add_favorite_dto_1 = require("./dto/add-favorite.dto");
 const rating_service_dto_1 = require("./dto/rating-service.dto");
 const like_comment_dto_1 = require("./dto/like-comment.dto");
+const delete_comment_dto_1 = require("./dto/delete-comment.dto");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -174,6 +175,10 @@ let UserController = class UserController {
         }), (0, rxjs_1.catchError)((e) => {
             throw new common_1.BadRequestException('Something wrong!');
         }));
+    }
+    deleteRatingService(res, data) {
+        return (0, rxjs_1.from)(this.userService.deleteRating(data.id))
+            .pipe((0, rxjs_1.map)(r => res.status(common_1.HttpStatus.OK).send()), (0, rxjs_1.catchError)(e => { throw e; }));
     }
     likeComment(res, data) {
         return this.userService.likeComment(data.commentId).pipe((0, rxjs_1.map)((comment) => {
@@ -326,6 +331,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, rating_service_dto_1.RatingServiceDto, Array]),
     __metadata("design:returntype", rxjs_1.Observable)
 ], UserController.prototype, "ratingService", null);
+__decorate([
+    (0, common_1.Post)('delete-rating'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, delete_comment_dto_1.DeleteCommentDto]),
+    __metadata("design:returntype", rxjs_1.Observable)
+], UserController.prototype, "deleteRatingService", null);
 __decorate([
     (0, common_1.Post)('like-comment'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

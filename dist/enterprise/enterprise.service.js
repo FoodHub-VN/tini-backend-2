@@ -22,8 +22,11 @@ const mongoose_1 = require("mongoose");
 const notification_gateway_1 = require("../notification/notification.gateway");
 const NotiType_type_1 = require("../shared/NotiType.type");
 const upload_service_1 = require("../upload/upload.service");
+const lodash_1 = require("lodash");
+const fs = require("fs");
+const config_1 = require("@nestjs/config");
 let EnterpriseService = class EnterpriseService {
-    constructor(enterpriseModel, serviceModel, bService, req, notiModel, scheduleModel, scheduleHistoryModel, userModel, uploadService, notiSocket) {
+    constructor(enterpriseModel, serviceModel, bService, req, notiModel, scheduleModel, scheduleHistoryModel, userModel, uploadService, notiSocket, configService, purchaseTempModel) {
         this.enterpriseModel = enterpriseModel;
         this.serviceModel = serviceModel;
         this.bService = bService;
@@ -34,6 +37,10 @@ let EnterpriseService = class EnterpriseService {
         this.userModel = userModel;
         this.uploadService = uploadService;
         this.notiSocket = notiSocket;
+        this.configService = configService;
+        this.purchaseTempModel = purchaseTempModel;
+        var path = require("path");
+        this.premiumConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "../../res/json/premium.json"), 'utf-8'));
     }
     findEnterpriseByName(name) {
         return (0, rxjs_1.from)(this.enterpriseModel.findOne({ username: name }).exec());
@@ -97,13 +104,13 @@ let EnterpriseService = class EnterpriseService {
             throw e;
         }
     }
-    async buyPremium(id) {
+    async buyPremium(enterprise, idOffer) {
         try {
-            const model = await this.enterpriseModel.findOne({ _id: this.req.user.id }).exec();
-            if (parseInt(model.premium) >= parseInt(id)) {
+            const model = await this.enterpriseModel.findOne({ _id: mongoose_1.Types.ObjectId(enterprise) }).exec();
+            if ((0, lodash_1.parseInt)(model.premium) >= (0, lodash_1.parseInt)(idOffer)) {
                 throw new common_1.ConflictException("Premium is lower than previous");
             }
-            await model.update({ premium: id }).exec();
+            await model.update({ premium: idOffer }).exec();
             return true;
         }
         catch (e) {
@@ -248,6 +255,69 @@ let EnterpriseService = class EnterpriseService {
             throw e;
         }
     }
+    async getPaymentUrl(offerId) {
+        const oldOffer = (await this.enterpriseModel.findOne({ _id: this.req.user.id }).exec()).premium;
+        if (oldOffer && (0, lodash_1.parseInt)(oldOffer) >= (0, lodash_1.parseInt)(offerId)) {
+            throw new common_1.BadRequestException("New offer is bad than previous");
+        }
+        console.log(offerId);
+        let offer = this.premiumConfig[offerId];
+        if (!offer)
+            throw new common_1.NotFoundException("Offer not found");
+        var tmnCode = this.configService.get('TMN_CODE');
+        var secretKey = this.configService.get('HASH_SECRET');
+        var vnpUrl = this.configService.get('VNP_URL');
+        var returnUrl = this.configService.get("RETURN_URL");
+        var moment = require("moment");
+        var dateCreate = moment().format("YYYYMMDDHHmmss");
+        var orderId = this.req.user.id + '_' + moment().format("YYYYMMDDHHmmss") + '_' + offerId;
+        var orderInfo = "THanh toan";
+        var locale = "vn";
+        var currCode = 'VND';
+        var vnp_Params = {};
+        vnp_Params['vnp_Version'] = '2.1.0';
+        vnp_Params['vnp_Command'] = 'pay';
+        vnp_Params['vnp_TmnCode'] = tmnCode;
+        vnp_Params['vnp_Locale'] = locale;
+        vnp_Params['vnp_CurrCode'] = currCode;
+        vnp_Params['vnp_TxnRef'] = orderId;
+        vnp_Params['vnp_OrderInfo'] = orderInfo;
+        vnp_Params['vnp_Amount'] = offer.price * 100;
+        vnp_Params['vnp_ReturnUrl'] = returnUrl;
+        vnp_Params['vnp_IpAddr'] = this.req.ip;
+        vnp_Params['vnp_CreateDate'] = dateCreate;
+        vnp_Params = Object.keys(vnp_Params).sort().reduce(function (result, key) {
+            result[key] = vnp_Params[key];
+            return result;
+        }, {});
+        var querystring = require('qs');
+        var signData = querystring.stringify(vnp_Params, { encode: true, format: "RFC1738" });
+        var crypto = require("crypto");
+        var hmac = crypto.createHmac("sha512", secretKey);
+        var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
+        vnp_Params['vnp_SecureHash'] = signed;
+        vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: true, format: "RFC1738" });
+        return vnpUrl;
+    }
+    async handleConfirmTransaction(amount, transactionNo, responseCode, orderId) {
+        try {
+            var offset = orderId.split("_");
+            if (offset.length < 3)
+                return;
+            var clientId = offset[0];
+            var offerId = offset[2];
+            if (responseCode == 0) {
+                await this.buyPremium(clientId, offerId);
+                this.notiSocket.sendNotificationToClient(clientId, { success: true, offerId });
+            }
+            else {
+                this.notiSocket.sendNotificationToClient(clientId, { success: false });
+            }
+        }
+        catch (e) {
+            throw e;
+        }
+    }
 };
 EnterpriseService = __decorate([
     (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),
@@ -259,8 +329,10 @@ EnterpriseService = __decorate([
     __param(5, (0, common_1.Inject)(database_constants_1.SCHEDULE_MODEL)),
     __param(6, (0, common_1.Inject)(database_constants_1.SCHEDULE_HISTORY_MODEL)),
     __param(7, (0, common_1.Inject)(database_constants_1.USER_MODEL)),
+    __param(11, (0, common_1.Inject)(database_constants_1.PURCHASE_TEMP_MODEL)),
     __metadata("design:paramtypes", [Object, Object, b_service_service_1.BServiceService, Object, Object, Object, Object, Object, upload_service_1.FileUploadService,
-        notification_gateway_1.NotificationGateway])
+        notification_gateway_1.NotificationGateway,
+        config_1.ConfigService, Object])
 ], EnterpriseService);
 exports.EnterpriseService = EnterpriseService;
 //# sourceMappingURL=enterprise.service.js.map

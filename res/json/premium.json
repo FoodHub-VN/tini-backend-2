@@ -1,0 +1,44 @@
+{
+  "1": {
+    "price": 279000,
+    "title": "Gói thường",
+    "benefit": [
+      "Benefit 1",
+      "Benefit 2",
+      "Benefit 3"
+    ],
+    "missing": [
+      "Missing 1",
+      "Missing 2",
+      "Missing 3"
+    ]
+  },
+  "2": {
+    "price": 279000,
+    "title": "Gói VIP",
+    "benefit": [
+      "Benefit 1",
+      "Benefit 2",
+      "Benefit 3"
+    ],
+    "missing": [
+      "Missing 1",
+      "Missing 2",
+      "Missing 3"
+    ]
+  },
+  "3": {
+    "price": 279000,
+    "title": "Gói Premium",
+    "benefit": [
+      "Benefit 1",
+      "Benefit 2",
+      "Benefit 3"
+    ],
+    "missing": [
+      "Missing 1",
+      "Missing 2",
+      "Missing 3"
+    ]
+  }
+}

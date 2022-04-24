@@ -11,6 +11,7 @@ import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { AddFavoriteDto } from "./dto/add-favorite.dto";
 import { RatingServiceDto } from "./dto/rating-service.dto";
 import { LikeCommentDto } from "./dto/like-comment.dto";
+import { DeleteCommentDto } from "./dto/delete-comment.dto";
 export declare class UserController {
     private readonly userService;
     constructor(userService: UserService);
@@ -26,6 +27,7 @@ export declare class UserController {
     getFollowedService(res: Response): Observable<Response>;
     getHistorySchedule(res: Response): Observable<Response>;
     ratingService(res: Response, data: RatingServiceDto, files: Array<Express.Multer.File>): Observable<Response>;
+    deleteRatingService(res: Response, data: DeleteCommentDto): Observable<Response>;
     likeComment(res: Response, data: LikeCommentDto): Observable<Response>;
     uploadImage(file: Express.Multer.File, res: Response): Observable<Response>;
     getNotifications(res: Response): Observable<Response>;
