@@ -40,9 +40,11 @@ const delete_schedule_dto_1 = require("./dto/delete-schedule.dto");
 const done_schedule_dto_1 = require("./dto/done-schedule.dto");
 const enterprise_edit_dto_1 = require("./dto/enterprise-edit.dto");
 const payment_url_dto_1 = require("./dto/payment-url.dto");
+const config_1 = require("@nestjs/config");
 let EnterpriseController = class EnterpriseController {
-    constructor(enterpriseService, req) {
+    constructor(enterpriseService, req, configService) {
         this.enterpriseService = enterpriseService;
+        this.configService = configService;
     }
     register(data, res) {
         const { username, email } = data;
@@ -176,8 +178,7 @@ let EnterpriseController = class EnterpriseController {
             result[key] = vnp_Params[key];
             return result;
         }, {});
-        var config = require('config');
-        var secretKey = config.get('vnp_HashSecret');
+        var secretKey = this.configService.get('HASH_SECRET');
         var querystring = require('qs');
         var signData = querystring.stringify(vnp_Params, { encode: true, format: "RFC1738" });
         var crypto = require("crypto");
@@ -331,7 +332,7 @@ EnterpriseController = __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtEnterpriseAuthGuard),
     (0, common_1.Controller)({ path: "enterprise", scope: common_1.Scope.REQUEST }),
     __param(1, (0, common_1.Inject)(core_1.REQUEST)),
-    __metadata("design:paramtypes", [enterprise_service_1.EnterpriseService, Object])
+    __metadata("design:paramtypes", [enterprise_service_1.EnterpriseService, Object, config_1.ConfigService])
 ], EnterpriseController);
 exports.EnterpriseController = EnterpriseController;
 //# sourceMappingURL=enterprise.controller.js.map

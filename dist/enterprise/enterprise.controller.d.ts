@@ -11,9 +11,11 @@ import { DeleteScheduleDto } from "./dto/delete-schedule.dto";
 import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
 import { PaymentDtoUrl } from "./dto/payment-url.dto";
+import { ConfigService } from "@nestjs/config";
 export declare class EnterpriseController {
     private enterpriseService;
-    constructor(enterpriseService: EnterpriseService, req: AuthenticatedRequest<EnterprisePrincipal>);
+    private configService;
+    constructor(enterpriseService: EnterpriseService, req: AuthenticatedRequest<EnterprisePrincipal>, configService: ConfigService);
     register(data: EnterpriseRegisterDto, res: Response): Observable<Response<any, Record<string, any>>>;
     newService(data: EnterPriseNewServiceDataDto, res: Response, files: Array<Express.Multer.File>): Observable<Response>;
     getInfo(res: any): Observable<Response>;

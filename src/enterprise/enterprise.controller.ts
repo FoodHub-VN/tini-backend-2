@@ -37,6 +37,7 @@ import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
 import { PaymentDtoUrl } from "./dto/payment-url.dto";
 import querystring from "qs";
+import { ConfigService } from "@nestjs/config";
 
 
 @UseGuards(JwtEnterpriseAuthGuard)
@@ -45,7 +46,8 @@ export class EnterpriseController {
 
   constructor(
     private enterpriseService: EnterpriseService,
-    @Inject(REQUEST) req: AuthenticatedRequest<EnterprisePrincipal>
+    @Inject(REQUEST) req: AuthenticatedRequest<EnterprisePrincipal>,
+    private configService: ConfigService
   ) {
 
   }
@@ -277,8 +279,7 @@ export class EnterpriseController {
       result[key] = vnp_Params[key];
       return result;
     }, {});
-    var config = require('config');
-    var secretKey = config.get('vnp_HashSecret');
+    var secretKey = this.configService.get<string>('HASH_SECRET');
     var querystring = require('qs');
     var signData = querystring.stringify(vnp_Params, { encode: true, format:"RFC1738" });
     var crypto = require("crypto");
