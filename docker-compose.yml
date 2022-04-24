@@ -18,6 +18,10 @@ services:
       - DB_PASSWORD=$DB_PASSWORD
       - DB_NAME=$DB_NAME
       - DB_PORT=$DB_PORT
+      - TMN_CODE=5XK2JZPT
+      - HASH_SECRET=CIXCUTQDKONMNLVCNGPAASFGGMSHNNUU
+      - VNP_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+      - RETURN_URL=http://enterprise.bkservice.tk/
     stdin_open: true
     tty: true
   mongodb:
