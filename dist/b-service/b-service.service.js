@@ -46,7 +46,6 @@ let BServiceService = class BServiceService {
         if (!mongoose_1.Types.ObjectId.isValid(data.category)) {
             throw new common_1.NotFoundException("Category Not found");
         }
-        console.log(data);
         try {
             const serviceExist = await this.serviceModel.findOne({ name: data.name }).exec();
             if (serviceExist) {
@@ -167,7 +166,6 @@ let BServiceService = class BServiceService {
             }
             const leanScore = scores.map(s => s.scores);
             let resScore = [0, 0, 0, 0, 0];
-            console.log(leanScore);
             leanScore.forEach((e) => {
                 resScore[0] = resScore[0] + e[0];
                 resScore[1] = resScore[1] + e[1];

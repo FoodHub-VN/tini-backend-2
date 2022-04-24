@@ -46,7 +46,6 @@ let EnterpriseController = class EnterpriseController {
     }
     register(data, res) {
         const { username, email } = data;
-        console.log(username);
         return this.enterpriseService.existEnterpriseByName(username).pipe((0, rxjs_1.mergeMap)(b => {
             if (b) {
                 throw new common_1.ConflictException(`Enterprise ${username} already exists!`);
@@ -71,7 +70,6 @@ let EnterpriseController = class EnterpriseController {
     }
     newService(data, res, files) {
         return this.enterpriseService.createNewService(data, files).pipe((0, rxjs_1.map)(service => {
-            console.log(service);
             return res.status(common_1.HttpStatus.OK).send({ service: service });
         }), (0, rxjs_1.catchError)((err) => {
             throw err;

@@ -264,7 +264,6 @@ let UserService = class UserService {
             }
             const service = await this.serviceModel.findOne({ _id: comment.service }).exec();
             let imgCount = comment.images && comment.images.length > 0 ? 1 : 0;
-            console.log(service);
             await service.update({
                 imgCmtCount: service.imgCmtCount ? service.imgCmtCount - imgCount : 0,
                 textCmtCount: service.textCmtCount ? service.textCmtCount - 1 : 0
@@ -340,7 +339,6 @@ let UserService = class UserService {
                 (0, rxjs_1.throwError)(() => new Error());
             }
         }), (0, rxjs_1.catchError)((err, cau) => {
-            console.log(err);
             throw new common_1.BadRequestException({ err });
         }));
     }
