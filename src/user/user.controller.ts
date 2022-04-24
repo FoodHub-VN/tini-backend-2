@@ -92,7 +92,6 @@ export class UserController {
   @Put("/update-profile")
   @UseGuards(JwtAuthGuard)
     update(@Req() req: AuthenticatedRequest<UserPrincipal>, @Res() res: Response, @Body() body: UpdateProfileDto):Observable<Response> {
-    console.log(body);
     return this.userService.updateProfile(req.user.username, body).pipe(
       map(u => {
         if (u) {

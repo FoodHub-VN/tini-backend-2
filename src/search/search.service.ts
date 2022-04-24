@@ -49,7 +49,6 @@ export class SearchService {
       filter.huyen && (condition['address.village'] = filter.huyen);
 
 
-      console.log(condition);
       if (textSearch && textSearch.length > 0) {
         services = await this.serviceModel.find({
           $text: {
@@ -58,7 +57,6 @@ export class SearchService {
           ...condition
         }).populate("category").exec();
       } else {
-        console.log(condition);
         services = await this.serviceModel.find({ ...condition } , null).populate("category").exec();
       }
       return services;

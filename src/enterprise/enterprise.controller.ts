@@ -54,7 +54,6 @@ export class EnterpriseController {
   @Post("/register")
   register(@Body() data: EnterpriseRegisterDto, @Res() res: Response) {
     const { username, email } = data;
-    console.log(username)
     return this.enterpriseService.existEnterpriseByName(username).pipe(
       mergeMap(b => {
           if (b) {
@@ -102,7 +101,6 @@ export class EnterpriseController {
   newService(@Body() data: EnterPriseNewServiceDataDto, @Res() res: Response , @UploadedFiles() files: Array<Express.Multer.File>): Observable<Response> {
     return this.enterpriseService.createNewService(data, files).pipe(
       map(service => {
-        console.log(service)
         return res.status(HttpStatus.OK).send({ service: service });
       }),
       catchError((err) => {

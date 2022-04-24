@@ -41,7 +41,6 @@ export class BServiceController {
     })
   }))
   upload(@UploadedFile() file: Express.Multer.File) {
-    console.log(file.path);
   }
 
   @Put("modify-service")
@@ -55,7 +54,6 @@ export class BServiceController {
         if (!service) {
           throw new NotFoundException(`Not Found service ${data.name}`);
         } else {
-          console.log(service)
           return res.status(HttpStatus.OK).send({
             service: service
           });
