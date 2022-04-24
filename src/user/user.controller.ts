@@ -31,6 +31,7 @@ import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { AddFavoriteDto } from "./dto/add-favorite.dto";
 import { RatingServiceDto } from "./dto/rating-service.dto";
 import { LikeCommentDto } from "./dto/like-comment.dto";
+import { DeleteCommentDto } from "./dto/delete-comment.dto";
 
 @Controller({ path: "user" })
 export class UserController {
@@ -239,6 +240,16 @@ export class UserController {
         throw new BadRequestException('Something wrong!');
       })
     )
+  }
+
+  @Post('delete-rating')
+  @UseGuards(JwtAuthGuard)
+  deleteRatingService(@Res() res: Response, @Body() data: DeleteCommentDto): Observable<Response>{
+    return from(this.userService.deleteRating(data.id))
+      .pipe(
+        map(r=>res.status(HttpStatus.OK).send()),
+        catchError(e=>{throw e;})
+      )
   }
 
   @Post('like-comment')

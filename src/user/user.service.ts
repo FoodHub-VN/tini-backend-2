@@ -307,7 +307,7 @@ export class UserService {
         uploads = await Promise.all<FileUploaded>(promises);
         await service.update({imgCmtCount: service.imgCmtCount?service.imgCmtCount+images.length: 1}).exec();
       }
-      await this.scoreModel.create({service: Types.ObjectId(serviceId), userRate: this.req.user.id, scores: score});
+
       await service.update({textCmtCount: service.textCmtCount?service.textCmtCount+1: 1}).exec();
       const comment = await this.commentModel.create({
         user: this.req.user.id,
@@ -317,13 +317,46 @@ export class UserService {
         content: content,
         images: uploads
       })
+      await this.scoreModel.create({
+        service: Types.ObjectId(serviceId),
+        userRate: this.req.user.id,
+        scores: score,
+        commentId: comment._id
+      });
       return comment;
     }
     catch (e) {
       throw e;
     }
   }
-
+  
+  async deleteRating(id: string): Promise<any>{
+    try{
+      if (!Types.ObjectId(id)) {
+        throw new NotFoundException("Comment not found");
+      }
+      const comment = await this.commentModel.findOne({_id: Types.ObjectId(id)}).exec();
+      if(!comment || comment.user != this.req.user.id){
+        throw new NotFoundException("Comment not found");
+      }
+      const service = await this.serviceModel.findOne({_id: comment.service}).exec();
+      let imgCount = comment.images && comment.images.length>0?1: 0;
+      console.log(service);
+      await service.update({
+        imgCmtCount: service.imgCmtCount?service.imgCmtCount-imgCount:0,
+        textCmtCount: service.textCmtCount?service.textCmtCount - 1:0
+      }).exec();
+      comment.images&&comment.images.length>0 && this.uploadService.deleteMulti(comment.images.map(i=>i.key));
+      await this.scoreModel.remove({commentId: comment._id});
+      await comment.remove();
+      return true;
+    }
+    catch (e) {
+      throw e;
+    }
+    
+  }
+  
   likeComment(commentId: string): Observable<Comment> {
     if (!Types.ObjectId.isValid(commentId)) {
       throw new NotFoundException("Comment not found");
