@@ -36,30 +36,38 @@ export class SearchService {
 
   }
 
-  async deepSearch(textSearch: string, filter: Filter){
+  async deepSearch(textSearch: string, filter: Filter, page: number|undefined){
     if(filter.category && !Types.ObjectId.isValid(filter.category)){
       throw new NotFoundException("Category not found: " + filter.category);
     }
     try {
       let services: Array<Service> = [];
       let condition: any = {};
-
+      let resultPerPage = 12;
+      page = page || 1;
       filter.category && (condition['category'] = Types.ObjectId(filter.category));
       filter.quan && (condition['address.district'] = filter.quan);
       filter.huyen && (condition['address.village'] = filter.huyen);
 
-
+      let totalPage = 1;
       if (textSearch && textSearch.length > 0) {
         services = await this.serviceModel.find({
           $text: {
             $search: textSearch
           },
           ...condition
-        }).populate("category").exec();
+        }).skip((page-1)*resultPerPage).limit(resultPerPage).populate("category").exec();
+        totalPage = await this.serviceModel.find({
+          $text: {
+            $search: textSearch
+          },
+          ...condition
+        }).countDocuments().exec() / resultPerPage;
       } else {
-        services = await this.serviceModel.find({ ...condition } , null).populate("category").exec();
+        services = await this.serviceModel.find({ ...condition } , null).skip((page-1)*resultPerPage).limit(resultPerPage).populate("category").exec();
+        totalPage = await this.serviceModel.find({ ...condition } , null).countDocuments().exec() / resultPerPage;
       }
-      return services;
+      return { services, totalPage: Math.ceil(totalPage), page };
     }
     catch (e) {
       console.log(e);

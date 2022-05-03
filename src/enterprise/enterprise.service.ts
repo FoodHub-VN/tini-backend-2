@@ -9,7 +9,7 @@ import {
 } from "@nestjs/common";
 import {
   ENTERPRISE_MODEL,
-  NOTIFICATION_MODEL, PURCHASE_TEMP_MODEL,
+  NOTIFICATION_MODEL, PURCHASE_MODEL, PURCHASE_TEMP_MODEL,
   SCHEDULE_HISTORY_MODEL,
   SCHEDULE_MODEL,
   SERVICE_MODEL, USER_MODEL
@@ -42,6 +42,7 @@ import path from "path";
 import * as fs from "fs";
 import { ConfigService } from "@nestjs/config";
 import { PurchaseTempModel } from "../database/model/purchase-temp";
+import { PurchaseModel } from "../database/model/purchase-history.model";
 
 @Injectable({scope: Scope.REQUEST})
 export class EnterpriseService {
@@ -58,7 +59,8 @@ export class EnterpriseService {
     private uploadService: FileUploadService,
     private notiSocket: NotificationGateway,
     private readonly configService: ConfigService,
-    @Inject(PURCHASE_TEMP_MODEL) private purchaseTempModel: PurchaseTempModel
+    @Inject(PURCHASE_TEMP_MODEL) private purchaseTempModel: PurchaseTempModel,
+    @Inject(PURCHASE_MODEL) private purchaseModel: PurchaseModel
   ) {
     var path = require("path");
     this.premiumConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "../../res/json/premium.json"), 'utf-8'));
@@ -135,15 +137,26 @@ export class EnterpriseService {
     }
   }
   
-  async buyPremium(enterprise: string, idOffer: string): Promise<any>{
+  async buyPremium(enterprise: string, idOffer: string, transactionNo: string): Promise<boolean>{
     try{
+      let exist = await this.purchaseModel.exists({transactionNo: transactionNo});
+      if(exist){
+        return false;
+      }
       const model = await this.enterpriseModel.findOne({_id: Types.ObjectId(enterprise)}).exec();
-      if(parseInt(model.premium) >= parseInt(idOffer)){
+      if(!model) {
+        throw new NotFoundException("Enterprise model not found!");
+      }
+      if(model.premium && (parseInt(model.premium) >= parseInt(idOffer))){
         throw new ConflictException("Premium is lower than previous");
       }
+
       await model.update({premium: idOffer}).exec();
+
+      await this.purchaseModel.create({enterprise: enterprise, transactionNo: transactionNo, date: Date.now(), premium: idOffer});
       return true;
     } catch (e) {
+      console.log(e);
       throw e;
     }
   }
@@ -356,17 +369,17 @@ export class EnterpriseService {
   }
 
   async handleConfirmTransaction( amount: number,
-                                  transactionNo: number,
-                                  responseCode: number,
+                                  transactionNo: string,
+                                  responseCode: string,
                                   orderId: string): Promise<any>{
     try{
       var offset = orderId.split("_");
       if(offset.length<3) return;
       var clientId = offset[0];
       var offerId = offset[2];
-      if(responseCode == 0){
-        await this.buyPremium(clientId, offerId);
-        this.notiSocket.sendNotificationToClient(clientId, {success: true, offerId});
+      if(responseCode === "00"){
+        let success = await this.buyPremium(clientId, offerId, transactionNo);
+        this.notiSocket.sendNotificationToClient(clientId, {success: success, offerId});
       }
       else{
         this.notiSocket.sendNotificationToClient(clientId, {success: false});
@@ -376,5 +389,25 @@ export class EnterpriseService {
       throw e;
     }
 
+  }
+  async handleConfirmTransactionFromClient(amount: number,
+                                     transactionNo: string,
+                                     responseCode: string,
+                                     orderId: string): Promise<any>{
+    try{
+      if(responseCode!=="00") return false;
+      var offset = orderId.split("_");
+      if(offset.length<3) return;
+      var clientId = offset[0];
+      var offerId = offset[2];
+      let exist = await this.purchaseModel.exists({transactionNo});
+      if(exist) return false;
+      let success = await this.buyPremium(this.req.user.id, offerId, transactionNo);
+      this.notiSocket.sendNotificationToClient(this.req.user.id, {success: success, offerId});
+      return success;
+    }
+    catch (e){
+
+    }
   }
 }

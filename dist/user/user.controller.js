@@ -83,9 +83,8 @@ let UserController = class UserController {
     }
     update(req, res, body) {
         return this.userService.updateProfile(req.user.username, body).pipe((0, rxjs_1.map)(u => {
-            var _a;
             if (u) {
-                return res.status(common_1.HttpStatus.OK).send({ user: Object.assign(Object.assign({}, u), { avatar: (_a = u.avatar) === null || _a === void 0 ? void 0 : _a.url }) });
+                return res.status(common_1.HttpStatus.OK).send({ user: Object.assign({}, u) });
             }
             else {
                 throw new common_1.NotFoundException("User not Found");
@@ -156,7 +155,7 @@ let UserController = class UserController {
         return this.userService.getHistorySchedule().pipe((0, rxjs_1.map)((histories) => {
             if (histories) {
                 return res.status(common_1.HttpStatus.OK).send({
-                    historys: histories
+                    scheduleDone: histories
                 });
             }
             else {

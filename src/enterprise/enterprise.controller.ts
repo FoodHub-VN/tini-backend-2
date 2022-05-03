@@ -36,7 +36,6 @@ import { DeleteScheduleDto } from "./dto/delete-schedule.dto";
 import { DoneScheduleDto } from "./dto/done-schedule.dto";
 import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
 import { PaymentDtoUrl } from "./dto/payment-url.dto";
-import querystring from "qs";
 import { ConfigService } from "@nestjs/config";
 
 
@@ -262,8 +261,8 @@ export class EnterpriseController {
   @Public()
   confirmPayment(
     @Query("vnp_Amount") amount: number,
-    @Query("vnp_TransactionNo") transactionNo: number,
-    @Query("vnp_ResponseCode") responseCode: number,
+    @Query("vnp_TransactionNo") transactionNo: string,
+    @Query("vnp_ResponseCode") responseCode: string,
     @Query("vnp_TxnRef") orderId: string,
     @Req() req: AuthenticatedRequest<EnterprisePrincipal>,
     @Res() res: Response
@@ -287,14 +286,49 @@ export class EnterpriseController {
     var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
 
 
-    if(secureHash === signed){
+    if (secureHash === signed) {
       //Kiem tra du lieu co hop le khong, cap nhat trang thai don hang va gui ket qua cho VNPAY theo dinh dang duoi
-      res.status(200).json({RspCode: '00', Message: 'success'})
-    }
-    else {
-      res.status(200).json({RspCode: '97', Message: 'Fail checksum'})
+      res.status(200).json({ RspCode: "00", Message: "success" });
+    } else {
+      res.status(200).json({ RspCode: "97", Message: "Fail checksum" });
     }
     this.enterpriseService.handleConfirmTransaction(amount, transactionNo, responseCode, orderId);
+  }
+
+  @Post("vnp_ipn_client")
+  async handleConfirmTransactionFromClient(@Res() res: Response, @Body() data: any) {
+    try {
+      let vnp_Params = data.data;
+      var secureHash = vnp_Params["vnp_SecureHash"];
+
+      delete vnp_Params["vnp_SecureHash"];
+      delete vnp_Params["vnp_SecureHashType"];
+
+      vnp_Params = Object.keys(vnp_Params).sort().reduce(function(result, key) {
+        result[key] = vnp_Params[key];
+        return result;
+      }, {});
+      var secretKey = this.configService.get<string>("HASH_SECRET");
+      var querystring = require("qs");
+      var signData = querystring.stringify(vnp_Params, { encode: true, format: "RFC1738" });
+      var crypto = require("crypto");
+      var hmac = crypto.createHmac("sha512", secretKey);
+      var signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+      console.log(secureHash, signed);
+      if (secureHash === signed) {
+        //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
+        let vnp_Amount = vnp_Params["vnp_Amount"];
+        let vnp_TransactionNo = vnp_Params["vnp_TransactionNo"];
+        let vnp_ResponseCode = vnp_Params["vnp_ResponseCode"];
+        let orderID = vnp_Params["vnp_TxnRef"];
+        let success = await this.enterpriseService.handleConfirmTransactionFromClient(vnp_Amount, vnp_TransactionNo, vnp_ResponseCode, orderID);
+        res.status(success?HttpStatus.OK:HttpStatus.BAD_REQUEST).send();
+      } else {
+        res.status(HttpStatus.BAD_REQUEST).send();
+      }
+    } catch (e) {
+      throw new BadRequestException();
+    }
   }
 
 }

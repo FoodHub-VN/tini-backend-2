@@ -149,6 +149,7 @@ export class UserService {
     }
     try{
       const schedule = await this.scheduleModel.findOne({_id: Types.ObjectId(scheduleId)}).exec();
+      if(!schedule) throw new ConflictException("Schedule not found!");
       await schedule.remove();
       return true;
     }
@@ -159,7 +160,7 @@ export class UserService {
   }
 
   getAllSchedule(): Observable<Schedule[]> {
-    return from(this.scheduleModel.find({ user: Types.ObjectId(this.req.user.id) }).populate(["service"]).exec());
+    return from(this.scheduleModel.find({ user: Types.ObjectId(this.req.user.id) }).populate(["service", "user"]).exec());
   }
 
   addToFavorite(serviceId: string): Observable<Service> {
@@ -288,7 +289,7 @@ export class UserService {
   }
 
   getHistorySchedule(): Observable<ScheduleHistory[]> {
-    return from(this.scheduleHistory.find({ user: Types.ObjectId(this.req.user.id) }).populate("service").exec());
+    return from(this.scheduleHistory.find({ user: Types.ObjectId(this.req.user.id) }).populate(["service", "user"]).exec());
   }
 
   async ratingService(serviceId: string, score: number[], title: string, content: string, images: Array<Express.Multer.File> | undefined): Promise<Comment> {

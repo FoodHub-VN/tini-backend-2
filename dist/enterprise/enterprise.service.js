@@ -26,7 +26,7 @@ const lodash_1 = require("lodash");
 const fs = require("fs");
 const config_1 = require("@nestjs/config");
 let EnterpriseService = class EnterpriseService {
-    constructor(enterpriseModel, serviceModel, bService, req, notiModel, scheduleModel, scheduleHistoryModel, userModel, uploadService, notiSocket, configService, purchaseTempModel) {
+    constructor(enterpriseModel, serviceModel, bService, req, notiModel, scheduleModel, scheduleHistoryModel, userModel, uploadService, notiSocket, configService, purchaseTempModel, purchaseModel) {
         this.enterpriseModel = enterpriseModel;
         this.serviceModel = serviceModel;
         this.bService = bService;
@@ -39,6 +39,7 @@ let EnterpriseService = class EnterpriseService {
         this.notiSocket = notiSocket;
         this.configService = configService;
         this.purchaseTempModel = purchaseTempModel;
+        this.purchaseModel = purchaseModel;
         var path = require("path");
         this.premiumConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "../../res/json/premium.json"), 'utf-8'));
     }
@@ -104,16 +105,25 @@ let EnterpriseService = class EnterpriseService {
             throw e;
         }
     }
-    async buyPremium(enterprise, idOffer) {
+    async buyPremium(enterprise, idOffer, transactionNo) {
         try {
+            let exist = await this.purchaseModel.exists({ transactionNo: transactionNo });
+            if (exist) {
+                return false;
+            }
             const model = await this.enterpriseModel.findOne({ _id: mongoose_1.Types.ObjectId(enterprise) }).exec();
-            if ((0, lodash_1.parseInt)(model.premium) >= (0, lodash_1.parseInt)(idOffer)) {
+            if (!model) {
+                throw new common_1.NotFoundException("Enterprise model not found!");
+            }
+            if (model.premium && ((0, lodash_1.parseInt)(model.premium) >= (0, lodash_1.parseInt)(idOffer))) {
                 throw new common_1.ConflictException("Premium is lower than previous");
             }
             await model.update({ premium: idOffer }).exec();
+            await this.purchaseModel.create({ enterprise: enterprise, transactionNo: transactionNo, date: Date.now(), premium: idOffer });
             return true;
         }
         catch (e) {
+            console.log(e);
             throw e;
         }
     }
@@ -306,9 +316,9 @@ let EnterpriseService = class EnterpriseService {
                 return;
             var clientId = offset[0];
             var offerId = offset[2];
-            if (responseCode == 0) {
-                await this.buyPremium(clientId, offerId);
-                this.notiSocket.sendNotificationToClient(clientId, { success: true, offerId });
+            if (responseCode === "00") {
+                let success = await this.buyPremium(clientId, offerId, transactionNo);
+                this.notiSocket.sendNotificationToClient(clientId, { success: success, offerId });
             }
             else {
                 this.notiSocket.sendNotificationToClient(clientId, { success: false });
@@ -316,6 +326,25 @@ let EnterpriseService = class EnterpriseService {
         }
         catch (e) {
             throw e;
+        }
+    }
+    async handleConfirmTransactionFromClient(amount, transactionNo, responseCode, orderId) {
+        try {
+            if (responseCode !== "00")
+                return false;
+            var offset = orderId.split("_");
+            if (offset.length < 3)
+                return;
+            var clientId = offset[0];
+            var offerId = offset[2];
+            let exist = await this.purchaseModel.exists({ transactionNo });
+            if (exist)
+                return false;
+            let success = await this.buyPremium(this.req.user.id, offerId, transactionNo);
+            this.notiSocket.sendNotificationToClient(this.req.user.id, { success: success, offerId });
+            return success;
+        }
+        catch (e) {
         }
     }
 };
@@ -330,9 +359,10 @@ EnterpriseService = __decorate([
     __param(6, (0, common_1.Inject)(database_constants_1.SCHEDULE_HISTORY_MODEL)),
     __param(7, (0, common_1.Inject)(database_constants_1.USER_MODEL)),
     __param(11, (0, common_1.Inject)(database_constants_1.PURCHASE_TEMP_MODEL)),
+    __param(12, (0, common_1.Inject)(database_constants_1.PURCHASE_MODEL)),
     __metadata("design:paramtypes", [Object, Object, b_service_service_1.BServiceService, Object, Object, Object, Object, Object, upload_service_1.FileUploadService,
         notification_gateway_1.NotificationGateway,
-        config_1.ConfigService, Object])
+        config_1.ConfigService, Object, Object])
 ], EnterpriseService);
 exports.EnterpriseService = EnterpriseService;
 //# sourceMappingURL=enterprise.service.js.map

@@ -115,6 +115,8 @@ let UserService = class UserService {
         }
         try {
             const schedule = await this.scheduleModel.findOne({ _id: mongoose_1.Types.ObjectId(scheduleId) }).exec();
+            if (!schedule)
+                throw new common_1.ConflictException("Schedule not found!");
             await schedule.remove();
             return true;
         }
@@ -123,7 +125,7 @@ let UserService = class UserService {
         }
     }
     getAllSchedule() {
-        return (0, rxjs_1.from)(this.scheduleModel.find({ user: mongoose_1.Types.ObjectId(this.req.user.id) }).populate(["service"]).exec());
+        return (0, rxjs_1.from)(this.scheduleModel.find({ user: mongoose_1.Types.ObjectId(this.req.user.id) }).populate(["service", "user"]).exec());
     }
     addToFavorite(serviceId) {
         if (!mongoose_1.Types.ObjectId.isValid(serviceId)) {
@@ -214,7 +216,7 @@ let UserService = class UserService {
         }));
     }
     getHistorySchedule() {
-        return (0, rxjs_1.from)(this.scheduleHistory.find({ user: mongoose_1.Types.ObjectId(this.req.user.id) }).populate("service").exec());
+        return (0, rxjs_1.from)(this.scheduleHistory.find({ user: mongoose_1.Types.ObjectId(this.req.user.id) }).populate(["service", "user"]).exec());
     }
     async ratingService(serviceId, score, title, content, images) {
         if (!mongoose_1.Types.ObjectId(serviceId)) {

@@ -95,7 +95,7 @@ export class UserController {
     return this.userService.updateProfile(req.user.username, body).pipe(
       map(u => {
         if (u) {
-          return res.status(HttpStatus.OK).send({ user: {...u, avatar:u.avatar?.url} });
+          return res.status(HttpStatus.OK).send({ user: {...u} });
         } else {
           throw new NotFoundException("User not Found");
         }
@@ -213,7 +213,7 @@ export class UserController {
       map((histories)=>{
         if(histories){
           return res.status(HttpStatus.OK).send({
-            historys: histories
+            scheduleDone: histories
           })
         }
         else{

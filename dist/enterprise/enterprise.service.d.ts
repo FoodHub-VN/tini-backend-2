@@ -17,6 +17,7 @@ import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
 import { UserModel } from "../database/model/user.model";
 import { ConfigService } from "@nestjs/config";
 import { PurchaseTempModel } from "../database/model/purchase-temp";
+import { PurchaseModel } from "../database/model/purchase-history.model";
 export declare class EnterpriseService {
     private enterpriseModel;
     private serviceModel;
@@ -30,8 +31,9 @@ export declare class EnterpriseService {
     private notiSocket;
     private readonly configService;
     private purchaseTempModel;
+    private purchaseModel;
     private premiumConfig;
-    constructor(enterpriseModel: EnterpriseModel, serviceModel: ServiceModel, bService: BServiceService, req: AuthenticatedRequest<EnterprisePrincipal>, notiModel: NotificationModel, scheduleModel: ScheduleModel, scheduleHistoryModel: ScheduleHistoryModel, userModel: UserModel, uploadService: FileUploadService, notiSocket: NotificationGateway, configService: ConfigService, purchaseTempModel: PurchaseTempModel);
+    constructor(enterpriseModel: EnterpriseModel, serviceModel: ServiceModel, bService: BServiceService, req: AuthenticatedRequest<EnterprisePrincipal>, notiModel: NotificationModel, scheduleModel: ScheduleModel, scheduleHistoryModel: ScheduleHistoryModel, userModel: UserModel, uploadService: FileUploadService, notiSocket: NotificationGateway, configService: ConfigService, purchaseTempModel: PurchaseTempModel, purchaseModel: PurchaseModel);
     findEnterpriseByName(name: string): Observable<Enterprise>;
     findEnterpriseWithPassByName(name: string): Observable<Enterprise>;
     existEnterpriseByName(name: string): Observable<boolean>;
@@ -43,7 +45,7 @@ export declare class EnterpriseService {
     getAllNotifications(): Promise<Notification[]>;
     readNoti(notiId: string): Promise<any>;
     readAllNoti(): Promise<any>;
-    buyPremium(enterprise: string, idOffer: string): Promise<any>;
+    buyPremium(enterprise: string, idOffer: string, transactionNo: string): Promise<boolean>;
     getSchedules(): Promise<any>;
     deleteSchedule(id: string): Promise<any>;
     doneSchedule(id: string): Promise<any>;
@@ -51,5 +53,6 @@ export declare class EnterpriseService {
     updateProfile(data: EnterpriseEditDto): Promise<Enterprise>;
     getOverviewAnalysis(): Promise<any>;
     getPaymentUrl(offerId: string): Promise<any>;
-    handleConfirmTransaction(amount: number, transactionNo: number, responseCode: number, orderId: string): Promise<any>;
+    handleConfirmTransaction(amount: number, transactionNo: string, responseCode: string, orderId: string): Promise<any>;
+    handleConfirmTransactionFromClient(amount: number, transactionNo: string, responseCode: string, orderId: string): Promise<any>;
 }

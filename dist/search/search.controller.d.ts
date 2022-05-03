@@ -6,5 +6,5 @@ import { UserPrincipal } from "../auth/interface/user-principal";
 export declare class SearchController {
     private readonly searchService;
     constructor(searchService: SearchService);
-    search(res: Response, searchText: string, category: string, quan: string, huyen: string, req: AuthenticatedRequest<UserPrincipal>): Observable<Response>;
+    search(res: Response, searchText: string, category: string, quan: string, huyen: string, page: number, req: AuthenticatedRequest<UserPrincipal>): Observable<Response>;
 }

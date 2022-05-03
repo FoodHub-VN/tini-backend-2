@@ -7,5 +7,9 @@ export declare class SearchService {
     private introductionModel;
     constructor(serviceModel: ServiceModel, introductionModel: IntroductionModel);
     quickSearch(textSearch: string): Observable<any>;
-    deepSearch(textSearch: string, filter: Filter): Promise<Service[]>;
+    deepSearch(textSearch: string, filter: Filter, page: number | undefined): Promise<{
+        services: Service[];
+        totalPage: number;
+        page: number;
+    }>;
 }

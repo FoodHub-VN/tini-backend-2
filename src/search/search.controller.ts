@@ -19,19 +19,20 @@ export class SearchController {
          @Query("category") category: string,
          @Query("quan") quan: string,
          @Query("huyen") huyen: string,
+         @Query('page') page: number,
          @Req() req: AuthenticatedRequest<UserPrincipal>
   ): Observable<Response> {
     let filter: Filter = {};
     category && (filter.category = category.toString());
     quan && (filter.quan = quan.toString());
     huyen && (filter.huyen = huyen.toString());
-    return from(this.searchService.deepSearch(searchText, filter))
+    return from(this.searchService.deepSearch(searchText, filter, page))
       .pipe(
         map((services) => {
           if (services) {
             return res.status(HttpStatus.OK).send({
               searchText: searchText,
-              services: services
+              ...services
             });
           } else {
             throw new BadRequestException();

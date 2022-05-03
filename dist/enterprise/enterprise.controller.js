@@ -185,12 +185,45 @@ let EnterpriseController = class EnterpriseController {
         var hmac = crypto.createHmac("sha512", secretKey);
         var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
         if (secureHash === signed) {
-            res.status(200).json({ RspCode: '00', Message: 'success' });
+            res.status(200).json({ RspCode: "00", Message: "success" });
         }
         else {
-            res.status(200).json({ RspCode: '97', Message: 'Fail checksum' });
+            res.status(200).json({ RspCode: "97", Message: "Fail checksum" });
         }
         this.enterpriseService.handleConfirmTransaction(amount, transactionNo, responseCode, orderId);
+    }
+    async handleConfirmTransactionFromClient(res, data) {
+        try {
+            let vnp_Params = data.data;
+            var secureHash = vnp_Params["vnp_SecureHash"];
+            delete vnp_Params["vnp_SecureHash"];
+            delete vnp_Params["vnp_SecureHashType"];
+            vnp_Params = Object.keys(vnp_Params).sort().reduce(function (result, key) {
+                result[key] = vnp_Params[key];
+                return result;
+            }, {});
+            var secretKey = this.configService.get("HASH_SECRET");
+            var querystring = require("qs");
+            var signData = querystring.stringify(vnp_Params, { encode: true, format: "RFC1738" });
+            var crypto = require("crypto");
+            var hmac = crypto.createHmac("sha512", secretKey);
+            var signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+            console.log(secureHash, signed);
+            if (secureHash === signed) {
+                let vnp_Amount = vnp_Params["vnp_Amount"];
+                let vnp_TransactionNo = vnp_Params["vnp_TransactionNo"];
+                let vnp_ResponseCode = vnp_Params["vnp_ResponseCode"];
+                let orderID = vnp_Params["vnp_TxnRef"];
+                let success = await this.enterpriseService.handleConfirmTransactionFromClient(vnp_Amount, vnp_TransactionNo, vnp_ResponseCode, orderID);
+                res.status(success ? common_1.HttpStatus.OK : common_1.HttpStatus.BAD_REQUEST).send();
+            }
+            else {
+                res.status(common_1.HttpStatus.BAD_REQUEST).send();
+            }
+        }
+        catch (e) {
+            throw new common_1.BadRequestException();
+        }
     }
 };
 __decorate([
@@ -325,9 +358,17 @@ __decorate([
     __param(4, (0, common_1.Req)()),
     __param(5, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, Number, String, Object, Object]),
+    __metadata("design:paramtypes", [Number, String, String, String, Object, Object]),
     __metadata("design:returntype", void 0)
 ], EnterpriseController.prototype, "confirmPayment", null);
+__decorate([
+    (0, common_1.Post)("vnp_ipn_client"),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], EnterpriseController.prototype, "handleConfirmTransactionFromClient", null);
 EnterpriseController = __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtEnterpriseAuthGuard),
     (0, common_1.Controller)({ path: "enterprise", scope: common_1.Scope.REQUEST }),
