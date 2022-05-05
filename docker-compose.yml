@@ -21,7 +21,9 @@ services:
       - TMN_CODE=5XK2JZPT
       - HASH_SECRET=CIXCUTQDKONMNLVCNGPAASFGGMSHNNUU
       - VNP_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-      - RETURN_URL=http://enterprise.bkservice.tk/
+      - RETURN_URL=http://enterprise.bkservice.tk/payment-result
+      - FLASK_ENV=development
+      - FLASK_APP=bkservice.py
     stdin_open: true
     tty: true
   mongodb:
@@ -35,6 +37,8 @@ services:
       - db:/data/db
     environment:
       - MONGO_INITDB_DATABASE=nestjs-test
+
+
 
 volumes:
   db:
