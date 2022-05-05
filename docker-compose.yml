@@ -38,6 +38,8 @@ services:
       - db:/data/db
     environment:
       - MONGO_INITDB_DATABASE=nestjs-test
+    logging:
+      driver: none
 
 
 
