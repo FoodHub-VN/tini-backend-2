@@ -6,6 +6,7 @@ services:
     ports:
       - "3008:3007"
       - "8080:8080"
+      - "5000:5000"
     links:
       - mongodb
     env_file:
