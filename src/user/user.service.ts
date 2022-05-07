@@ -26,6 +26,7 @@ import { NotiType } from "../shared/NotiType.type";
 import { NotificationGateway } from "../notification/notification.gateway";
 import { FileUploaded } from "../upload/interface/upload.interface";
 import { ScoreModel } from "../database/model/scores.model";
+import { EnterpriseService } from "../enterprise/enterprise.service";
 
 
 @Injectable()
@@ -40,7 +41,8 @@ export class UserService {
     @Inject(NOTIFICATION_MODEL) private notiModel: NotificationModel,
     @Inject(SCORE_MODEL) private scoreModel: ScoreModel,
     private uploadService: FileUploadService,
-    private notiSocket: NotificationGateway
+    private notiSocket: NotificationGateway,
+    private enterpriseService: EnterpriseService
   ) {
   }
   findUserWithPassByName(username: string, lean = false): Observable<User> {
@@ -308,7 +310,6 @@ export class UserService {
         uploads = await Promise.all<FileUploaded>(promises);
         await service.update({imgCmtCount: service.imgCmtCount?service.imgCmtCount+images.length: 1}).exec();
       }
-
       await service.update({textCmtCount: service.textCmtCount?service.textCmtCount+1: 1}).exec();
       const comment = await this.commentModel.create({
         user: this.req.user.id,
@@ -324,6 +325,7 @@ export class UserService {
         scores: score,
         commentId: comment._id
       });
+      await this.enterpriseService.calRankingPointService(serviceId);
       return comment;
     }
     catch (e) {
@@ -348,7 +350,8 @@ export class UserService {
       }).exec();
       comment.images&&comment.images.length>0 && this.uploadService.deleteMulti(comment.images.map(i=>i.key));
       await this.scoreModel.remove({commentId: comment._id});
-      await comment.remove();
+      await comment.remove()
+      await this.enterpriseService.calRankingPointService(service._id);
       return true;
     }
     catch (e) {

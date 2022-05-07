@@ -11,7 +11,8 @@
       "Missing 1",
       "Missing 2",
       "Missing 3"
-    ]
+    ],
+    "bonus": 1
   },
   "2": {
     "price": 279000,
@@ -25,7 +26,8 @@
       "Missing 1",
       "Missing 2",
       "Missing 3"
-    ]
+    ],
+    "bonus": 2
   },
   "3": {
     "price": 279000,
@@ -39,6 +41,7 @@
       "Missing 1",
       "Missing 2",
       "Missing 3"
-    ]
+    ],
+    "bonus": 3
   }
 }

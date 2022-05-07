@@ -15,11 +15,12 @@ const b_service_module_1 = require("../b-service/b-service.module");
 const nestjs_form_data_1 = require("nestjs-form-data");
 const upload_module_1 = require("../upload/upload.module");
 const config_1 = require("@nestjs/config");
+const axios_1 = require("@nestjs/axios");
 let EnterpriseModule = class EnterpriseModule {
 };
 EnterpriseModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, b_service_module_1.BServiceModule, nestjs_form_data_1.NestjsFormDataModule, upload_module_1.UploadModule, config_1.ConfigModule],
+        imports: [database_module_1.DatabaseModule, b_service_module_1.BServiceModule, nestjs_form_data_1.NestjsFormDataModule, upload_module_1.UploadModule, config_1.ConfigModule, axios_1.HttpModule],
         providers: [enterprise_service_1.EnterpriseService],
         controllers: [enterprise_controller_1.EnterpriseController],
         exports: [enterprise_service_1.EnterpriseService]

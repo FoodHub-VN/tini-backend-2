@@ -31,12 +31,12 @@ let SearchService = class SearchService {
                     $search: textSearch
                 }
             }, { score: { $meta: "textScore" } })
-                .sort({ score: { $meta: "textScore" } })
+                .sort({ rankingPoint: 'desc' })
                 .populate("category")
                 .exec());
         }
         else {
-            return (0, rxjs_1.from)(this.serviceModel.find().populate("category").exec());
+            return (0, rxjs_1.from)(this.serviceModel.find().populate("category").sort({ rankingPoint: 'desc' }).exec());
         }
     }
     async deepSearch(textSearch, filter, page) {
@@ -55,13 +55,17 @@ let SearchService = class SearchService {
             if (textSearch && textSearch.length > 0) {
                 services = await this.serviceModel.find(Object.assign({ $text: {
                         $search: textSearch
-                    } }, condition)).skip((page - 1) * resultPerPage).limit(resultPerPage).populate("category").exec();
+                    } }, condition)).sort({ rankingPoint: 'desc' })
+                    .skip((page - 1) * resultPerPage)
+                    .limit(resultPerPage)
+                    .populate("category")
+                    .exec();
                 totalPage = await this.serviceModel.find(Object.assign({ $text: {
                         $search: textSearch
                     } }, condition)).countDocuments().exec() / resultPerPage;
             }
             else {
-                services = await this.serviceModel.find(Object.assign({}, condition), null).skip((page - 1) * resultPerPage).limit(resultPerPage).populate("category").exec();
+                services = await this.serviceModel.find(Object.assign({}, condition), null).sort({ rankingPoint: 'desc' }).skip((page - 1) * resultPerPage).limit(resultPerPage).populate("category").exec();
                 totalPage = await this.serviceModel.find(Object.assign({}, condition), null).countDocuments().exec() / resultPerPage;
             }
             return { services, totalPage: Math.ceil(totalPage), page };

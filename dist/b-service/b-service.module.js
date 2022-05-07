@@ -12,13 +12,14 @@ const b_service_service_1 = require("./b-service.service");
 const b_service_controller_1 = require("./b-service.controller");
 const database_module_1 = require("../database/database.module");
 const upload_module_1 = require("../upload/upload.module");
+const enterprise_module_1 = require("../enterprise/enterprise.module");
 let BServiceModule = class BServiceModule {
 };
 BServiceModule = __decorate([
     (0, common_1.Module)({
         providers: [b_service_service_1.BServiceService],
         controllers: [b_service_controller_1.BServiceController],
-        imports: [database_module_1.DatabaseModule, upload_module_1.UploadModule],
+        imports: [database_module_1.DatabaseModule, upload_module_1.UploadModule, (0, common_1.forwardRef)(() => enterprise_module_1.EnterpriseModule)],
         exports: [b_service_service_1.BServiceService]
     })
 ], BServiceModule);

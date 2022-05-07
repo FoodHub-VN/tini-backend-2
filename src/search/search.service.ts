@@ -4,8 +4,7 @@ import { Service, ServiceModel } from "../database/model/service.model";
 import { IntroductionModel } from "../database/model/introduction.model";
 import { from, Observable } from "rxjs";
 import { Filter } from "./interface/filter.interface";
-import { Address } from "../database/model/user.model";
-import { FilterQuery, Types } from "mongoose";
+import { Types } from "mongoose";
 
 @Injectable()
 export class SearchService {
@@ -14,7 +13,6 @@ export class SearchService {
     @Inject(INTRODUCTION_MODEL) private introductionModel: IntroductionModel
   ) {
   }
-
   quickSearch(textSearch: string): Observable<any> {
     const result: Array<any> = [];
     if(textSearch && textSearch.length > 2) {
@@ -25,13 +23,13 @@ export class SearchService {
             }
           },
           { score: { $meta: "textScore" } })
-        .sort({ score: { $meta: "textScore" } })
+        .sort({rankingPoint: 'desc'})
         .populate("category")
         .exec()
       );
     }
     else{
-      return from(this.serviceModel.find().populate("category").exec());
+      return from(this.serviceModel.find().populate("category").sort({rankingPoint: 'desc'}).exec());
     }
 
   }
@@ -54,9 +52,14 @@ export class SearchService {
         services = await this.serviceModel.find({
           $text: {
             $search: textSearch
-          },
+          }
+          ,
           ...condition
-        }).skip((page-1)*resultPerPage).limit(resultPerPage).populate("category").exec();
+        }).sort({rankingPoint: 'desc'})
+          .skip((page-1)*resultPerPage)
+          .limit(resultPerPage)
+          .populate("category")
+          .exec();
         totalPage = await this.serviceModel.find({
           $text: {
             $search: textSearch
@@ -64,7 +67,7 @@ export class SearchService {
           ...condition
         }).countDocuments().exec() / resultPerPage;
       } else {
-        services = await this.serviceModel.find({ ...condition } , null).skip((page-1)*resultPerPage).limit(resultPerPage).populate("category").exec();
+        services = await this.serviceModel.find({ ...condition } , null).sort({rankingPoint: 'desc'}).skip((page-1)*resultPerPage).limit(resultPerPage).populate("category").exec();
         totalPage = await this.serviceModel.find({ ...condition } , null).countDocuments().exec() / resultPerPage;
       }
       return { services, totalPage: Math.ceil(totalPage), page };

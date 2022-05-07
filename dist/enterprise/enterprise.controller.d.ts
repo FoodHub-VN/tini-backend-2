@@ -32,4 +32,5 @@ export declare class EnterpriseController {
     getPaymentUrl(req: AuthenticatedRequest<EnterprisePrincipal>, ip: any, res: Response, data: PaymentDtoUrl): Observable<Response<any, Record<string, any>>>;
     confirmPayment(amount: number, transactionNo: string, responseCode: string, orderId: string, req: AuthenticatedRequest<EnterprisePrincipal>, res: Response): void;
     handleConfirmTransactionFromClient(res: Response, data: any): Promise<void>;
+    test(data: any): boolean;
 }

@@ -330,5 +330,10 @@ export class EnterpriseController {
       throw new BadRequestException();
     }
   }
-
+  @Public()
+  @Post('testne')
+  test(@Body() data: any){
+    this.enterpriseService.calRankingPointService(data.id);
+    return true;
+  }
 }

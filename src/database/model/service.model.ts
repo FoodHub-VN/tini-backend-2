@@ -34,7 +34,6 @@ type ServiceModel = Model<Service>;
 const ServiceSchema = new Schema<Service>({
   name: {
     type: SchemaTypes.String,
-    text: true
   },
   avatar: SchemaTypes.Mixed,
   images: [SchemaTypes.Mixed],
@@ -54,7 +53,7 @@ const ServiceSchema = new Schema<Service>({
   category: {type: SchemaTypes.ObjectId, ref: 'Category'},
 }, { timestamps: true });
 
-
+ServiceSchema.index({name: 'text'});
 ServiceSchema.post<Service>("remove", async function(service) {
 
   //delete introduction

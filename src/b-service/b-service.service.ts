@@ -1,13 +1,22 @@
-import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException, forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+  Scope
+} from "@nestjs/common";
 import {
   CATEGORY_MODEL,
   COMMENT_MODEL,
   INTRODUCTION_MODEL,
-  SCHEDULE_MODEL, SCORE_MODEL,
+  SCHEDULE_MODEL,
+  SCORE_MODEL,
   SERVICE_MODEL
 } from "../database/database.constants";
 import { Service, ServiceModel } from "../database/model/service.model";
-import { REQUEST } from "@nestjs/core";
+import { ModuleRef, REQUEST } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
 import { EnterPriseNewServiceDataDto } from "../enterprise/dto/enterprise-new-service.dto";
@@ -23,6 +32,7 @@ import { FileUploaded } from "../upload/interface/upload.interface";
 import { Comment, CommentModel } from "../database/model/comment.model";
 import { ScoreModel } from "../database/model/scores.model";
 import { getRatingScore } from "../shared/utility";
+import { EnterpriseService } from "../enterprise/enterprise.service";
 
 @Injectable({ scope: Scope.REQUEST })
 export class BServiceService {
@@ -34,7 +44,9 @@ export class BServiceService {
     @Inject(CATEGORY_MODEL) private categoryModel: CategoryModel,
     @Inject(COMMENT_MODEL) private commentModel : CommentModel,
     @Inject(SCORE_MODEL) private scoreModel : ScoreModel,
-    private uploadService: FileUploadService
+    private uploadService: FileUploadService,
+    private moduleRef: ModuleRef,
+    @Inject(forwardRef(()=>EnterpriseService)) private enterpriseService: EnterpriseService
   ) {
   }
 
@@ -125,7 +137,12 @@ export class BServiceService {
         model.images.push(...res);
         await model.save();
       }
-      return await this.serviceModel.findOneAndUpdate({ _id: Types.ObjectId(serviceId) }, { ...__data }, { new: true }).exec();
+
+      await this.serviceModel.findOneAndUpdate({ _id: Types.ObjectId(serviceId) }, { ...__data }, { new: true }).exec();
+      if(data.introduction){
+        await this.enterpriseService.calRankingPointService(serviceId);
+      }
+      return this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
     } catch (e) {
       throw e;
     }
@@ -246,4 +263,5 @@ export class BServiceService {
       return [...defaultScore, getRatingScore(defaultScore)];
     }
   }
+
 }

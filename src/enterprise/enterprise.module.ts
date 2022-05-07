@@ -6,9 +6,10 @@ import { BServiceModule } from "../b-service/b-service.module";
 import { NestjsFormDataModule } from "nestjs-form-data";
 import { UploadModule } from "../upload/upload.module";
 import { ConfigModule } from "@nestjs/config";
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
-  imports:[DatabaseModule, BServiceModule, NestjsFormDataModule, UploadModule, ConfigModule],
+  imports:[DatabaseModule, BServiceModule, NestjsFormDataModule, UploadModule, ConfigModule, HttpModule],
   providers: [EnterpriseService],
   controllers: [EnterpriseController],
   exports: [EnterpriseService]

@@ -14,6 +14,7 @@ import { Notification, NotificationModel } from "../database/model/notification.
 import { NotificationGateway } from "../notification/notification.gateway";
 import { FileUploaded } from "../upload/interface/upload.interface";
 import { ScoreModel } from "../database/model/scores.model";
+import { EnterpriseService } from "../enterprise/enterprise.service";
 export declare class UserService {
     private userModel;
     private scheduleModel;
@@ -25,7 +26,8 @@ export declare class UserService {
     private scoreModel;
     private uploadService;
     private notiSocket;
-    constructor(userModel: UserModel, scheduleModel: ScheduleModel, serviceModel: ServiceModel, scheduleHistory: ScheduleHistoryModel, req: AuthenticatedRequest<UserPrincipal>, commentModel: CommentModel, notiModel: NotificationModel, scoreModel: ScoreModel, uploadService: FileUploadService, notiSocket: NotificationGateway);
+    private enterpriseService;
+    constructor(userModel: UserModel, scheduleModel: ScheduleModel, serviceModel: ServiceModel, scheduleHistory: ScheduleHistoryModel, req: AuthenticatedRequest<UserPrincipal>, commentModel: CommentModel, notiModel: NotificationModel, scoreModel: ScoreModel, uploadService: FileUploadService, notiSocket: NotificationGateway, enterpriseService: EnterpriseService);
     findUserWithPassByName(username: string, lean?: boolean): Observable<User>;
     findUserByName(username: string, lean?: boolean): Observable<User>;
     findUserById(userId: string): Promise<User>;

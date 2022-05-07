@@ -1,5 +1,6 @@
 /// <reference types="multer" />
 import { Service, ServiceModel } from "../database/model/service.model";
+import { ModuleRef } from "@nestjs/core";
 import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
 import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
 import { EnterPriseNewServiceDataDto } from "../enterprise/dto/enterprise-new-service.dto";
@@ -12,6 +13,7 @@ import { CategoryModel } from "../database/model/category.model";
 import { FileUploadService } from "../upload/upload.service";
 import { Comment, CommentModel } from "../database/model/comment.model";
 import { ScoreModel } from "../database/model/scores.model";
+import { EnterpriseService } from "../enterprise/enterprise.service";
 export declare class BServiceService {
     private serviceModel;
     private introductionModel;
@@ -21,7 +23,9 @@ export declare class BServiceService {
     private commentModel;
     private scoreModel;
     private uploadService;
-    constructor(serviceModel: ServiceModel, introductionModel: IntroductionModel, req: AuthenticatedRequest<EnterprisePrincipal>, scheduleModel: ScheduleModel, categoryModel: CategoryModel, commentModel: CommentModel, scoreModel: ScoreModel, uploadService: FileUploadService);
+    private moduleRef;
+    private enterpriseService;
+    constructor(serviceModel: ServiceModel, introductionModel: IntroductionModel, req: AuthenticatedRequest<EnterprisePrincipal>, scheduleModel: ScheduleModel, categoryModel: CategoryModel, commentModel: CommentModel, scoreModel: ScoreModel, uploadService: FileUploadService, moduleRef: ModuleRef, enterpriseService: EnterpriseService);
     createService(data: EnterPriseNewServiceDataDto, images: Array<Express.Multer.File> | undefined): Promise<Service>;
     modifyService(data: EnterPriseNewServiceDataDto, serviceId: string, images: Array<Express.Multer.File> | undefined): Promise<Service>;
     addServiceIntroduce(data: AddServiceIntroduceDto, serviceId: string): Observable<any>;

@@ -18,6 +18,9 @@ import { UserModel } from "../database/model/user.model";
 import { ConfigService } from "@nestjs/config";
 import { PurchaseTempModel } from "../database/model/purchase-temp";
 import { PurchaseModel } from "../database/model/purchase-history.model";
+import { CommentModel } from "../database/model/comment.model";
+import { HttpService } from "@nestjs/axios";
+import { ScoreModel } from "../database/model/scores.model";
 export declare class EnterpriseService {
     private enterpriseModel;
     private serviceModel;
@@ -27,13 +30,16 @@ export declare class EnterpriseService {
     private scheduleModel;
     private scheduleHistoryModel;
     private userModel;
+    private commentModel;
     private uploadService;
     private notiSocket;
     private readonly configService;
     private purchaseTempModel;
     private purchaseModel;
+    private httpService;
+    private scoreModel;
     private premiumConfig;
-    constructor(enterpriseModel: EnterpriseModel, serviceModel: ServiceModel, bService: BServiceService, req: AuthenticatedRequest<EnterprisePrincipal>, notiModel: NotificationModel, scheduleModel: ScheduleModel, scheduleHistoryModel: ScheduleHistoryModel, userModel: UserModel, uploadService: FileUploadService, notiSocket: NotificationGateway, configService: ConfigService, purchaseTempModel: PurchaseTempModel, purchaseModel: PurchaseModel);
+    constructor(enterpriseModel: EnterpriseModel, serviceModel: ServiceModel, bService: BServiceService, req: AuthenticatedRequest<EnterprisePrincipal>, notiModel: NotificationModel, scheduleModel: ScheduleModel, scheduleHistoryModel: ScheduleHistoryModel, userModel: UserModel, commentModel: CommentModel, uploadService: FileUploadService, notiSocket: NotificationGateway, configService: ConfigService, purchaseTempModel: PurchaseTempModel, purchaseModel: PurchaseModel, httpService: HttpService, scoreModel: ScoreModel);
     findEnterpriseByName(name: string): Observable<Enterprise>;
     findEnterpriseWithPassByName(name: string): Observable<Enterprise>;
     existEnterpriseByName(name: string): Observable<boolean>;
@@ -55,4 +61,6 @@ export declare class EnterpriseService {
     getPaymentUrl(offerId: string): Promise<any>;
     handleConfirmTransaction(amount: number, transactionNo: string, responseCode: string, orderId: string): Promise<any>;
     handleConfirmTransactionFromClient(amount: number, transactionNo: string, responseCode: string, orderId: string): Promise<any>;
+    calRankingPointService(serviceId: string): Promise<any>;
+    updateAllRankingPointOfEnterprise(enterprise: string): Promise<void>;
 }

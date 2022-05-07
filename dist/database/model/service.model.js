@@ -5,7 +5,6 @@ const mongoose_1 = require("mongoose");
 const ServiceSchema = new mongoose_1.Schema({
     name: {
         type: mongoose_1.SchemaTypes.String,
-        text: true
     },
     avatar: mongoose_1.SchemaTypes.Mixed,
     images: [mongoose_1.SchemaTypes.Mixed],
@@ -25,6 +24,7 @@ const ServiceSchema = new mongoose_1.Schema({
     category: { type: mongoose_1.SchemaTypes.ObjectId, ref: 'Category' },
 }, { timestamps: true });
 exports.ServiceSchema = ServiceSchema;
+ServiceSchema.index({ name: 'text' });
 ServiceSchema.post("remove", async function (service) {
     const intro = await this.model("Introduction").findOne({ service: this._id }).exec();
     await intro.remove();

@@ -3,4 +3,5 @@ export interface Premium{
   title: string;
   benefit: string[];
   missing: string[];
+  bonus: number;
 }

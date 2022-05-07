@@ -225,6 +225,10 @@ let EnterpriseController = class EnterpriseController {
             throw new common_1.BadRequestException();
         }
     }
+    test(data) {
+        this.enterpriseService.calRankingPointService(data.id);
+        return true;
+    }
 };
 __decorate([
     (0, public_guard_decorator_1.Public)(),
@@ -369,6 +373,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], EnterpriseController.prototype, "handleConfirmTransactionFromClient", null);
+__decorate([
+    (0, public_guard_decorator_1.Public)(),
+    (0, common_1.Post)('testne'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], EnterpriseController.prototype, "test", null);
 EnterpriseController = __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtEnterpriseAuthGuard),
     (0, common_1.Controller)({ path: "enterprise", scope: common_1.Scope.REQUEST }),

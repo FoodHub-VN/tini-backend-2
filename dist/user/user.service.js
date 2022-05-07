@@ -22,8 +22,9 @@ const utility_1 = require("../shared/utility");
 const upload_service_1 = require("../upload/upload.service");
 const NotiType_type_1 = require("../shared/NotiType.type");
 const notification_gateway_1 = require("../notification/notification.gateway");
+const enterprise_service_1 = require("../enterprise/enterprise.service");
 let UserService = class UserService {
-    constructor(userModel, scheduleModel, serviceModel, scheduleHistory, req, commentModel, notiModel, scoreModel, uploadService, notiSocket) {
+    constructor(userModel, scheduleModel, serviceModel, scheduleHistory, req, commentModel, notiModel, scoreModel, uploadService, notiSocket, enterpriseService) {
         this.userModel = userModel;
         this.scheduleModel = scheduleModel;
         this.serviceModel = serviceModel;
@@ -34,6 +35,7 @@ let UserService = class UserService {
         this.scoreModel = scoreModel;
         this.uploadService = uploadService;
         this.notiSocket = notiSocket;
+        this.enterpriseService = enterpriseService;
     }
     findUserWithPassByName(username, lean = false) {
         return (0, rxjs_1.from)(this.userModel.findOne({ username }, null, { lean }).select("+password").exec());
@@ -249,6 +251,7 @@ let UserService = class UserService {
                 scores: score,
                 commentId: comment._id
             });
+            await this.enterpriseService.calRankingPointService(serviceId);
             return comment;
         }
         catch (e) {
@@ -273,6 +276,7 @@ let UserService = class UserService {
             comment.images && comment.images.length > 0 && this.uploadService.deleteMulti(comment.images.map(i => i.key));
             await this.scoreModel.remove({ commentId: comment._id });
             await comment.remove();
+            await this.enterpriseService.calRankingPointService(service._id);
             return true;
         }
         catch (e) {
@@ -390,7 +394,8 @@ UserService = __decorate([
     __param(6, (0, common_1.Inject)(database_constants_1.NOTIFICATION_MODEL)),
     __param(7, (0, common_1.Inject)(database_constants_1.SCORE_MODEL)),
     __metadata("design:paramtypes", [Object, Object, Object, Object, Object, Object, Object, Object, upload_service_1.FileUploadService,
-        notification_gateway_1.NotificationGateway])
+        notification_gateway_1.NotificationGateway,
+        enterprise_service_1.EnterpriseService])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

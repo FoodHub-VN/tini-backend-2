@@ -25,8 +25,10 @@ const upload_service_1 = require("../upload/upload.service");
 const lodash_1 = require("lodash");
 const fs = require("fs");
 const config_1 = require("@nestjs/config");
+const axios_1 = require("@nestjs/axios");
+const utility_1 = require("../shared/utility");
 let EnterpriseService = class EnterpriseService {
-    constructor(enterpriseModel, serviceModel, bService, req, notiModel, scheduleModel, scheduleHistoryModel, userModel, uploadService, notiSocket, configService, purchaseTempModel, purchaseModel) {
+    constructor(enterpriseModel, serviceModel, bService, req, notiModel, scheduleModel, scheduleHistoryModel, userModel, commentModel, uploadService, notiSocket, configService, purchaseTempModel, purchaseModel, httpService, scoreModel) {
         this.enterpriseModel = enterpriseModel;
         this.serviceModel = serviceModel;
         this.bService = bService;
@@ -35,11 +37,14 @@ let EnterpriseService = class EnterpriseService {
         this.scheduleModel = scheduleModel;
         this.scheduleHistoryModel = scheduleHistoryModel;
         this.userModel = userModel;
+        this.commentModel = commentModel;
         this.uploadService = uploadService;
         this.notiSocket = notiSocket;
         this.configService = configService;
         this.purchaseTempModel = purchaseTempModel;
         this.purchaseModel = purchaseModel;
+        this.httpService = httpService;
+        this.scoreModel = scoreModel;
         var path = require("path");
         this.premiumConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "../../res/json/premium.json"), 'utf-8'));
     }
@@ -119,6 +124,7 @@ let EnterpriseService = class EnterpriseService {
                 throw new common_1.ConflictException("Premium is lower than previous");
             }
             await model.update({ premium: idOffer }).exec();
+            await this.updateAllRankingPointOfEnterprise(enterprise);
             await this.purchaseModel.create({ enterprise: enterprise, transactionNo: transactionNo, date: Date.now(), premium: idOffer });
             return true;
         }
@@ -347,6 +353,59 @@ let EnterpriseService = class EnterpriseService {
         catch (e) {
         }
     }
+    async calRankingPointService(serviceId) {
+        if (!mongoose_1.Types.ObjectId.isValid(serviceId)) {
+            throw new common_1.NotFoundException("Service not found");
+        }
+        const service = await this.serviceModel.findOne({ _id: mongoose_1.Types.ObjectId(serviceId) }).exec();
+        const enterprise = await this.enterpriseModel.findOne({ _id: service.enterprise }).exec();
+        const comment = await this.commentModel.find({ service: service._id }).exec();
+        let promise = [];
+        comment.map((cmt) => {
+            promise.push(this.httpService.post('http://127.0.0.1:5001', { text: cmt.content }).toPromise());
+        });
+        let arrCmtScore = await Promise.all(promise);
+        arrCmtScore = arrCmtScore.map(i => i.data.np);
+        let sum = arrCmtScore.reduce((a, b) => (a + b), 0);
+        let avg = sum / arrCmtScore.length;
+        const introduce = service.introduction;
+        const { convert } = require('html-to-text');
+        let text = convert(introduce);
+        const introduceCal = await this.httpService.post('http://127.0.0.1:5001', { text: text }).toPromise();
+        let introduceScore = introduceCal.data.np;
+        const scores = await this.scoreModel.find({ service: service._id }).exec();
+        let ratingScore = scores.map((s) => {
+            return (0, utility_1.getRatingScore)(s.scores);
+        }).reduce((a, b) => (a + b), 0) / scores.length;
+        let premiumId = enterprise.premium;
+        let premiumScore = 0;
+        if (premiumId) {
+            let premium = this.premiumConfig[premiumId];
+            if (premium) {
+                premiumScore = premium.bonus;
+            }
+        }
+        let totalPoint = premiumScore + (3 * ratingScore + introduceScore + 3 * avg) / 7;
+        console.log("Call NP: ", serviceId, "__new Point: ", service.rankingPoint, "->", totalPoint);
+        await service.update({ rankingPoint: totalPoint }).exec();
+        return totalPoint;
+    }
+    async updateAllRankingPointOfEnterprise(enterprise) {
+        try {
+            if (!mongoose_1.Types.ObjectId.isValid(enterprise)) {
+                throw new common_1.NotFoundException("Service not found");
+            }
+            let service = await this.serviceModel.find({ enterprise: enterprise }).exec();
+            let promise = [];
+            service && service.map(s => {
+                promise.push(this.calRankingPointService(s._id));
+            });
+            await Promise.all(promise);
+            return;
+        }
+        catch (e) {
+        }
+    }
 };
 EnterpriseService = __decorate([
     (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),
@@ -358,11 +417,13 @@ EnterpriseService = __decorate([
     __param(5, (0, common_1.Inject)(database_constants_1.SCHEDULE_MODEL)),
     __param(6, (0, common_1.Inject)(database_constants_1.SCHEDULE_HISTORY_MODEL)),
     __param(7, (0, common_1.Inject)(database_constants_1.USER_MODEL)),
-    __param(11, (0, common_1.Inject)(database_constants_1.PURCHASE_TEMP_MODEL)),
-    __param(12, (0, common_1.Inject)(database_constants_1.PURCHASE_MODEL)),
-    __metadata("design:paramtypes", [Object, Object, b_service_service_1.BServiceService, Object, Object, Object, Object, Object, upload_service_1.FileUploadService,
+    __param(8, (0, common_1.Inject)(database_constants_1.COMMENT_MODEL)),
+    __param(12, (0, common_1.Inject)(database_constants_1.PURCHASE_TEMP_MODEL)),
+    __param(13, (0, common_1.Inject)(database_constants_1.PURCHASE_MODEL)),
+    __param(15, (0, common_1.Inject)(database_constants_1.SCORE_MODEL)),
+    __metadata("design:paramtypes", [Object, Object, b_service_service_1.BServiceService, Object, Object, Object, Object, Object, Object, upload_service_1.FileUploadService,
         notification_gateway_1.NotificationGateway,
-        config_1.ConfigService, Object, Object])
+        config_1.ConfigService, Object, Object, axios_1.HttpService, Object])
 ], EnterpriseService);
 exports.EnterpriseService = EnterpriseService;
 //# sourceMappingURL=enterprise.service.js.map

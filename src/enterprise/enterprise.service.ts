@@ -8,10 +8,11 @@ import {
   Scope
 } from "@nestjs/common";
 import {
+  COMMENT_MODEL,
   ENTERPRISE_MODEL,
   NOTIFICATION_MODEL, PURCHASE_MODEL, PURCHASE_TEMP_MODEL,
   SCHEDULE_HISTORY_MODEL,
-  SCHEDULE_MODEL,
+  SCHEDULE_MODEL, SCORE_MODEL,
   SERVICE_MODEL, USER_MODEL
 } from "../database/database.constants";
 import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
@@ -43,6 +44,11 @@ import * as fs from "fs";
 import { ConfigService } from "@nestjs/config";
 import { PurchaseTempModel } from "../database/model/purchase-temp";
 import { PurchaseModel } from "../database/model/purchase-history.model";
+import { CommentModel } from "../database/model/comment.model";
+import { HttpService } from "@nestjs/axios";
+import { log } from "util";
+import { ScoreModel } from "../database/model/scores.model";
+import { getRatingScore } from "../shared/utility";
 
 @Injectable({scope: Scope.REQUEST})
 export class EnterpriseService {
@@ -56,11 +62,14 @@ export class EnterpriseService {
     @Inject(SCHEDULE_MODEL) private scheduleModel: ScheduleModel,
     @Inject(SCHEDULE_HISTORY_MODEL) private scheduleHistoryModel: ScheduleHistoryModel,
     @Inject(USER_MODEL)private userModel: UserModel,
+    @Inject(COMMENT_MODEL) private commentModel: CommentModel,
     private uploadService: FileUploadService,
     private notiSocket: NotificationGateway,
     private readonly configService: ConfigService,
     @Inject(PURCHASE_TEMP_MODEL) private purchaseTempModel: PurchaseTempModel,
-    @Inject(PURCHASE_MODEL) private purchaseModel: PurchaseModel
+    @Inject(PURCHASE_MODEL) private purchaseModel: PurchaseModel,
+    private httpService: HttpService,
+    @Inject(SCORE_MODEL) private scoreModel: ScoreModel
   ) {
     var path = require("path");
     this.premiumConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "../../res/json/premium.json"), 'utf-8'));
@@ -152,7 +161,7 @@ export class EnterpriseService {
       }
 
       await model.update({premium: idOffer}).exec();
-
+      await this.updateAllRankingPointOfEnterprise(enterprise);
       await this.purchaseModel.create({enterprise: enterprise, transactionNo: transactionNo, date: Date.now(), premium: idOffer});
       return true;
     } catch (e) {
@@ -409,5 +418,71 @@ export class EnterpriseService {
     catch (e){
 
     }
+  }
+  async calRankingPointService(serviceId: string): Promise<any>{
+    if(!Types.ObjectId.isValid(serviceId)){
+      throw new NotFoundException("Service not found");
+    }
+    const service = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
+    const enterprise = await this.enterpriseModel.findOne({_id: service.enterprise}).exec();
+    const comment = await this.commentModel.find({service: service._id}).exec();
+    /**
+     * Cmt score
+     */
+    let promise = [];
+    comment.map((cmt)=>{
+      promise.push(this.httpService.post('http://127.0.0.1:5001', {text: cmt.content}).toPromise())
+    })
+    let arrCmtScore = await Promise.all(promise);
+    arrCmtScore = arrCmtScore.map(i=>i.data.np);
+    let sum = arrCmtScore.reduce((a, b)=>(a+b), 0);
+    let avg = sum/arrCmtScore.length;
+
+    // introduce score
+    const introduce = service.introduction;
+    const { convert } = require('html-to-text');
+    let text = convert(introduce)
+    const introduceCal = await this.httpService.post('http://127.0.0.1:5001', {text: text}).toPromise();
+    let introduceScore = introduceCal.data.np;
+
+    //rating score
+    const scores = await this.scoreModel.find({service: service._id}).exec();
+    let ratingScore = scores.map((s)=>{
+      return getRatingScore(s.scores);
+    }).reduce((a,b)=>(a+b), 0)/scores.length;
+
+    //bonus
+    let premiumId = enterprise.premium;
+    let premiumScore = 0;
+    if(premiumId){
+      let premium = this.premiumConfig[premiumId];
+      if(premium){
+        premiumScore = premium.bonus;
+      }
+    }
+    let totalPoint = premiumScore + (3*ratingScore+introduceScore+3*avg)/7;
+    console.log("Call NP: ",serviceId, "__new Point: ",service.rankingPoint,"->", totalPoint);
+    await service.update({rankingPoint: totalPoint}).exec();
+
+    return totalPoint;
+  }
+
+  async updateAllRankingPointOfEnterprise(enterprise: string){
+    try{
+      if(!Types.ObjectId.isValid(enterprise)){
+        throw new NotFoundException("Service not found");
+      }
+      let service = await this.serviceModel.find({enterprise: enterprise}).exec();
+      let promise = [];
+      service && service.map(s=>{
+        promise.push(this.calRankingPointService(s._id));
+      })
+      await Promise.all(promise);
+      return;
+    }
+    catch (e){
+
+    }
+
   }
 }

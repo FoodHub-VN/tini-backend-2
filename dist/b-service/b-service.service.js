@@ -31,8 +31,9 @@ const rxjs_1 = require("rxjs");
 const mongoose_1 = require("mongoose");
 const upload_service_1 = require("../upload/upload.service");
 const utility_1 = require("../shared/utility");
+const enterprise_service_1 = require("../enterprise/enterprise.service");
 let BServiceService = class BServiceService {
-    constructor(serviceModel, introductionModel, req, scheduleModel, categoryModel, commentModel, scoreModel, uploadService) {
+    constructor(serviceModel, introductionModel, req, scheduleModel, categoryModel, commentModel, scoreModel, uploadService, moduleRef, enterpriseService) {
         this.serviceModel = serviceModel;
         this.introductionModel = introductionModel;
         this.req = req;
@@ -41,6 +42,8 @@ let BServiceService = class BServiceService {
         this.commentModel = commentModel;
         this.scoreModel = scoreModel;
         this.uploadService = uploadService;
+        this.moduleRef = moduleRef;
+        this.enterpriseService = enterpriseService;
     }
     async createService(data, images) {
         if (!mongoose_1.Types.ObjectId.isValid(data.category)) {
@@ -95,7 +98,11 @@ let BServiceService = class BServiceService {
                 model.images.push(...res);
                 await model.save();
             }
-            return await this.serviceModel.findOneAndUpdate({ _id: mongoose_1.Types.ObjectId(serviceId) }, Object.assign({}, __data), { new: true }).exec();
+            await this.serviceModel.findOneAndUpdate({ _id: mongoose_1.Types.ObjectId(serviceId) }, Object.assign({}, __data), { new: true }).exec();
+            if (data.introduction) {
+                await this.enterpriseService.calRankingPointService(serviceId);
+            }
+            return this.serviceModel.findOne({ _id: mongoose_1.Types.ObjectId(serviceId) }).exec();
         }
         catch (e) {
             throw e;
@@ -191,7 +198,10 @@ BServiceService = __decorate([
     __param(4, (0, common_1.Inject)(database_constants_1.CATEGORY_MODEL)),
     __param(5, (0, common_1.Inject)(database_constants_1.COMMENT_MODEL)),
     __param(6, (0, common_1.Inject)(database_constants_1.SCORE_MODEL)),
-    __metadata("design:paramtypes", [Object, Object, Object, Object, Object, Object, Object, upload_service_1.FileUploadService])
+    __param(9, (0, common_1.Inject)((0, common_1.forwardRef)(() => enterprise_service_1.EnterpriseService))),
+    __metadata("design:paramtypes", [Object, Object, Object, Object, Object, Object, Object, upload_service_1.FileUploadService,
+        core_1.ModuleRef,
+        enterprise_service_1.EnterpriseService])
 ], BServiceService);
 exports.BServiceService = BServiceService;
 //# sourceMappingURL=b-service.service.js.map

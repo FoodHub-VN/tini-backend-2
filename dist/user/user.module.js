@@ -12,13 +12,15 @@ const database_module_1 = require("../database/database.module");
 const user_controller_1 = require("./user.controller");
 const user_service_1 = require("./user.service");
 const upload_module_1 = require("../upload/upload.module");
+const enterprise_module_1 = require("../enterprise/enterprise.module");
 let UserModule = class UserModule {
 };
 UserModule = __decorate([
     (0, common_1.Module)({
         imports: [
             database_module_1.DatabaseModule,
-            upload_module_1.UploadModule
+            upload_module_1.UploadModule,
+            enterprise_module_1.EnterpriseModule
         ],
         controllers: [user_controller_1.UserController],
         providers: [user_service_1.UserService],
