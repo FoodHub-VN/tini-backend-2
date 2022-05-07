@@ -1,2 +1,2 @@
 docker build -t lv2 .
-sudo docker-compose up
+sudo docker-compose up -d
