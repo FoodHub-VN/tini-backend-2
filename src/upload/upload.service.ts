@@ -38,7 +38,7 @@ export class FileUploadService {
       await this.deleteS3(bucketS3, key);
       return true;
     } catch (err) {
-      throw err;
+      return false;
     }
   }
 
@@ -48,7 +48,7 @@ export class FileUploadService {
       await this.deleteS3Multi(bucketS3, keys);
       return true;
     } catch (err) {
-      throw err;
+     return false;
     }
   }
 

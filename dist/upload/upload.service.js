@@ -36,7 +36,7 @@ let FileUploadService = class FileUploadService {
             return true;
         }
         catch (err) {
-            throw err;
+            return false;
         }
     }
     async deleteMulti(keys) {
@@ -45,7 +45,7 @@ let FileUploadService = class FileUploadService {
             return true;
         }
         catch (err) {
-            throw err;
+            return false;
         }
     }
     async uploadS3(file, bucket, name, isPublic = true) {

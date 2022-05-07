@@ -1,11 +1,10 @@
 FROM node:14.18.1-alpine AS dev
 WORKDIR usr/src/app
 COPY package*.json ./
+ENV PYTHONUNBUFFERED=1
 RUN apk add --update --no-cache --virtual builds-deps build-base python3 && ln -sf python3 /usr/bin/python
-RUN apk add py3-pip
+RUN python3 -m ensurepip
+RUN pip3 install --no-cache --upgrade pip setuptools
 RUN yarn install
-RUN pip3 install Flask
-RUN pip3 install underthesea
 CMD yarn start:prod
-CMD python3 AI/bkservice.py
 COPY . .

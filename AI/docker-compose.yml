@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  ai:
+    image: lvai2
+    ports:
+      - "5005:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=bkservice.py
+    stdin_open: true
+    tty: true
