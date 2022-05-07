@@ -431,7 +431,7 @@ export class EnterpriseService {
      */
     let promise = [];
     comment.map((cmt)=>{
-      promise.push(this.httpService.post('http://127.0.0.1:5001', {text: cmt.content}).toPromise())
+      promise.push(this.httpService.post('http://127.0.0.1:5000', {text: cmt.content}).toPromise())
     })
     let arrCmtScore = await Promise.all(promise);
     arrCmtScore = arrCmtScore.map(i=>i.data.np);
@@ -442,7 +442,7 @@ export class EnterpriseService {
     const introduce = service.introduction;
     const { convert } = require('html-to-text');
     let text = convert(introduce)
-    const introduceCal = await this.httpService.post('http://127.0.0.1:5001', {text: text}).toPromise();
+    const introduceCal = await this.httpService.post('http://127.0.0.1:5000', {text: text}).toPromise();
     let introduceScore = introduceCal.data.np;
 
     //rating score
