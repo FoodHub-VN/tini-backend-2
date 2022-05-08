@@ -423,48 +423,55 @@ export class EnterpriseService {
     if(!Types.ObjectId.isValid(serviceId)){
       throw new NotFoundException("Service not found");
     }
-    const service = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)}).exec();
-    const enterprise = await this.enterpriseModel.findOne({_id: service.enterprise}).exec();
-    const comment = await this.commentModel.find({service: service._id}).exec();
-    /**
-     * Cmt score
-     */
-    let promise = [];
-    comment.map((cmt)=>{
-      promise.push(this.httpService.post('http://127.0.0.1:5005', {text: cmt.content}).toPromise())
-    })
-    let arrCmtScore = await Promise.all(promise);
-    arrCmtScore = arrCmtScore.map(i=>i.data.np);
-    let sum = arrCmtScore.reduce((a, b)=>(a+b), 0);
-    let avg = sum/arrCmtScore.length;
+    try {
 
-    // introduce score
-    const introduce = service.introduction;
-    const { convert } = require('html-to-text');
-    let text = convert(introduce)
-    const introduceCal = await this.httpService.post('http://127.0.0.1:5005', {text: text}).toPromise();
-    let introduceScore = introduceCal.data.np;
 
-    //rating score
-    const scores = await this.scoreModel.find({service: service._id}).exec();
-    let ratingScore = scores.map((s)=>{
-      return getRatingScore(s.scores);
-    }).reduce((a,b)=>(a+b), 0)/scores.length;
+      const service = await this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec();
+      const enterprise = await this.enterpriseModel.findOne({ _id: service.enterprise }).exec();
+      const comment = await this.commentModel.find({ service: service._id }).exec();
+      /**
+       * Cmt score
+       */
+      let promise = [];
+      comment.map((cmt) => {
+        promise.push(this.httpService.post('http://localhost:5005', { text: cmt.content }).toPromise())
+      })
+      let arrCmtScore = await Promise.all(promise);
+      arrCmtScore = arrCmtScore.map(i => i.data.np);
+      let sum = arrCmtScore.reduce((a, b) => (a + b), 0);
+      let avg = sum / arrCmtScore.length;
 
-    //bonus
-    let premiumId = enterprise.premium;
-    let premiumScore = 0;
-    if(premiumId){
-      let premium = this.premiumConfig[premiumId];
-      if(premium){
-        premiumScore = premium.bonus;
+      // introduce score
+      const introduce = service.introduction;
+      const { convert } = require('html-to-text');
+      let text = convert(introduce)
+      const introduceCal = await this.httpService.post('http://localhost:5005', { text: text }).toPromise();
+      let introduceScore = introduceCal.data.np;
+
+      //rating score
+      const scores = await this.scoreModel.find({ service: service._id }).exec();
+      let ratingScore = scores.map((s) => {
+        return getRatingScore(s.scores);
+      }).reduce((a, b) => (a + b), 0) / scores.length;
+
+      //bonus
+      let premiumId = enterprise.premium;
+      let premiumScore = 0;
+      if (premiumId) {
+        let premium = this.premiumConfig[premiumId];
+        if (premium) {
+          premiumScore = premium.bonus;
+        }
       }
-    }
-    let totalPoint = premiumScore + (3*ratingScore+introduceScore+3*avg)/7;
-    console.log("Call NP: ",serviceId, "__new Point: ",service.rankingPoint,"->", totalPoint);
-    await service.update({rankingPoint: totalPoint}).exec();
+      let totalPoint = premiumScore + (3 * ratingScore + introduceScore + 3 * avg) / 7;
+      console.log("Call NP: ", serviceId, "__new Point: ", service.rankingPoint, "->", totalPoint);
+      await service.update({ rankingPoint: totalPoint }).exec();
 
-    return totalPoint;
+      return totalPoint;
+    }
+    catch (e) {
+      return 0;
+    }
   }
 
   async updateAllRankingPointOfEnterprise(enterprise: string){
