@@ -236,6 +236,7 @@ export class UserController {
         }
       }),
       catchError((e)=>{
+        console.log(e);
         throw new BadRequestException('Something wrong!');
       })
     )

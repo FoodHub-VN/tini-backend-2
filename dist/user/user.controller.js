@@ -171,6 +171,7 @@ let UserController = class UserController {
                 });
             }
         }), (0, rxjs_1.catchError)((e) => {
+            console.log(e);
             throw new common_1.BadRequestException('Something wrong!');
         }));
     }
