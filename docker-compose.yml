@@ -93,5 +93,20 @@ services:
       - FLASK_APP=bkservice.py
     stdin_open: true
     tty: true
+  client-customer:
+    image: lv-client-customer
+    ports:
+      - "80:5000"
+    build:
+      context: ../client_customer/BK-Service
+    env_file:
+      - ./.env
+    environment:
+      - REACT_APP_SOCKET_URI= http://3.26.113.160:8080
+      - REACT_APP_SOCKET_URI_DEV= http://localhost:8080
+      - REACT_APP_API_URL_DEV = http://localhost:3007
+      - REACT_APP_API_URL = http://3.26.113.160:3007
+    stdin_open: true
+    tty: true
 volumes:
   db:
