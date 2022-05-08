@@ -111,7 +111,7 @@ services:
   client-enterprise:
     image: lv-client
     ports:
-      - "4000:4000"
+      - "81:4000"
     build:
       context: ../client_enterprise/BK-Service
     env_file:
