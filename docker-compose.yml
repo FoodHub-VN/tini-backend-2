@@ -64,7 +64,7 @@ services:
       - TMN_CODE=5XK2JZPT
       - HASH_SECRET=CIXCUTQDKONMNLVCNGPAASFGGMSHNNUU
       - VNP_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-      - RETURN_URL=http://enterprise.bkservice.tk/payment-result
+      - RETURN_URL=http://www.enterprise.bkservice.tk/payment-result
       - FLASK_ENV=development
       - FLASK_APP=bkservice.py
     stdin_open: true
