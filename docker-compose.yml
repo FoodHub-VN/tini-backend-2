@@ -64,7 +64,7 @@ services:
       - TMN_CODE=5XK2JZPT
       - HASH_SECRET=CIXCUTQDKONMNLVCNGPAASFGGMSHNNUU
       - VNP_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-      - RETURN_URL=http://3.26.113.160:81/payment-result
+      - RETURN_URL=http://www.enterprise.bkservice.tk/payment-result
       - FLASK_ENV=development
       - FLASK_APP=bkservice.py
     stdin_open: true
@@ -102,10 +102,10 @@ services:
     env_file:
       - ./.env
     environment:
-      - REACT_APP_SOCKET_URI= http://3.26.113.160:8080
+      - REACT_APP_SOCKET_URI= http://52.63.143.20:8080
       - REACT_APP_SOCKET_URI_DEV= http://localhost:8080
       - REACT_APP_API_URL_DEV = http://localhost:3007
-      - REACT_APP_API_URL = http://3.26.113.160:3007
+      - REACT_APP_API_URL = http://52.63.143.20:3007
     stdin_open: true
     tty: true
   client-enterprise:
@@ -117,10 +117,10 @@ services:
     env_file:
       - ./.env
     environment:
-      - REACT_APP_SOCKET_URI= http://3.26.113.160:8080
+      - REACT_APP_SOCKET_URI= http://52.63.143.20:8080
       - REACT_APP_SOCKET_URI_DEV= http://localhost:8080
       - REACT_APP_API_URL_DEV = http://localhost:3007
-      - REACT_APP_API_URL = http://3.26.113.160:3007
+      - REACT_APP_API_URL = http://52.63.143.20:3007
     stdin_open: true
     tty: true
 volumes:
