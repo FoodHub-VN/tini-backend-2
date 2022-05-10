@@ -321,6 +321,7 @@ export class EnterpriseController {
         let vnp_TransactionNo = vnp_Params["vnp_TransactionNo"];
         let vnp_ResponseCode = vnp_Params["vnp_ResponseCode"];
         let orderID = vnp_Params["vnp_TxnRef"];
+        console.log("Handle Transaction", JSON.stringify(data), vnp_Amount, vnp_TransactionNo, vnp_ResponseCode, orderID);
         let success = await this.enterpriseService.handleConfirmTransactionFromClient(vnp_Amount, vnp_TransactionNo, vnp_ResponseCode, orderID);
         res.status(success?HttpStatus.OK:HttpStatus.BAD_REQUEST).send();
       } else {
