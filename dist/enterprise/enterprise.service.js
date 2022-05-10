@@ -351,6 +351,8 @@ let EnterpriseService = class EnterpriseService {
             return success;
         }
         catch (e) {
+            console.log(e);
+            throw e;
         }
     }
     async calRankingPointService(serviceId) {
@@ -363,7 +365,7 @@ let EnterpriseService = class EnterpriseService {
             const comment = await this.commentModel.find({ service: service._id }).exec();
             let promise = [];
             comment.map((cmt) => {
-                promise.push(this.httpService.post('http://3.26.113.160:5005', { text: cmt.content }).toPromise());
+                promise.push(this.httpService.post('http://52.63.143.20:5005', { text: cmt.content }).toPromise());
             });
             let arrCmtScore = await Promise.all(promise);
             arrCmtScore = arrCmtScore.map(i => i.data.np);
@@ -372,7 +374,7 @@ let EnterpriseService = class EnterpriseService {
             const introduce = service.introduction;
             const { convert } = require('html-to-text');
             let text = convert(introduce);
-            const introduceCal = await this.httpService.post('http://3.26.113.160:5005', { text: text }).toPromise();
+            const introduceCal = await this.httpService.post('http://52.63.143.20:5005', { text: text }).toPromise();
             let introduceScore = introduceCal.data.np;
             const scores = await this.scoreModel.find({ service: service._id }).exec();
             let ratingScore = scores.map((s) => {
