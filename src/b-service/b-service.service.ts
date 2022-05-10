@@ -70,7 +70,9 @@ export class BServiceService {
           promises.push(this.uploadService.upload(e));
         });
         const res = await Promise.all<FileUploaded>(promises);
-        return await this.serviceModel.create({ ...data, enterprise: this.req.user.id, images: res });
+        let service = await this.serviceModel.create({ ...data, enterprise: this.req.user.id, images: res });
+        await this.enterpriseService.calRankingPointService(service._id);
+        return this.serviceModel.findOne({_id: service._id});
       } else {
         return await this.serviceModel.create({ ...data, enterprise: this.req.user.id });
       }

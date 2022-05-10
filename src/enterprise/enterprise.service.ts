@@ -1,54 +1,45 @@
-import {
-  BadRequestException,
-  ConflictException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  NotFoundException, Query,
-  Scope
-} from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
 import {
   COMMENT_MODEL,
   ENTERPRISE_MODEL,
-  NOTIFICATION_MODEL, PURCHASE_MODEL, PURCHASE_TEMP_MODEL,
+  NOTIFICATION_MODEL,
+  PURCHASE_MODEL,
+  PURCHASE_TEMP_MODEL,
   SCHEDULE_HISTORY_MODEL,
-  SCHEDULE_MODEL, SCORE_MODEL,
-  SERVICE_MODEL, USER_MODEL
-} from "../database/database.constants";
-import { Enterprise, EnterpriseModel } from "../database/model/enterprise.model";
-import { catchError, from, map, mergeMap, Observable, throwError } from "rxjs";
-import { EnterpriseRegisterDto } from "./dto/enterprise-register.dto";
-import { EnterPriseNewServiceDataDto } from "./dto/enterprise-new-service.dto";
-import { Service, ServiceModel } from "../database/model/service.model";
-import { REQUEST } from "@nestjs/core";
-import { AuthenticatedRequest } from "../auth/interface/authenticated-request.interface";
-import { EnterprisePrincipal } from "../auth/interface/enterprise-principal";
-import { BServiceService } from "../b-service/b-service.service";
-import { Notification, NotificationModel } from "../database/model/notification.model";
-import { Types } from "mongoose";
-import { ScheduleModel } from "../database/model/schedule";
-import { NotificationGateway } from "../notification/notification.gateway";
-import { NotiType } from "../shared/NotiType.type";
-import { ScheduleHistoryModel } from "../database/model/schedule-history.model";
-import { FileUploaded } from "../upload/interface/upload.interface";
-import { FileUploadService } from "../upload/upload.service";
-import { EnterpriseEditDto } from "./dto/enterprise-edit.dto";
-import { UserModel } from "../database/model/user.model";
-import { parseInt } from "lodash";
-import moment from "moment";
-import querystring from "qs";
-import crypto from "crypto";
-import { Premium } from "../shared/premium";
-import path from "path";
-import * as fs from "fs";
-import { ConfigService } from "@nestjs/config";
-import { PurchaseTempModel } from "../database/model/purchase-temp";
-import { PurchaseModel } from "../database/model/purchase-history.model";
-import { CommentModel } from "../database/model/comment.model";
-import { HttpService } from "@nestjs/axios";
-import { log } from "util";
-import { ScoreModel } from "../database/model/scores.model";
-import { getRatingScore } from "../shared/utility";
+  SCHEDULE_MODEL,
+  SCORE_MODEL,
+  SERVICE_MODEL,
+  USER_MODEL,
+} from '../database/database.constants';
+import { Enterprise, EnterpriseModel } from '../database/model/enterprise.model';
+import { catchError, from, map, mergeMap, Observable, throwError } from 'rxjs';
+import { EnterpriseRegisterDto } from './dto/enterprise-register.dto';
+import { EnterPriseNewServiceDataDto } from './dto/enterprise-new-service.dto';
+import { Service, ServiceModel } from '../database/model/service.model';
+import { REQUEST } from '@nestjs/core';
+import { AuthenticatedRequest } from '../auth/interface/authenticated-request.interface';
+import { EnterprisePrincipal } from '../auth/interface/enterprise-principal';
+import { BServiceService } from '../b-service/b-service.service';
+import { Notification, NotificationModel } from '../database/model/notification.model';
+import { Types } from 'mongoose';
+import { ScheduleModel } from '../database/model/schedule';
+import { NotificationGateway } from '../notification/notification.gateway';
+import { NotiType } from '../shared/NotiType.type';
+import { ScheduleHistoryModel } from '../database/model/schedule-history.model';
+import { FileUploaded } from '../upload/interface/upload.interface';
+import { FileUploadService } from '../upload/upload.service';
+import { EnterpriseEditDto } from './dto/enterprise-edit.dto';
+import { UserModel } from '../database/model/user.model';
+import { parseInt } from 'lodash';
+import { Premium } from '../shared/premium';
+import * as fs from 'fs';
+import { ConfigService } from '@nestjs/config';
+import { PurchaseTempModel } from '../database/model/purchase-temp';
+import { PurchaseModel } from '../database/model/purchase-history.model';
+import { CommentModel } from '../database/model/comment.model';
+import { HttpService } from '@nestjs/axios';
+import { ScoreModel } from '../database/model/scores.model';
+import { getRatingScore } from '../shared/utility';
 
 @Injectable({scope: Scope.REQUEST})
 export class EnterpriseService {
@@ -434,26 +425,32 @@ export class EnterpriseService {
        * Cmt score
        */
       let promise = [];
-      comment.map((cmt) => {
+      comment && comment.map((cmt) => {
         promise.push(this.httpService.post('http://52.63.143.20:5005', { text: cmt.content }).toPromise())
       })
       let arrCmtScore = await Promise.all(promise);
-      arrCmtScore = arrCmtScore.map(i => i.data.np);
-      let sum = arrCmtScore.reduce((a, b) => (a + b), 0);
-      let avg = sum / arrCmtScore.length;
+      let arrScore = 7;
+      arrCmtScore = arrCmtScore && arrCmtScore.map(i => i.data.np);
+      let sum = (arrCmtScore&& arrCmtScore.length>0)?arrCmtScore.reduce((a, b) => (a + b), 0): 7;
+      let avg = sum / (arrCmtScore.length>0?arrCmtScore.length:1);
 
       // introduce score
+      let introduceScore = 7;
       const introduce = service.introduction;
-      const { convert } = require('html-to-text');
-      let text = convert(introduce)
-      const introduceCal = await this.httpService.post('http://52.63.143.20:5005', { text: text }).toPromise();
-      let introduceScore = introduceCal.data.np;
-
+      if(introduce && introduce.length>0){
+        const { convert } = require('html-to-text');
+        let text = convert(introduce)
+        const introduceCal = await this.httpService.post('http://52.63.143.20:5005', { text: text }).toPromise();
+        introduceScore = introduceCal.data.np;
+      }
       //rating score
       const scores = await this.scoreModel.find({ service: service._id }).exec();
-      let ratingScore = scores.map((s) => {
-        return getRatingScore(s.scores);
-      }).reduce((a, b) => (a + b), 0) / scores.length;
+      let ratingScore = 7;
+      if(scores) {
+        ratingScore = scores.map((s) => {
+          return getRatingScore(s.scores);
+        }).reduce((a, b) => (a + b), 0) / scores.length;
+      }
 
       //bonus
       let premiumId = enterprise.premium;
@@ -490,7 +487,8 @@ export class EnterpriseService {
       return;
     }
     catch (e){
-
+      console.log(e);
+      return;
     }
 
   }

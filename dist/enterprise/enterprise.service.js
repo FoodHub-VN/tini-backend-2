@@ -364,22 +364,29 @@ let EnterpriseService = class EnterpriseService {
             const enterprise = await this.enterpriseModel.findOne({ _id: service.enterprise }).exec();
             const comment = await this.commentModel.find({ service: service._id }).exec();
             let promise = [];
-            comment.map((cmt) => {
+            comment && comment.map((cmt) => {
                 promise.push(this.httpService.post('http://52.63.143.20:5005', { text: cmt.content }).toPromise());
             });
             let arrCmtScore = await Promise.all(promise);
-            arrCmtScore = arrCmtScore.map(i => i.data.np);
-            let sum = arrCmtScore.reduce((a, b) => (a + b), 0);
-            let avg = sum / arrCmtScore.length;
+            let arrScore = 7;
+            arrCmtScore = arrCmtScore && arrCmtScore.map(i => i.data.np);
+            let sum = (arrCmtScore && arrCmtScore.length > 0) ? arrCmtScore.reduce((a, b) => (a + b), 0) : 7;
+            let avg = sum / (arrCmtScore.length > 0 ? arrCmtScore.length : 1);
+            let introduceScore = 7;
             const introduce = service.introduction;
-            const { convert } = require('html-to-text');
-            let text = convert(introduce);
-            const introduceCal = await this.httpService.post('http://52.63.143.20:5005', { text: text }).toPromise();
-            let introduceScore = introduceCal.data.np;
+            if (introduce && introduce.length > 0) {
+                const { convert } = require('html-to-text');
+                let text = convert(introduce);
+                const introduceCal = await this.httpService.post('http://52.63.143.20:5005', { text: text }).toPromise();
+                introduceScore = introduceCal.data.np;
+            }
             const scores = await this.scoreModel.find({ service: service._id }).exec();
-            let ratingScore = scores.map((s) => {
-                return (0, utility_1.getRatingScore)(s.scores);
-            }).reduce((a, b) => (a + b), 0) / scores.length;
+            let ratingScore = 7;
+            if (scores) {
+                ratingScore = scores.map((s) => {
+                    return (0, utility_1.getRatingScore)(s.scores);
+                }).reduce((a, b) => (a + b), 0) / scores.length;
+            }
             let premiumId = enterprise.premium;
             let premiumScore = 0;
             if (premiumId) {
@@ -412,6 +419,8 @@ let EnterpriseService = class EnterpriseService {
             return;
         }
         catch (e) {
+            console.log(e);
+            return;
         }
     }
 };

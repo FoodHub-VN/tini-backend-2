@@ -64,7 +64,9 @@ let BServiceService = class BServiceService {
                     promises.push(this.uploadService.upload(e));
                 });
                 const res = await Promise.all(promises);
-                return await this.serviceModel.create(Object.assign(Object.assign({}, data), { enterprise: this.req.user.id, images: res }));
+                let service = await this.serviceModel.create(Object.assign(Object.assign({}, data), { enterprise: this.req.user.id, images: res }));
+                await this.enterpriseService.calRankingPointService(service._id);
+                return this.serviceModel.findOne({ _id: service._id });
             }
             else {
                 return await this.serviceModel.create(Object.assign(Object.assign({}, data), { enterprise: this.req.user.id }));
