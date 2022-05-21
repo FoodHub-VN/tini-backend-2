@@ -244,8 +244,12 @@ export class BServiceService {
     if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not found!");
     }
-    const defaultScore =[7,7,7,7,7,];
+    const defaultScore =[7,7,7,7,7];
     try{
+      const service = await this.serviceModel.findOne({_id: Types.ObjectId(serviceId)});
+      if(!service){
+        throw new NotFoundException("Service not found!");
+      }
       const scores = await this.scoreModel.find({service: serviceId}).exec();
       if(scores.length<=0){
         return [...defaultScore, getRatingScore(defaultScore)];
@@ -260,7 +264,7 @@ export class BServiceService {
         resScore[4] = resScore[4] + e[4];
       })
       resScore.forEach((e, i)=>{resScore[i] = resScore[i]/leanScore.length});
-      return [...resScore, getRatingScore(resScore)];
+      return [...resScore, getRatingScore(resScore), service.rankingPoint];
     }
     catch (e) {
       console.log(e);

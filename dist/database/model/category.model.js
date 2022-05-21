@@ -8,7 +8,7 @@ const CategorySchema = new mongoose_1.Schema({
 exports.CategorySchema = CategorySchema;
 CategorySchema.post('remove', async function () {
     const serviceModel = await this.model("Category").find({ category: this._id }).exec();
-    await Promise.all(serviceModel.map((service) => {
+    serviceModel && await Promise.all(serviceModel.map((service) => {
         return service.remove();
     }));
     return;

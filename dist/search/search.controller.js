@@ -20,11 +20,12 @@ let SearchController = class SearchController {
     constructor(searchService) {
         this.searchService = searchService;
     }
-    search(res, searchText, category, quan, huyen, page, req) {
+    search(res, searchText, category, quan, huyen, page, rating, req) {
         let filter = {};
         category && (filter.category = category.toString());
         quan && (filter.quan = quan.toString());
         huyen && (filter.huyen = huyen.toString());
+        rating && rating !== -1 && (filter.rating = rating);
         return (0, rxjs_1.from)(this.searchService.deepSearch(searchText, filter, page))
             .pipe((0, rxjs_1.map)((services) => {
             if (services) {
@@ -44,9 +45,10 @@ __decorate([
     __param(3, (0, common_1.Query)("quan")),
     __param(4, (0, common_1.Query)("huyen")),
     __param(5, (0, common_1.Query)('page')),
-    __param(6, (0, common_1.Req)()),
+    __param(6, (0, common_1.Query)('rating')),
+    __param(7, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String, String, String, String, Number, Object]),
+    __metadata("design:paramtypes", [Object, String, String, String, String, Number, Number, Object]),
     __metadata("design:returntype", rxjs_1.Observable)
 ], SearchController.prototype, "search", null);
 SearchController = __decorate([

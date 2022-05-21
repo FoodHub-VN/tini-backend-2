@@ -287,7 +287,7 @@ let EnterpriseService = class EnterpriseService {
         var moment = require("moment");
         var dateCreate = moment().format("YYYYMMDDHHmmss");
         var orderId = this.req.user.id + '_' + moment().format("YYYYMMDDHHmmss") + '_' + offerId;
-        var orderInfo = "THanh toan";
+        var orderInfo = "Thanh toan";
         var locale = "vn";
         var currCode = 'VND';
         var vnp_Params = {};
@@ -356,6 +356,7 @@ let EnterpriseService = class EnterpriseService {
         }
     }
     async calRankingPointService(serviceId) {
+        console.log("calRankingPointService", serviceId);
         if (!mongoose_1.Types.ObjectId.isValid(serviceId)) {
             throw new common_1.NotFoundException("Service not found");
         }

@@ -65,6 +65,7 @@ let BServiceService = class BServiceService {
                 });
                 const res = await Promise.all(promises);
                 let service = await this.serviceModel.create(Object.assign(Object.assign({}, data), { enterprise: this.req.user.id, images: res }));
+                console.log("Create service", service._id);
                 await this.enterpriseService.calRankingPointService(service._id);
                 return this.serviceModel.findOne({ _id: service._id });
             }
@@ -167,8 +168,12 @@ let BServiceService = class BServiceService {
         if (!mongoose_1.Types.ObjectId.isValid(serviceId)) {
             throw new common_1.NotFoundException("Service not found!");
         }
-        const defaultScore = [7, 7, 7, 7, 7,];
+        const defaultScore = [7, 7, 7, 7, 7];
         try {
+            const service = await this.serviceModel.findOne({ _id: mongoose_1.Types.ObjectId(serviceId) });
+            if (!service) {
+                throw new common_1.NotFoundException("Service not found!");
+            }
             const scores = await this.scoreModel.find({ service: serviceId }).exec();
             if (scores.length <= 0) {
                 return [...defaultScore, (0, utility_1.getRatingScore)(defaultScore)];
@@ -183,7 +188,7 @@ let BServiceService = class BServiceService {
                 resScore[4] = resScore[4] + e[4];
             });
             resScore.forEach((e, i) => { resScore[i] = resScore[i] / leanScore.length; });
-            return [...resScore, (0, utility_1.getRatingScore)(resScore)];
+            return [...resScore, (0, utility_1.getRatingScore)(resScore), service.rankingPoint];
         }
         catch (e) {
             console.log(e);

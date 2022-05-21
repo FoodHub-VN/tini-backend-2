@@ -20,12 +20,14 @@ export class SearchController {
          @Query("quan") quan: string,
          @Query("huyen") huyen: string,
          @Query('page') page: number,
+         @Query('rating') rating: number,
          @Req() req: AuthenticatedRequest<UserPrincipal>
   ): Observable<Response> {
     let filter: Filter = {};
     category && (filter.category = category.toString());
     quan && (filter.quan = quan.toString());
     huyen && (filter.huyen = huyen.toString());
+    rating && rating!==-1 && (filter.rating = rating);
     return from(this.searchService.deepSearch(searchText, filter, page))
       .pipe(
         map((services) => {

@@ -34,23 +34,23 @@ async function postDeleteHook(user) {
 UserSchema.pre("save", preSaveHook);
 UserSchema.post("remove", async function (user) {
     const comments = await this.model("Comment").find({ user: this._id }).exec();
-    await Promise.all(comments.map((comment) => {
+    comments && await Promise.all(comments.map((comment) => {
         return comment.remove();
     }));
     const notis = await this.model("Notification").find({ user: this._id }).exec();
-    await Promise.all(notis.map((noti) => {
+    notis && await Promise.all(notis.map((noti) => {
         return noti.remove();
     }));
     const scheduleHistories = await this.model("ScheduleHistory").find({ user: this._id }).exec();
-    await Promise.all(scheduleHistories.map((scheduleHistory) => {
+    scheduleHistories && await Promise.all(scheduleHistories.map((scheduleHistory) => {
         return scheduleHistory.remove();
     }));
     const purchaseHistories = await this.model("Purchase").find({ user: this._id }).exec();
-    await Promise.all(purchaseHistories.map((purchaseHistory) => {
+    purchaseHistories && await Promise.all(purchaseHistories.map((purchaseHistory) => {
         return purchaseHistory.remove();
     }));
     const schedules = await this.model("Schedule").find({ user: this._id }).exec();
-    await Promise.all(schedules.map((schedule) => {
+    schedules && await Promise.all(schedules.map((schedule) => {
         return schedule.remove();
     }));
     return;

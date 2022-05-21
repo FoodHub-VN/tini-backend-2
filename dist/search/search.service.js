@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const database_constants_1 = require("../database/database.constants");
 const rxjs_1 = require("rxjs");
 const mongoose_1 = require("mongoose");
+const DOWN = [Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, 2, 4, 6, 8];
+const UP = [Number.MAX_SAFE_INTEGER, 2, 4, 6, 8, Number.MAX_SAFE_INTEGER];
 let SearchService = class SearchService {
     constructor(serviceModel, introductionModel) {
         this.serviceModel = serviceModel;
@@ -28,20 +30,20 @@ let SearchService = class SearchService {
             return (0, rxjs_1.from)(this.serviceModel
                 .find({
                 $text: {
-                    $search: textSearch
-                }
-            }, { score: { $meta: "textScore" } })
+                    $search: textSearch,
+                },
+            }, { score: { $meta: 'textScore' } })
                 .sort({ rankingPoint: 'desc' })
-                .populate("category")
+                .populate('category')
                 .exec());
         }
         else {
-            return (0, rxjs_1.from)(this.serviceModel.find().populate("category").sort({ rankingPoint: 'desc' }).exec());
+            return (0, rxjs_1.from)(this.serviceModel.find().populate('category').sort({ rankingPoint: 'desc' }).exec());
         }
     }
     async deepSearch(textSearch, filter, page) {
         if (filter.category && !mongoose_1.Types.ObjectId.isValid(filter.category)) {
-            throw new common_1.NotFoundException("Category not found: " + filter.category);
+            throw new common_1.NotFoundException('Category not found: ' + filter.category);
         }
         try {
             let services = [];
@@ -51,22 +53,114 @@ let SearchService = class SearchService {
             filter.category && (condition['category'] = mongoose_1.Types.ObjectId(filter.category));
             filter.quan && (condition['address.district'] = filter.quan);
             filter.huyen && (condition['address.village'] = filter.huyen);
-            let totalPage = 1;
-            if (textSearch && textSearch.length > 0) {
-                services = await this.serviceModel.find(Object.assign({ $text: {
-                        $search: textSearch
-                    } }, condition)).sort({ rankingPoint: 'desc' })
-                    .skip((page - 1) * resultPerPage)
-                    .limit(resultPerPage)
-                    .populate("category")
-                    .exec();
-                totalPage = await this.serviceModel.find(Object.assign({ $text: {
-                        $search: textSearch
-                    } }, condition)).countDocuments().exec() / resultPerPage;
+            let down = 0;
+            let up = 0;
+            if (!filter.rating || filter.rating === -1) {
+                down = 0;
+                up = 0;
             }
             else {
-                services = await this.serviceModel.find(Object.assign({}, condition), null).sort({ rankingPoint: 'desc' }).skip((page - 1) * resultPerPage).limit(resultPerPage).populate("category").exec();
-                totalPage = await this.serviceModel.find(Object.assign({}, condition), null).countDocuments().exec() / resultPerPage;
+                down = filter.rating;
+                up = filter.rating;
+            }
+            let totalPage = 1;
+            if (textSearch && textSearch.length > 0) {
+                if (!filter.rating || filter.rating === -1) {
+                    services = await this.serviceModel.find({
+                        $text: {
+                            $search: textSearch,
+                        },
+                        $or: [
+                            Object.assign({ rankingPoint: {
+                                    $gte: DOWN[down],
+                                    $lte: UP[up],
+                                } }, condition),
+                            Object.assign({ rankingPoint: null }, condition)
+                        ]
+                    }).sort({ rankingPoint: 'desc' })
+                        .skip((page - 1) * resultPerPage)
+                        .limit(resultPerPage)
+                        .populate('category')
+                        .exec();
+                    totalPage = await this.serviceModel.find({
+                        $text: {
+                            $search: textSearch,
+                        },
+                        $or: [
+                            Object.assign({ rankingPoint: {
+                                    $gte: DOWN[down],
+                                    $lte: UP[up],
+                                } }, condition),
+                            Object.assign({ rankingPoint: null }, condition)
+                        ]
+                    }).countDocuments().exec() / resultPerPage;
+                }
+                else {
+                    services = await this.serviceModel.find(Object.assign({ $text: {
+                            $search: textSearch,
+                        }, rankingPoint: {
+                            $gte: DOWN[down],
+                            $lte: UP[up],
+                            $ne: null,
+                        } }, condition)).sort({ rankingPoint: 'desc' })
+                        .skip((page - 1) * resultPerPage)
+                        .limit(resultPerPage)
+                        .populate('category')
+                        .exec();
+                    totalPage = await this.serviceModel.find(Object.assign({ $text: {
+                            $search: textSearch,
+                        }, rankingPoint: {
+                            $gte: DOWN[down],
+                            $lte: UP[up],
+                            $ne: null,
+                        } }, condition)).countDocuments().exec() / resultPerPage;
+                }
+            }
+            else {
+                if (!filter.rating || filter.rating === -1) {
+                    services = await this.serviceModel.find({
+                        $or: [
+                            Object.assign({ rankingPoint: {
+                                    $gte: DOWN[down],
+                                    $lte: UP[up],
+                                } }, condition),
+                            Object.assign({ rankingPoint: null }, condition)
+                        ],
+                    }, null)
+                        .sort({ rankingPoint: 'desc' })
+                        .skip((page - 1) * resultPerPage).limit(resultPerPage)
+                        .populate('category')
+                        .exec();
+                    totalPage = await this.serviceModel.find({
+                        $or: [
+                            Object.assign({ rankingPoint: {
+                                    $gte: DOWN[down],
+                                    $lte: UP[up],
+                                } }, condition),
+                            Object.assign({ rankingPoint: null }, condition)
+                        ],
+                    }, null)
+                        .countDocuments()
+                        .exec() / resultPerPage;
+                }
+                else {
+                    services = await this.serviceModel.find(Object.assign({ rankingPoint: {
+                            $gte: DOWN[down],
+                            $lte: UP[up],
+                            $ne: null,
+                        } }, condition), null)
+                        .sort({ rankingPoint: 'desc' })
+                        .skip((page - 1) * resultPerPage).limit(resultPerPage)
+                        .populate('category')
+                        .exec();
+                    totalPage = await this.serviceModel.find(Object.assign({ rankingPoint: {
+                            $gte: DOWN[down],
+                            $lte: UP[up],
+                            $ne: null,
+                        } }, condition), null)
+                        .countDocuments()
+                        .exec() / resultPerPage;
+                }
             }
             return { services, totalPage: Math.ceil(totalPage), page };
         }
