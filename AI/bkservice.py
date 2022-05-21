@@ -32,7 +32,7 @@ def calScore(text):
     if npTotal == 1:
         return MAX_SCORE - npMulti[1]*5/npMulti[3]
     elif npTotal == -1:
-        return 3 + npMulti[0]*5/npMulti[3]
+        return MIN_SCORE + npMulti[0]*5/npMulti[3]
     else:
         if npMulti[0]>0 and npMulti[1]>0:
             if npMulti[0]>npMulti[1]: return AVG + 3*(npMulti[0]-npMulti[1])/npMulti[0]

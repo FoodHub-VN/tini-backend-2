@@ -13,7 +13,7 @@ const CategorySchema = new Schema<Category>({
 
 CategorySchema.post<Category>('remove', async function() {
   const serviceModel = await this.model<ServiceModel>("Category").find({category: this._id}).exec();
-  await Promise.all(serviceModel.map((service)=>{
+  serviceModel&&await Promise.all(serviceModel.map((service)=>{
     return service.remove();
   }))
   return;

@@ -58,43 +58,45 @@ ServiceSchema.post<Service>("remove", async function(service) {
 
   //delete introduction
   const intro = await this.model<IntroductionModel>("Introduction").findOne({ service: this._id }).exec();
-  await intro.remove();
+  if(intro){
+    await intro.remove();
+  }
 
   //delete comment
   const comments = await this.model<CommentModel>("Comment").find({ service: this._id }).exec();
-  await Promise.all(comments.map((comment) => {
+  comments && await Promise.all(comments.map((comment) => {
     return comment.remove();
   }));
 
   //delete notification
 
   const notifications = await this.model<NotificationModel>("Notification").find({ service: this._id }).exec();
-  await Promise.all(notifications.map((noti) => {
+  notifications && await Promise.all(notifications.map((noti) => {
     return noti.remove();
   }));
 
   //delete order history
   const scheduleHistories = await this.model<ScheduleHistoryModel>("ScheduleHistory").find({ service: this._id }).exec();
-  await Promise.all(scheduleHistories.map((schedule) => {
+  scheduleHistories && await Promise.all(scheduleHistories.map((schedule) => {
     return schedule.remove();
   }));
 
 
   //delete premium
   const premiumHistory = await this.model<PurchaseModel>("Purchase").find({ service: this._id }).exec();
-  await Promise.all(premiumHistory.map((purchase) => {
+  premiumHistory && await Promise.all(premiumHistory.map((purchase) => {
     return purchase.remove();
   }));
 
   //delete schedule
   const schedules = await this.model<ScheduleModel>("Schedule").find({ service: this._id }).exec();
-  await Promise.all(schedules.map((schedule) => {
+  schedules&&await Promise.all(schedules.map((schedule) => {
     return schedule.remove();
   }));
 
   //delete scores
   const scores = await this.model<ScoreModel>("Score").find({ service: this._id }).exec();
-  await Promise.all(scores.map((score) => {
+  scores&&await Promise.all(scores.map((score) => {
     return score.remove();
   }));
   return;

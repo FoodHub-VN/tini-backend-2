@@ -331,7 +331,7 @@ export class EnterpriseService {
     var dateCreate = moment().format("YYYYMMDDHHmmss");
     var orderId = this.req.user.id +'_'+ moment().format("YYYYMMDDHHmmss")+'_'+offerId;
 
-    var orderInfo = "THanh toan";
+    var orderInfo = "Thanh toan";
     var locale = "vn";
     var currCode = 'VND';
     var vnp_Params = {};
@@ -412,11 +412,11 @@ export class EnterpriseService {
     }
   }
   async calRankingPointService(serviceId: string): Promise<any>{
+    console.log("calRankingPointService", serviceId);
     if(!Types.ObjectId.isValid(serviceId)){
       throw new NotFoundException("Service not found");
     }
     try {
-
 
       const service = await this.serviceModel.findOne({ _id: Types.ObjectId(serviceId) }).exec();
       const enterprise = await this.enterpriseModel.findOne({ _id: service.enterprise }).exec();

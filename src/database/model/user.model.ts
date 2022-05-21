@@ -70,34 +70,34 @@ UserSchema.pre<User>("save", preSaveHook);
 UserSchema.post<User>("remove", async function(user) {
     //delete comment
     const comments = await this.model<CommentModel>("Comment").find({ user: this._id }).exec();
-    await Promise.all(comments.map((comment) => {
+    comments&&await Promise.all(comments.map((comment) => {
         return comment.remove();
     }));
 
     //delete notification
 
     const notis = await this.model<NotificationModel>("Notification").find({ user: this._id }).exec();
-    await Promise.all(notis.map((noti) => {
+    notis&&await Promise.all(notis.map((noti) => {
         return noti.remove();
     }));
 
     //delete schedule history
 
     const scheduleHistories = await this.model<ScheduleHistoryModel>("ScheduleHistory").find({ user: this._id }).exec();
-    await Promise.all(scheduleHistories.map((scheduleHistory) => {
+    scheduleHistories&&await Promise.all(scheduleHistories.map((scheduleHistory) => {
         return scheduleHistory.remove();
     }));
 
     //delete purchase history
     const purchaseHistories = await this.model<PurchaseModel>("Purchase").find({ user: this._id }).exec();
-    await Promise.all(purchaseHistories.map((purchaseHistory) => {
+    purchaseHistories&&await Promise.all(purchaseHistories.map((purchaseHistory) => {
         return purchaseHistory.remove();
     }));
 
     //delete schedule
 
     const schedules = await this.model<ScheduleModel>("Schedule").find({ user: this._id}).exec();
-    await Promise.all(schedules.map((schedule) => {
+    schedules&&await Promise.all(schedules.map((schedule) => {
         return schedule.remove();
     }))
     return;

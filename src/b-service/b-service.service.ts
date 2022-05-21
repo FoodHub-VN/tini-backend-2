@@ -55,6 +55,7 @@ export class BServiceService {
       throw new NotFoundException("Category Not found");
     }
     try{
+
       const serviceExist = await this.serviceModel.findOne({ name: data.name }).exec();
       if (serviceExist) {
         throw new ConflictException("Service is already existing: " + serviceExist.name);
@@ -71,6 +72,7 @@ export class BServiceService {
         });
         const res = await Promise.all<FileUploaded>(promises);
         let service = await this.serviceModel.create({ ...data, enterprise: this.req.user.id, images: res });
+        console.log("Create service", service._id);
         await this.enterpriseService.calRankingPointService(service._id);
         return this.serviceModel.findOne({_id: service._id});
       } else {
