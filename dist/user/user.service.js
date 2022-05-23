@@ -277,6 +277,7 @@ let UserService = class UserService {
             comment.images && comment.images.length > 0 && this.uploadService.deleteMulti(comment.images.map(i => i.key));
             await this.scoreModel.remove({ commentId: comment._id });
             await comment.remove();
+            await this.enterpriseService.calRankingPointService(service._id);
             return true;
         }
         catch (e) {

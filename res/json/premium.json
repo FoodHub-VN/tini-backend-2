@@ -1,6 +1,6 @@
 {
   "1": {
-    "price": 279000,
+    "price": 100000,
     "title": "Gói thường",
     "benefit": [
       "Benefit 1",
@@ -15,7 +15,7 @@
     "bonus": 1
   },
   "2": {
-    "price": 279000,
+    "price": 200000,
     "title": "Gói VIP",
     "benefit": [
       "Benefit 1",
@@ -30,7 +30,7 @@
     "bonus": 2
   },
   "3": {
-    "price": 279000,
+    "price": 300000,
     "title": "Gói Premium",
     "benefit": [
       "Benefit 1",
