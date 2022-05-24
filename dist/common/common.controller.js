@@ -66,6 +66,11 @@ let CommonController = class CommonController {
             throw new common_1.BadRequestException("Something wrong!");
         }));
     }
+    getEnterpriseInfo(res, idEnterprise) {
+        return (0, rxjs_1.from)(this.commonService.getEnterpriseInfo(idEnterprise)).pipe((0, rxjs_1.map)(e => res.status(common_1.HttpStatus.OK).send({ enterprise: e })), (0, rxjs_1.catchError)((e) => {
+            throw new common_1.BadRequestException();
+        }));
+    }
 };
 __decorate([
     (0, common_1.Get)('/categories'),
@@ -106,6 +111,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", rxjs_1.Observable)
 ], CommonController.prototype, "getServiceScore", null);
+__decorate([
+    (0, common_1.Get)('/enterprise/:idEnterprise'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Param)('idEnterprise')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], CommonController.prototype, "getEnterpriseInfo", null);
 CommonController = __decorate([
     (0, common_1.Controller)(''),
     __metadata("design:paramtypes", [common_service_1.CommonService,

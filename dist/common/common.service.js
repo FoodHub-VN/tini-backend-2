@@ -16,18 +16,25 @@ exports.CommonService = void 0;
 const common_1 = require("@nestjs/common");
 const database_constants_1 = require("../database/database.constants");
 const rxjs_1 = require("rxjs");
+const mongoose_1 = require("mongoose");
 let CommonService = class CommonService {
-    constructor(categoryModel) {
+    constructor(categoryModel, enterpriseModel) {
         this.categoryModel = categoryModel;
+        this.enterpriseModel = enterpriseModel;
     }
     getCategories() {
         return (0, rxjs_1.from)(this.categoryModel.find().exec());
+    }
+    async getEnterpriseInfo(enterpriseId) {
+        let enterprise = await this.enterpriseModel.findOne({ _id: mongoose_1.Types.ObjectId(enterpriseId) }).exec();
+        return enterprise;
     }
 };
 CommonService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(database_constants_1.CATEGORY_MODEL)),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)(database_constants_1.ENTERPRISE_MODEL)),
+    __metadata("design:paramtypes", [Object, Object])
 ], CommonService);
 exports.CommonService = CommonService;
 //# sourceMappingURL=common.service.js.map

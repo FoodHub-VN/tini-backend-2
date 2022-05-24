@@ -88,8 +88,15 @@ export class CommonController {
   }
   // enterprise info
 
-  // @Get('/enterprise/:idEnterprise')
-  // getEnterpriseInfo(@Res() res, @Param('idEnterprise') idEnterprise): Promise<Response>{
-  //
-  // }
+  @Get('/enterprise/:idEnterprise')
+  getEnterpriseInfo(@Res() res, @Param('idEnterprise') idEnterprise){
+      return from(this.commonService.getEnterpriseInfo(idEnterprise)).pipe(
+        map(e=>res.status(HttpStatus.OK).send({enterprise: e})),
+        catchError((e)=>{
+          throw new BadRequestException();
+        })
+      )
+  }
+
+
 }

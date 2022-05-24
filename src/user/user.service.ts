@@ -165,6 +165,14 @@ export class UserService {
     return from(this.scheduleModel.find({ user: Types.ObjectId(this.req.user.id) }).populate(["service", "user"]).exec());
   }
 
+  async getSchedulesByService(serviceId: string): Promise<Schedule[]> {
+    const schedules = await this.scheduleModel.find({
+      user: Types.ObjectId(this.req.user.id),
+      service: Types.ObjectId(serviceId)
+    }).exec();
+    return schedules;
+  }
+
   addToFavorite(serviceId: string): Observable<Service> {
     if (!Types.ObjectId.isValid(serviceId)) {
       throw new NotFoundException("Service not Found");

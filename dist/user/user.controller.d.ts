@@ -22,6 +22,7 @@ export declare class UserController {
     unSchedule(data: any, res: Response): Observable<Response>;
     doneSchedule(data: DoneScheduleDto, req: AuthenticatedRequest<UserPrincipal>, res: Response): Observable<Response>;
     getAllSchedule(res: Response): Observable<Response<any, Record<string, any>>>;
+    getScheduleByService(res: Response, data: any): Observable<Response<any, Record<string, any>>>;
     addServiceToFavorite(req: AuthenticatedRequest<UserPrincipal>, data: AddFavoriteDto, res: Response): Observable<Response>;
     removeServiceFromFavorite(req: AuthenticatedRequest<UserPrincipal>, data: AddFavoriteDto, res: Response): Observable<Response>;
     getFollowedService(res: Response): Observable<Response>;

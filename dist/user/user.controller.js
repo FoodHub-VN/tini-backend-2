@@ -124,6 +124,12 @@ let UserController = class UserController {
             throw new common_1.BadRequestException(err);
         }));
     }
+    getScheduleByService(res, data) {
+        return (0, rxjs_1.from)(this.userService.getSchedulesByService(data.serviceId))
+            .pipe((0, rxjs_1.map)(schedules => res.status(common_1.HttpStatus.OK).send({ schedules })), (0, rxjs_1.catchError)((e) => {
+            throw new common_1.BadRequestException();
+        }));
+    }
     addServiceToFavorite(req, data, res) {
         return this.userService.addToFavorite(data.serviceId).pipe((0, rxjs_1.map)((service) => {
             if (service) {
@@ -283,6 +289,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "getAllSchedule", null);
+__decorate([
+    (0, common_1.Post)('schedule-by-service'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "getScheduleByService", null);
 __decorate([
     (0, common_1.Post)("/add-favorite"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

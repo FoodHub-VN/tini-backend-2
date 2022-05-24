@@ -157,6 +157,18 @@ export class UserController {
     );
   }
 
+  @Post('schedule-by-service')
+  @UseGuards(JwtAuthGuard)
+  getScheduleByService(@Res() res: Response, @Body() data: any){
+    return from(this.userService.getSchedulesByService(data.serviceId))
+      .pipe(
+        map(schedules=>res.status(HttpStatus.OK).send({schedules})),
+        catchError((e)=> {
+          throw new BadRequestException();
+        })
+      )
+  }
+
   @Post("/add-favorite")
   @UseGuards(JwtAuthGuard)
   addServiceToFavorite(@Req() req: AuthenticatedRequest<UserPrincipal>,

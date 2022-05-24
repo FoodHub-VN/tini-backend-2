@@ -39,6 +39,7 @@ export declare class UserService {
     addSchedule(username: string, serviceId: string, time: Date): Observable<Schedule>;
     removeSchedule(scheduleId: string): Promise<any>;
     getAllSchedule(): Observable<Schedule[]>;
+    getSchedulesByService(serviceId: string): Promise<Schedule[]>;
     addToFavorite(serviceId: string): Observable<Service>;
     removeFavorite(serviceId: string): Promise<any>;
     getFollowedService(): Observable<Service[]>;

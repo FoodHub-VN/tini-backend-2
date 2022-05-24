@@ -129,6 +129,13 @@ let UserService = class UserService {
     getAllSchedule() {
         return (0, rxjs_1.from)(this.scheduleModel.find({ user: mongoose_1.Types.ObjectId(this.req.user.id) }).populate(["service", "user"]).exec());
     }
+    async getSchedulesByService(serviceId) {
+        const schedules = await this.scheduleModel.find({
+            user: mongoose_1.Types.ObjectId(this.req.user.id),
+            service: mongoose_1.Types.ObjectId(serviceId)
+        }).exec();
+        return schedules;
+    }
     addToFavorite(serviceId) {
         if (!mongoose_1.Types.ObjectId.isValid(serviceId)) {
             throw new common_1.NotFoundException("Service not Found");

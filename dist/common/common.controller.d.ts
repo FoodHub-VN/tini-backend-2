@@ -13,4 +13,5 @@ export declare class CommonController {
     getCommentService(res: Response, idService: any): Observable<Response>;
     getUserInfo(res: Response, userId: string): Observable<Response>;
     getServiceScore(res: Response, idService: any): Observable<Response>;
+    getEnterpriseInfo(res: any, idEnterprise: any): Observable<any>;
 }
