@@ -167,7 +167,6 @@ export class UserService {
 
   async getSchedulesByService(serviceId: string): Promise<Schedule[]> {
     const schedules = await this.scheduleModel.find({
-      user: Types.ObjectId(this.req.user.id),
       service: Types.ObjectId(serviceId)
     }).exec();
     return schedules;

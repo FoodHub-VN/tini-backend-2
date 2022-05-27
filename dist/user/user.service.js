@@ -131,7 +131,6 @@ let UserService = class UserService {
     }
     async getSchedulesByService(serviceId) {
         const schedules = await this.scheduleModel.find({
-            user: mongoose_1.Types.ObjectId(this.req.user.id),
             service: mongoose_1.Types.ObjectId(serviceId)
         }).exec();
         return schedules;
