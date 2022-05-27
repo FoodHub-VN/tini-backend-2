@@ -27,6 +27,8 @@ interface Service extends Document {
    category: string;
    introduction: string;
    shortIntroduction: string;
+   cmtScore: number;
+   blogScore: number;
 }
 
 type ServiceModel = Model<Service>;

@@ -426,23 +426,24 @@ export class EnterpriseService {
        */
       let promise = [];
       comment && comment.map((cmt) => {
-        promise.push(this.httpService.post('http://52.63.143.20:5005', { text: cmt.content }).toPromise())
+        promise.push(this.httpService.post('http://3.104.91.35:5005', { text: cmt.content }).toPromise())
       })
       let arrCmtScore = await Promise.all(promise);
       let arrScore = 7;
       arrCmtScore = arrCmtScore && arrCmtScore.map(i => i.data.np);
       let sum = (arrCmtScore&& arrCmtScore.length>0)?arrCmtScore.reduce((a, b) => (a + b), 0): 7;
       let avg = sum / (arrCmtScore.length>0?arrCmtScore.length:1);
-
+      avg && await this.serviceModel.updateOne({cmtScore: avg}).exec();
       // introduce score
       let introduceScore = 7;
       const introduce = service.introduction;
       if(introduce && introduce.length>0){
         const { convert } = require('html-to-text');
         let text = convert(introduce)
-        const introduceCal = await this.httpService.post('http://52.63.143.20:5005', { text: text }).toPromise();
+        const introduceCal = await this.httpService.post('http://3.104.91.35:5005', { text: text }).toPromise();
         introduceScore = introduceCal.data.np;
       }
+      await this.serviceModel.updateOne({blogScore: introduceScore}).exec();
       //rating score
       const scores = await this.scoreModel.find({ service: service._id }).exec();
       let ratingScore = 7;
