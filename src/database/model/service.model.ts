@@ -53,6 +53,8 @@ const ServiceSchema = new Schema<Service>({
   introduction: SchemaTypes.String,
   shortIntroduction: SchemaTypes.String,
   category: {type: SchemaTypes.ObjectId, ref: 'Category'},
+  cmtScore: SchemaTypes.Number,
+  blogScore: SchemaTypes.Number
 }, { timestamps: true });
 
 ServiceSchema.index({name: 'text'});

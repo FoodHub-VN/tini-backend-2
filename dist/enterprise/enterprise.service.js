@@ -373,7 +373,7 @@ let EnterpriseService = class EnterpriseService {
             arrCmtScore = arrCmtScore && arrCmtScore.map(i => i.data.np);
             let sum = (arrCmtScore && arrCmtScore.length > 0) ? arrCmtScore.reduce((a, b) => (a + b), 0) : 7;
             let avg = sum / (arrCmtScore.length > 0 ? arrCmtScore.length : 1);
-            avg && await this.serviceModel.updateOne({ cmtScore: avg }).exec();
+            await service.update({ cmtScore: avg }).exec();
             let introduceScore = 7;
             const introduce = service.introduction;
             if (introduce && introduce.length > 0) {
@@ -382,7 +382,7 @@ let EnterpriseService = class EnterpriseService {
                 const introduceCal = await this.httpService.post('http://3.104.91.35:5005', { text: text }).toPromise();
                 introduceScore = introduceCal.data.np;
             }
-            await this.serviceModel.updateOne({ blogScore: introduceScore }).exec();
+            await service.update({ blogScore: introduceScore }).exec();
             const scores = await this.scoreModel.find({ service: service._id }).exec();
             let ratingScore = 7;
             if (scores) {
