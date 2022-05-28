@@ -21,6 +21,7 @@ interface Service extends Document {
     shortIntroduction: string;
     cmtScore: number;
     blogScore: number;
+    sortPoint: number;
 }
 declare type ServiceModel = Model<Service>;
 declare const ServiceSchema: Schema<Service, Model<Service, any, any>, undefined, {}>;

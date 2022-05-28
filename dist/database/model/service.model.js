@@ -23,7 +23,8 @@ const ServiceSchema = new mongoose_1.Schema({
     shortIntroduction: mongoose_1.SchemaTypes.String,
     category: { type: mongoose_1.SchemaTypes.ObjectId, ref: 'Category' },
     cmtScore: mongoose_1.SchemaTypes.Number,
-    blogScore: mongoose_1.SchemaTypes.Number
+    blogScore: mongoose_1.SchemaTypes.Number,
+    sortPoint: mongoose_1.SchemaTypes.Number,
 }, { timestamps: true });
 exports.ServiceSchema = ServiceSchema;
 ServiceSchema.index({ name: 'text' });
