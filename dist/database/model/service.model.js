@@ -25,7 +25,8 @@ const ServiceSchema = new mongoose_1.Schema({
     cmtScore: mongoose_1.SchemaTypes.Number,
     blogScore: mongoose_1.SchemaTypes.Number,
     starPoint: mongoose_1.SchemaTypes.Number,
-    enableSchedule: mongoose_1.SchemaTypes.Boolean
+    enableSchedule: mongoose_1.SchemaTypes.Boolean,
+    scheduleAllowedPerHour: mongoose_1.SchemaTypes.Number
 }, { timestamps: true });
 exports.ServiceSchema = ServiceSchema;
 ServiceSchema.index({ name: 'text' });

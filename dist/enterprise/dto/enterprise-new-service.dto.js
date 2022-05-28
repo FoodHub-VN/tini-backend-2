@@ -128,5 +128,13 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], EnterPriseNewServiceDataDto.prototype, "enableSchedule", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, swagger_1.ApiProperty)({
+        type: Number,
+        required: true
+    }),
+    __metadata("design:type", Number)
+], EnterPriseNewServiceDataDto.prototype, "scheduleAllowedPerHour", void 0);
 exports.EnterPriseNewServiceDataDto = EnterPriseNewServiceDataDto;
 //# sourceMappingURL=enterprise-new-service.dto.js.map

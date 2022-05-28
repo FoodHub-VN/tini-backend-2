@@ -13,4 +13,5 @@ export declare class EnterPriseNewServiceDataDto {
     readonly introduction: string;
     readonly shortIntroduction: string;
     readonly enableSchedule: boolean;
+    readonly scheduleAllowedPerHour: number;
 }

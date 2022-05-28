@@ -23,6 +23,7 @@ interface Service extends Document {
     blogScore: number;
     starPoint: number;
     enableSchedule: boolean;
+    scheduleAllowedPerHour: number;
 }
 declare type ServiceModel = Model<Service>;
 declare const ServiceSchema: Schema<Service, Model<Service, any, any>, undefined, {}>;

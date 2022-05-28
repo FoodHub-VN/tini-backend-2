@@ -113,6 +113,11 @@ export class EnterPriseNewServiceDataDto {
     required: true
   })
   readonly enableSchedule: boolean;
-
+  @IsNotEmpty()
+  @ApiProperty({
+    type: Number,
+    required: true
+  })
+  readonly scheduleAllowedPerHour: number;
 }
 
