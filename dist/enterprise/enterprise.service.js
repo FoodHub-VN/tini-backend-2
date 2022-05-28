@@ -385,14 +385,14 @@ let EnterpriseService = class EnterpriseService {
             await service.update({ blogScore: introduceScore }).exec();
             const scores = await this.scoreModel.find({ service: service._id }).exec();
             let ratingScore = 7;
-            if (scores) {
+            if (scores && scores.length > 0) {
                 ratingScore = scores.map((s) => {
                     return (0, utility_1.getRatingScore)(s.scores);
                 }).reduce((a, b) => (a + b), 0) / scores.length;
             }
             let premiumId = enterprise.premium;
             let premiumScore = 0;
-            if (premiumId) {
+            if (premiumId && enterprise.premium) {
                 let premium = this.premiumConfig[premiumId];
                 if (premium) {
                     premiumScore = premium.bonus;
@@ -400,6 +400,7 @@ let EnterpriseService = class EnterpriseService {
             }
             let totalPoint = premiumScore + (3 * ratingScore + introduceScore + 3 * avg) / 7;
             let totalWithOutPremium = totalPoint - premiumScore;
+            console.log(premiumScore, avg, ratingScore, introduceScore);
             console.log("Call NP: ", serviceId, "__new Point: ", service.rankingPoint, "->", totalPoint);
             await service.update({ rankingPoint: totalPoint, starPoint: totalWithOutPremium }).exec();
             return totalPoint;

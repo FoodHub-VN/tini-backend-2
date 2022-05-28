@@ -30,6 +30,7 @@ interface Service extends Document {
    cmtScore: number;
    blogScore: number;
   starPoint: number;
+  enableSchedule: boolean;
 }
 
 type ServiceModel = Model<Service>;
@@ -57,6 +58,7 @@ const ServiceSchema = new Schema<Service>({
   cmtScore: SchemaTypes.Number,
   blogScore: SchemaTypes.Number,
   starPoint: SchemaTypes.Number,
+  enableSchedule: SchemaTypes.Boolean
 }, { timestamps: true });
 
 ServiceSchema.index({name: 'text'});

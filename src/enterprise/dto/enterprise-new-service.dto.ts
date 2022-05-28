@@ -106,5 +106,13 @@ export class EnterPriseNewServiceDataDto {
     required: false
   })
   readonly shortIntroduction: string;
+
+  @IsNotEmpty()
+  @ApiProperty({
+    type: Boolean,
+    required: true
+  })
+  readonly enableSchedule: boolean;
+
 }
 

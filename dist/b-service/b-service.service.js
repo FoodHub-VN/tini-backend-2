@@ -176,7 +176,7 @@ let BServiceService = class BServiceService {
             }
             const scores = await this.scoreModel.find({ service: serviceId }).exec();
             if (scores.length <= 0) {
-                return [...defaultScore, (0, utility_1.getRatingScore)(defaultScore)];
+                return [...defaultScore, (0, utility_1.getRatingScore)(defaultScore), service.rankingPoint];
             }
             const leanScore = scores.map(s => s.scores);
             let resScore = [0, 0, 0, 0, 0];

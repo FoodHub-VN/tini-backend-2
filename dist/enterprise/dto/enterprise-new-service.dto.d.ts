@@ -12,4 +12,5 @@ export declare class EnterPriseNewServiceDataDto {
     readonly removeImg: string[];
     readonly introduction: string;
     readonly shortIntroduction: string;
+    readonly enableSchedule: boolean;
 }
