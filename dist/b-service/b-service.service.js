@@ -70,7 +70,9 @@ let BServiceService = class BServiceService {
                 return this.serviceModel.findOne({ _id: service._id });
             }
             else {
-                return await this.serviceModel.create(Object.assign(Object.assign({}, data), { enterprise: this.req.user.id }));
+                let service = await this.serviceModel.create(Object.assign(Object.assign({}, data), { enterprise: this.req.user.id }));
+                await this.enterpriseService.calRankingPointService(service._id);
+                return service;
             }
         }
         catch (e) {

@@ -454,7 +454,7 @@ export class EnterpriseService {
       }
 
       //bonus
-      let premiumId = enterprise.premium;
+      let premiumId = enterprise?.premium || undefined;
       let premiumScore = 0;
       if (premiumId && enterprise.premium) {
         let premium = this.premiumConfig[premiumId];

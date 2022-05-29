@@ -390,7 +390,7 @@ let EnterpriseService = class EnterpriseService {
                     return (0, utility_1.getRatingScore)(s.scores);
                 }).reduce((a, b) => (a + b), 0) / scores.length;
             }
-            let premiumId = enterprise.premium;
+            let premiumId = (enterprise === null || enterprise === void 0 ? void 0 : enterprise.premium) || undefined;
             let premiumScore = 0;
             if (premiumId && enterprise.premium) {
                 let premium = this.premiumConfig[premiumId];
