@@ -462,7 +462,7 @@ export class EnterpriseService {
           premiumScore = premium.bonus;
         }
       }
-      let totalPoint = premiumScore + (3 * ratingScore + introduceScore + 3 * avg) / 7;
+      let totalPoint = premiumScore + (introduceScore + 1.25* (ratingScore + avg)) / 3.5;
       let totalWithOutPremium = totalPoint - premiumScore;
       console.log(premiumScore,avg, ratingScore, introduceScore);
       console.log("Call NP: ", serviceId, "__new Point: ", service.rankingPoint, "->", totalPoint);

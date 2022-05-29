@@ -27,12 +27,12 @@ export class SearchService {
             },
           },
           { score: { $meta: 'textScore' } })
-        .sort({ rankingPoint: 'desc' })
+        .sort({ starPoint: 'desc' })
         .populate('category')
         .exec(),
       );
     } else {
-      return from(this.serviceModel.find().populate('category').sort({ rankingPoint: 'desc' }).exec());
+      return from(this.serviceModel.find().populate('category').sort({ starPoint: 'desc' }).exec());
     }
 
   }
@@ -68,17 +68,17 @@ export class SearchService {
             },
             $or: [
               {
-                rankingPoint: {
+                starPoint: {
                   $gte: DOWN[down],
                   $lte: UP[up],
                 },
                 ...condition,
               },{
-                rankingPoint: null,
+                starPoint: null,
                 ...condition,
               }
             ]
-          }).sort({ rankingPoint: 'desc' })
+          }).sort({ starPoint: 'desc' })
             .skip((page - 1) * resultPerPage)
             .limit(resultPerPage)
             .populate('category')
@@ -89,13 +89,13 @@ export class SearchService {
             },
             $or: [
               {
-                rankingPoint: {
+                starPoint: {
                   $gte: DOWN[down],
                   $lte: UP[up],
                 },
                 ...condition,
               },{
-                rankingPoint: null,
+                starPoint: null,
                 ...condition,
               }
             ]
@@ -105,13 +105,13 @@ export class SearchService {
             $text: {
               $search: textSearch,
             },
-            rankingPoint: {
+            starPoint: {
               $gte: DOWN[down],
               $lte: UP[up],
               $ne: null,
             },
             ...condition,
-          }).sort({ rankingPoint: 'desc' })
+          }).sort({ starPoint: 'desc' })
             .skip((page - 1) * resultPerPage)
             .limit(resultPerPage)
             .populate('category')
@@ -120,7 +120,7 @@ export class SearchService {
             $text: {
               $search: textSearch,
             },
-            rankingPoint: {
+            starPoint: {
               $gte: DOWN[down],
               $lte: UP[up],
               $ne: null,
@@ -133,32 +133,32 @@ export class SearchService {
           services = await this.serviceModel.find({
             $or: [
               {
-                rankingPoint: {
+                starPoint: {
                   $gte: DOWN[down],
                   $lte: UP[up],
                 },
                 ...condition,
               },
               {
-                rankingPoint: null,
+                starPoint: null,
                 ...condition,
               }],
           }, null)
-            .sort({ rankingPoint: 'desc' })
+            .sort({ starPoint: 'desc' })
             .skip((page - 1) * resultPerPage).limit(resultPerPage)
             .populate('category')
             .exec();
           totalPage = await this.serviceModel.find({
             $or: [
               {
-                rankingPoint: {
+                starPoint: {
                   $gte: DOWN[down],
                   $lte: UP[up],
                 },
                 ...condition,
               },
               {
-                rankingPoint: null,
+                starPoint: null,
                 ...condition,
               }],
           }, null)
@@ -166,19 +166,19 @@ export class SearchService {
             .exec() / resultPerPage;
         } else {
           services = await this.serviceModel.find({
-            rankingPoint: {
+            starPoint: {
               $gte: DOWN[down],
               $lte: UP[up],
               $ne: null,
             },
             ...condition,
           }, null)
-            .sort({ rankingPoint: 'desc' })
+            .sort({ starPoint: 'desc' })
             .skip((page - 1) * resultPerPage).limit(resultPerPage)
             .populate('category')
             .exec();
           totalPage = await this.serviceModel.find({
-            rankingPoint: {
+            starPoint: {
               $gte: DOWN[down],
               $lte: UP[up],
               $ne: null,
