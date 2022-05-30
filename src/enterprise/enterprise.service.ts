@@ -441,7 +441,7 @@ export class EnterpriseService {
         const { convert } = require('html-to-text');
         let text = convert(introduce)
         const introduceCal = await this.httpService.post('http://3.104.91.35:5005', { text: text }).toPromise();
-        introduceScore = introduceCal.data.np;
+        introduceScore = Math.max(Math.min(introduceCal.data.np, 7), 10);
       }
       await service.update({blogScore: introduceScore}).exec();
       //rating score
