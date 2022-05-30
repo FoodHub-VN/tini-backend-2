@@ -27,12 +27,12 @@ export class SearchService {
             },
           },
           { score: { $meta: 'textScore' } })
-        .sort({ starPoint: 'desc' })
+        .sort({ rankingPoint: 'desc' })
         .populate(['category', 'enterprise'])
         .exec(),
       );
     } else {
-      return from(this.serviceModel.find().populate(['category', 'enterprise']).sort({ starPoint: 'desc' }).exec());
+      return from(this.serviceModel.find().populate(['category', 'enterprise']).sort({ rankingPoint: 'desc' }).exec());
     }
 
   }
@@ -68,17 +68,17 @@ export class SearchService {
             },
             $or: [
               {
-                starPoint: {
+                rankingPoint: {
                   $gte: DOWN[down],
                   $lte: UP[up],
                 },
                 ...condition,
               },{
-                starPoint: null,
+                rankingPoint: null,
                 ...condition,
               }
             ]
-          }).sort({ starPoint: 'desc' })
+          }).sort({ rankingPoint: 'desc' })
             .skip((page - 1) * resultPerPage)
             .limit(resultPerPage)
             .populate(['category', 'enterprise'])
@@ -89,13 +89,13 @@ export class SearchService {
             },
             $or: [
               {
-                starPoint: {
+                rankingPoint: {
                   $gte: DOWN[down],
                   $lte: UP[up],
                 },
                 ...condition,
               },{
-                starPoint: null,
+                rankingPoint: null,
                 ...condition,
               }
             ]
@@ -105,13 +105,13 @@ export class SearchService {
             $text: {
               $search: textSearch,
             },
-            starPoint: {
+            rankingPoint: {
               $gte: DOWN[down],
               $lte: UP[up],
               $ne: null,
             },
             ...condition,
-          }).sort({ starPoint: 'desc' })
+          }).sort({ rankingPoint: 'desc' })
             .skip((page - 1) * resultPerPage)
             .limit(resultPerPage)
             .populate(['category', 'enterprise'])
@@ -120,7 +120,7 @@ export class SearchService {
             $text: {
               $search: textSearch,
             },
-            starPoint: {
+            rankingPoint: {
               $gte: DOWN[down],
               $lte: UP[up],
               $ne: null,
@@ -133,32 +133,32 @@ export class SearchService {
           services = await this.serviceModel.find({
             $or: [
               {
-                starPoint: {
+                rankingPoint: {
                   $gte: DOWN[down],
                   $lte: UP[up],
                 },
                 ...condition,
               },
               {
-                starPoint: null,
+                rankingPoint: null,
                 ...condition,
               }],
           }, null)
-            .sort({ starPoint: 'desc' })
+            .sort({ rankingPoint: 'desc' })
             .skip((page - 1) * resultPerPage).limit(resultPerPage)
             .populate(['category', 'enterprise'])
             .exec();
           totalPage = await this.serviceModel.find({
             $or: [
               {
-                starPoint: {
+                rankingPoint: {
                   $gte: DOWN[down],
                   $lte: UP[up],
                 },
                 ...condition,
               },
               {
-                starPoint: null,
+                rankingPoint: null,
                 ...condition,
               }],
           }, null)
@@ -166,19 +166,19 @@ export class SearchService {
             .exec() / resultPerPage;
         } else {
           services = await this.serviceModel.find({
-            starPoint: {
+            rankingPoint: {
               $gte: DOWN[down],
               $lte: UP[up],
               $ne: null,
             },
             ...condition,
           }, null)
-            .sort({ starPoint: 'desc' })
+            .sort({ rankingPoint: 'desc' })
             .skip((page - 1) * resultPerPage).limit(resultPerPage)
             .populate(['category', 'enterprise'])
             .exec();
           totalPage = await this.serviceModel.find({
-            starPoint: {
+            rankingPoint: {
               $gte: DOWN[down],
               $lte: UP[up],
               $ne: null,
