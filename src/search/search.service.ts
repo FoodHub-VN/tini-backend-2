@@ -28,11 +28,11 @@ export class SearchService {
           },
           { score: { $meta: 'textScore' } })
         .sort({ starPoint: 'desc' })
-        .populate('category')
+        .populate(['category', 'enterprise'])
         .exec(),
       );
     } else {
-      return from(this.serviceModel.find().populate('category').sort({ starPoint: 'desc' }).exec());
+      return from(this.serviceModel.find().populate(['category', 'enterprise']).sort({ starPoint: 'desc' }).exec());
     }
 
   }
@@ -81,7 +81,7 @@ export class SearchService {
           }).sort({ starPoint: 'desc' })
             .skip((page - 1) * resultPerPage)
             .limit(resultPerPage)
-            .populate('category')
+            .populate(['category', 'enterprise'])
             .exec();
           totalPage = await this.serviceModel.find({
             $text: {
@@ -114,7 +114,7 @@ export class SearchService {
           }).sort({ starPoint: 'desc' })
             .skip((page - 1) * resultPerPage)
             .limit(resultPerPage)
-            .populate('category')
+            .populate(['category', 'enterprise'])
             .exec();
           totalPage = await this.serviceModel.find({
             $text: {
@@ -146,7 +146,7 @@ export class SearchService {
           }, null)
             .sort({ starPoint: 'desc' })
             .skip((page - 1) * resultPerPage).limit(resultPerPage)
-            .populate('category')
+            .populate(['category', 'enterprise'])
             .exec();
           totalPage = await this.serviceModel.find({
             $or: [
@@ -175,7 +175,7 @@ export class SearchService {
           }, null)
             .sort({ starPoint: 'desc' })
             .skip((page - 1) * resultPerPage).limit(resultPerPage)
-            .populate('category')
+            .populate(['category', 'enterprise'])
             .exec();
           totalPage = await this.serviceModel.find({
             starPoint: {

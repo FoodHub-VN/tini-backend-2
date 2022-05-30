@@ -34,11 +34,11 @@ let SearchService = class SearchService {
                 },
             }, { score: { $meta: 'textScore' } })
                 .sort({ starPoint: 'desc' })
-                .populate('category')
+                .populate(['category', 'enterprise'])
                 .exec());
         }
         else {
-            return (0, rxjs_1.from)(this.serviceModel.find().populate('category').sort({ starPoint: 'desc' }).exec());
+            return (0, rxjs_1.from)(this.serviceModel.find().populate(['category', 'enterprise']).sort({ starPoint: 'desc' }).exec());
         }
     }
     async deepSearch(textSearch, filter, page) {
@@ -80,7 +80,7 @@ let SearchService = class SearchService {
                     }).sort({ starPoint: 'desc' })
                         .skip((page - 1) * resultPerPage)
                         .limit(resultPerPage)
-                        .populate('category')
+                        .populate(['category', 'enterprise'])
                         .exec();
                     totalPage = await this.serviceModel.find({
                         $text: {
@@ -105,7 +105,7 @@ let SearchService = class SearchService {
                         } }, condition)).sort({ starPoint: 'desc' })
                         .skip((page - 1) * resultPerPage)
                         .limit(resultPerPage)
-                        .populate('category')
+                        .populate(['category', 'enterprise'])
                         .exec();
                     totalPage = await this.serviceModel.find(Object.assign({ $text: {
                             $search: textSearch,
@@ -129,7 +129,7 @@ let SearchService = class SearchService {
                     }, null)
                         .sort({ starPoint: 'desc' })
                         .skip((page - 1) * resultPerPage).limit(resultPerPage)
-                        .populate('category')
+                        .populate(['category', 'enterprise'])
                         .exec();
                     totalPage = await this.serviceModel.find({
                         $or: [
@@ -151,7 +151,7 @@ let SearchService = class SearchService {
                         } }, condition), null)
                         .sort({ starPoint: 'desc' })
                         .skip((page - 1) * resultPerPage).limit(resultPerPage)
-                        .populate('category')
+                        .populate(['category', 'enterprise'])
                         .exec();
                     totalPage = await this.serviceModel.find(Object.assign({ starPoint: {
                             $gte: DOWN[down],
