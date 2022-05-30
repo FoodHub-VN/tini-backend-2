@@ -24,6 +24,7 @@ services:
       - RETURN_URL=http://3.104.91.35:81/payment-result
       - FLASK_ENV=development
       - FLASK_APP=bkservice.py
+      - TZ=Asia/Ho_Chi_Minh
     stdin_open: true
     tty: true
   mongodb:
@@ -37,6 +38,7 @@ services:
       - db:/data/db
     environment:
       - MONGO_INITDB_DATABASE=nestjs-test
+      - TZ=Asia/Ho_Chi_Minh
     logging:
       driver: none
   ai:
@@ -48,6 +50,7 @@ services:
     environment:
       - FLASK_ENV=development
       - FLASK_APP=bkservice.py
+      - TZ=Asia/Ho_Chi_Minh
     stdin_open: true
     tty: true
   client-customer:
@@ -63,6 +66,7 @@ services:
       - REACT_APP_SOCKET_URI_DEV= http://localhost:8080
       - REACT_APP_API_URL_DEV = http://localhost:3007
       - REACT_APP_API_URL = http://3.104.91.35:3007
+      - TZ=Asia/Ho_Chi_Minh
     stdin_open: true
     tty: true
   client-enterprise:
@@ -78,6 +82,7 @@ services:
       - REACT_APP_SOCKET_URI_DEV= http://localhost:8080
       - REACT_APP_API_URL_DEV = http://localhost:3007
       - REACT_APP_API_URL = http://3.104.91.35:3007
+      - TZ=Asia/Ho_Chi_Minh
     stdin_open: true
     tty: true
 volumes:
