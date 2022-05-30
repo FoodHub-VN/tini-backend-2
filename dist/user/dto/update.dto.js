@@ -63,5 +63,14 @@ __decorate([
     (0, class_transformer_1.Type)(() => common_type_1.Address),
     __metadata("design:type", common_type_1.Address)
 ], UpdateProfileDto.prototype, "address", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, swagger_1.ApiProperty)({
+        type: String,
+        required: true
+    }),
+    __metadata("design:type", String)
+], UpdateProfileDto.prototype, "gender", void 0);
 exports.UpdateProfileDto = UpdateProfileDto;
 //# sourceMappingURL=update.dto.js.map

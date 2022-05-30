@@ -55,4 +55,12 @@ export class UpdateProfileDto{
     })
     @Type(() => Address)
     readonly address?: Address;
+
+    @IsOptional()
+    @IsString()
+    @ApiProperty({
+        type: String,
+        required: true
+    })
+    readonly gender?: string;
 }

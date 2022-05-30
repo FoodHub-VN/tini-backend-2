@@ -5,4 +5,5 @@ export declare class UpdateProfileDto {
     readonly phone?: string;
     readonly birthday?: Date;
     readonly address?: Address;
+    readonly gender?: string;
 }

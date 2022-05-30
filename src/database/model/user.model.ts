@@ -21,7 +21,7 @@ interface User extends Document {
     readonly username: string;
     readonly email: string;
     readonly phone: string;
-    readonly gender: "male" | "female";
+    readonly gender: string;
     readonly birthday: Date;
     readonly address: Address;
     readonly password: string;
