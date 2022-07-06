@@ -10,10 +10,10 @@ async function bootstrap() {
   // app.useStaticAssets(join(__dirname, "..", "upload"));
   // add swagger module
   const config = new DocumentBuilder()
-    .setTitle("[BK Student APIs]")
-    .setDescription("The RESTful APIs from me")
+    .setTitle("[FoodHub APIs]")
+    .setDescription("The RESTful APIs from super dev")
       .setVersion('1.0')
-      .addTag('BK')
+      .addTag('FoodHub')
       .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
