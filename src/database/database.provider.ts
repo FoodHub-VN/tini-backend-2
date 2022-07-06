@@ -16,18 +16,6 @@ import { ConfigType } from "@nestjs/config";
 import mongodbConfig from "../config/mongodb.config";
 import { Connection, createConnection } from "mongoose";
 import { User, UserSchema } from "./model/user.model";
-import { CommentModel, CommentSchema } from "./model/comment.model";
-import { EnterpriseModel, EnterpriseSchema } from "./model/enterprise.model";
-import { IntroductionModel, IntroductionSchema } from "./model/introduction.model";
-import { NotificationModel, NotificationSchema } from "./model/notification.model";
-import { PremiumModel, PremiumSchema } from "./model/premium.model";
-import { PurchaseModel, PurchaseSchema } from "./model/purchase-history.model";
-import { ScheduleModel, ScheduleSchema } from "./model/schedule";
-import { ScheduleHistoryModel, ScheduleHistorySchema } from "./model/schedule-history.model";
-import { ServiceModel, ServiceSchema } from "./model/service.model";
-import { CategorySchema } from "./model/category.model";
-import { ScoreModel, ScoreSchema } from "./model/scores.model";
-import { PurchaseTempModel, PurchaseTempSchema } from "./model/purchase-temp";
 
 export const dbProviders = [
     {
@@ -44,90 +32,5 @@ export const dbProviders = [
         },
         inject: [DB_CONNECTION]
     },
-    {
-        provide: COMMENT_MODEL,
-        useFactory: (conn: Connection) => {
-            return conn.model<CommentModel>("Comment", CommentSchema, "comments");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: ENTERPRISE_MODEL,
-        useFactory: (conn: Connection) => {
-            return conn.model<EnterpriseModel>("Enterprise", EnterpriseSchema, "enterprises");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: INTRODUCTION_MODEL,
-        useFactory: (conn: Connection) => {
-            return conn.model<IntroductionModel>("Introduction", IntroductionSchema, "introductions");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: NOTIFICATION_MODEL,
-        useFactory: (conn: Connection) => {
-            return conn.model<NotificationModel>("Notification", NotificationSchema, "notifications");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: PREMIUM_MODEL,
-        useFactory: (conn: Connection) => {
-            return conn.model<PremiumModel>("Premium", PremiumSchema, "premiums");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: PURCHASE_MODEL,
-        useFactory: (conn: Connection) => {
-            return conn.model<PurchaseModel>("Purchase", PurchaseSchema, "purchaseds");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: SCHEDULE_MODEL,
-        useFactory: (conn: Connection) => {
-            return conn.model<ScheduleModel>("Schedule", ScheduleSchema, "schedules");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: SCHEDULE_HISTORY_MODEL,
-        useFactory: (conn: Connection) => {
-            return conn.model<ScheduleHistoryModel>("ScheduleHistory", ScheduleHistorySchema, "schedule_historys");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: SERVICE_MODEL,
-        useFactory: (conn: Connection)=>{
-            return conn.model<ServiceModel>("Service", ServiceSchema, "services");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: CATEGORY_MODEL,
-        useFactory: (conn: Connection)=>{
-            return conn.model<ServiceModel>("Category", CategorySchema, "categories");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: SCORE_MODEL,
-        useFactory: (conn: Connection)=>{
-            return conn.model<ScoreModel>("Score", ScoreSchema, "scores");
-        },
-        inject: [DB_CONNECTION]
-    },
-    {
-        provide: PURCHASE_TEMP_MODEL,
-        useFactory: (conn: Connection)=>{
-            return conn.model<PurchaseTempModel>("PurchaseTemp", PurchaseTempSchema, "purchase_temps");
-        },
-        inject: [DB_CONNECTION]
-    }
-
 
 ];

@@ -10,26 +10,17 @@ exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
-const local_strategy_1 = require("./strategy/local.strategy");
 const jwt_1 = require("@nestjs/jwt");
 const database_module_1 = require("../database/database.module");
-const user_module_1 = require("../user/user.module");
 const config_1 = require("@nestjs/config");
 const jwtConfig_config_1 = require("../config/jwtConfig.config");
-const jwt_strategy_1 = require("./strategy/jwt.strategy");
-const passport_1 = require("@nestjs/passport");
-const enterprise_module_1 = require("../enterprise/enterprise.module");
-const local_enterprise_strategy_1 = require("./strategy/local-enterprise.strategy");
-const jwt_enterprise_strategy_1 = require("./strategy/jwt-enterprise.strategy");
-const local_admin_strategy_1 = require("./strategy/local-admin.strategy");
-const jwt_admin_strategy_1 = require("./strategy/jwt-admin.strategy");
+const axios_1 = require("@nestjs/axios");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forFeature(jwtConfig_config_1.default),
-            passport_1.PassportModule.register({ defaultStrategy: "jwt" }),
             jwt_1.JwtModule.registerAsync({
                 imports: [
                     config_1.ConfigModule.forFeature(jwtConfig_config_1.default)
@@ -47,11 +38,10 @@ AuthModule = __decorate([
                 ]
             }),
             database_module_1.DatabaseModule,
-            user_module_1.UserModule,
-            enterprise_module_1.EnterpriseModule
+            axios_1.HttpModule
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, local_strategy_1.LocalStrategy, jwt_strategy_1.JwtStrategy, local_enterprise_strategy_1.LocalEnterpriseStrategy, jwt_enterprise_strategy_1.JwtEnterpriseStrategy, local_admin_strategy_1.LocalAdminStrategy, jwt_admin_strategy_1.JwtAdminStrategy],
+        providers: [auth_service_1.AuthService],
         exports: [auth_service_1.AuthService]
     })
 ], AuthModule);

@@ -1,24 +1,16 @@
 import { Module } from "@nestjs/common";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { LocalStrategy } from "./strategy/local.strategy";
 import { JwtModule, JwtModuleOptions } from "@nestjs/jwt";
 import { DatabaseModule } from "../database/database.module";
-import { UserModule } from "../user/user.module";
 import { ConfigModule, ConfigType } from "@nestjs/config";
 import jwtConfig from "../config/jwtConfig.config";
-import { JwtStrategy } from "./strategy/jwt.strategy";
-import { PassportModule } from "@nestjs/passport";
-import { EnterpriseModule } from "../enterprise/enterprise.module";
-import { LocalEnterpriseStrategy } from "./strategy/local-enterprise.strategy";
-import { JwtEnterpriseStrategy } from "./strategy/jwt-enterprise.strategy";
-import { LocalAdminStrategy } from "./strategy/local-admin.strategy";
-import { JwtAdminStrategy } from "./strategy/jwt-admin.strategy";
+import { HttpModule } from '@nestjs/axios';
+
 
 @Module({
     imports: [
         ConfigModule.forFeature(jwtConfig),
-        PassportModule.register({ defaultStrategy: "jwt" }),
         JwtModule.registerAsync({
             imports: [
                 ConfigModule.forFeature(jwtConfig)
@@ -36,11 +28,10 @@ import { JwtAdminStrategy } from "./strategy/jwt-admin.strategy";
             ]
         }),
         DatabaseModule,
-        UserModule,
-        EnterpriseModule
+        HttpModule
     ],
     controllers: [AuthController],
-    providers: [AuthService, LocalStrategy, JwtStrategy, LocalEnterpriseStrategy, JwtEnterpriseStrategy, LocalAdminStrategy, JwtAdminStrategy],
+    providers: [AuthService],
     exports: [AuthService]
 })
 export class AuthModule {

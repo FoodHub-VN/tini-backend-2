@@ -32,29 +32,6 @@ async function postDeleteHook(user) {
     const comments = this.model;
 }
 UserSchema.pre("save", preSaveHook);
-UserSchema.post("remove", async function (user) {
-    const comments = await this.model("Comment").find({ user: this._id }).exec();
-    comments && await Promise.all(comments.map((comment) => {
-        return comment.remove();
-    }));
-    const notis = await this.model("Notification").find({ user: this._id }).exec();
-    notis && await Promise.all(notis.map((noti) => {
-        return noti.remove();
-    }));
-    const scheduleHistories = await this.model("ScheduleHistory").find({ user: this._id }).exec();
-    scheduleHistories && await Promise.all(scheduleHistories.map((scheduleHistory) => {
-        return scheduleHistory.remove();
-    }));
-    const purchaseHistories = await this.model("Purchase").find({ user: this._id }).exec();
-    purchaseHistories && await Promise.all(purchaseHistories.map((purchaseHistory) => {
-        return purchaseHistory.remove();
-    }));
-    const schedules = await this.model("Schedule").find({ user: this._id }).exec();
-    schedules && await Promise.all(schedules.map((schedule) => {
-        return schedule.remove();
-    }));
-    return;
-});
 function comparePasswordMethod(password) {
     return (0, rxjs_1.from)((0, bcrypt_1.compare)(password, this.password));
 }

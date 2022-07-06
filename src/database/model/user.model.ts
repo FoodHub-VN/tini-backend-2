@@ -1,11 +1,6 @@
 import { Document, Model, Schema, SchemaTypes } from "mongoose";
 import { from, Observable } from "rxjs";
 import { compare, hash } from "bcrypt";
-import { CommentModel } from "./comment.model";
-import { NotificationModel } from "./notification.model";
-import { ScheduleHistoryModel } from "./schedule-history.model";
-import { PurchaseModel } from "./purchase-history.model";
-import { ScheduleModel } from "./schedule";
 import { FileUploaded } from "../../upload/interface/upload.interface";
 
 export interface Address extends Object {
@@ -67,41 +62,41 @@ async function postDeleteHook(user) {
 
 
 UserSchema.pre<User>("save", preSaveHook);
-UserSchema.post<User>("remove", async function(user) {
-    //delete comment
-    const comments = await this.model<CommentModel>("Comment").find({ user: this._id }).exec();
-    comments&&await Promise.all(comments.map((comment) => {
-        return comment.remove();
-    }));
-
-    //delete notification
-
-    const notis = await this.model<NotificationModel>("Notification").find({ user: this._id }).exec();
-    notis&&await Promise.all(notis.map((noti) => {
-        return noti.remove();
-    }));
-
-    //delete schedule history
-
-    const scheduleHistories = await this.model<ScheduleHistoryModel>("ScheduleHistory").find({ user: this._id }).exec();
-    scheduleHistories&&await Promise.all(scheduleHistories.map((scheduleHistory) => {
-        return scheduleHistory.remove();
-    }));
-
-    //delete purchase history
-    const purchaseHistories = await this.model<PurchaseModel>("Purchase").find({ user: this._id }).exec();
-    purchaseHistories&&await Promise.all(purchaseHistories.map((purchaseHistory) => {
-        return purchaseHistory.remove();
-    }));
-
-    //delete schedule
-
-    const schedules = await this.model<ScheduleModel>("Schedule").find({ user: this._id}).exec();
-    schedules&&await Promise.all(schedules.map((schedule) => {
-        return schedule.remove();
-    }))
-    return;
-});
+// UserSchema.post<User>("remove", async function(user) {
+//     //delete comment
+//     const comments = await this.model<CommentModel>("Comment").find({ user: this._id }).exec();
+//     comments&&await Promise.all(comments.map((comment) => {
+//         return comment.remove();
+//     }));
+//
+//     //delete notification
+//
+//     const notis = await this.model<NotificationModel>("Notification").find({ user: this._id }).exec();
+//     notis&&await Promise.all(notis.map((noti) => {
+//         return noti.remove();
+//     }));
+//
+//     //delete schedule history
+//
+//     const scheduleHistories = await this.model<ScheduleHistoryModel>("ScheduleHistory").find({ user: this._id }).exec();
+//     scheduleHistories&&await Promise.all(scheduleHistories.map((scheduleHistory) => {
+//         return scheduleHistory.remove();
+//     }));
+//
+//     //delete purchase history
+//     const purchaseHistories = await this.model<PurchaseModel>("Purchase").find({ user: this._id }).exec();
+//     purchaseHistories&&await Promise.all(purchaseHistories.map((purchaseHistory) => {
+//         return purchaseHistory.remove();
+//     }));
+//
+//     //delete schedule
+//
+//     const schedules = await this.model<ScheduleModel>("Schedule").find({ user: this._id}).exec();
+//     schedules&&await Promise.all(schedules.map((schedule) => {
+//         return schedule.remove();
+//     }))
+//     return;
+// });
 function comparePasswordMethod(password: string): Observable<boolean> {
     return from(compare(password, this.password));
 }

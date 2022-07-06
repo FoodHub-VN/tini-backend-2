@@ -15,90 +15,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
-const local_auth_guard_1 = require("./guard/local-auth.guard");
-const rxjs_1 = require("rxjs");
-const jwt_auth_guard_1 = require("./guard/jwt-auth.guard");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    login(req, res) {
-        return this.authService.login(req.user).pipe((0, rxjs_1.map)((r) => {
-            return res
-                .header("Authorization", "Bearer " + r.accessToken)
-                .json(r)
-                .send();
-        }));
-    }
-    loginEnterprise(req, res) {
-        return this.authService.loginEnterprise(req.user).pipe((0, rxjs_1.map)((token) => {
-            return res
-                .header("Authorization", "Bearer " + token.accessToken)
-                .json(token)
-                .send();
-        }));
-    }
-    loginAdmin(req, res) {
-        return this.authService.loginAdmin(req.user).pipe((0, rxjs_1.map)((token) => {
-            return res
-                .header("Authorization", "Bearer " + token.accessToken)
-                .json(token)
-                .send();
-        }));
-    }
-    testJwt(req, res) {
-        return (0, rxjs_1.of)(res.status(common_1.HttpStatus.OK).send(req.user));
-    }
-    checkTokenUser(res) {
-        return (0, rxjs_1.of)(res.status(common_1.HttpStatus.OK).send());
+    getToken(res, data) {
+        this.authService.sign(data);
+        return res.status(common_1.HttpStatus.OK).send({ hello: "hello" });
     }
 };
 __decorate([
-    (0, common_1.UseGuards)(local_auth_guard_1.LocalAuthGuard),
-    (0, common_1.Post)("/login"),
-    __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", rxjs_1.Observable)
-], AuthController.prototype, "login", null);
-__decorate([
-    (0, common_1.UseGuards)(local_auth_guard_1.LocalEnterpriseAuthGuard),
-    (0, common_1.Post)("/login-enterprise"),
-    __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", rxjs_1.Observable)
-], AuthController.prototype, "loginEnterprise", null);
-__decorate([
-    (0, common_1.UseGuards)(local_auth_guard_1.LocalAdminAuthGuard),
-    (0, common_1.Post)("/login-admin"),
-    __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", rxjs_1.Observable)
-], AuthController.prototype, "loginAdmin", null);
-__decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Post)("/testJwt"),
-    __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", rxjs_1.Observable)
-], AuthController.prototype, "testJwt", null);
-__decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Get)('/check-token-user'),
+    (0, common_1.Post)(''),
     __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", rxjs_1.Observable)
-], AuthController.prototype, "checkTokenUser", null);
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "getToken", null);
 AuthController = __decorate([
-    (0, common_1.Controller)("auth"),
+    (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
 exports.AuthController = AuthController;
