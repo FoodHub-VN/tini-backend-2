@@ -41,49 +41,7 @@ services:
       - TZ=Asia/Ho_Chi_Minh
     logging:
       driver: none
-  ai:
-    image: lvai2
-    build:
-      context: ./AI
-    ports:
-      - "5005:5000"
-    environment:
-      - FLASK_ENV=development
-      - FLASK_APP=bkservice.py
-      - TZ=Asia/Ho_Chi_Minh
-    stdin_open: true
-    tty: true
-  client-customer:
-    image: lv-client-customer
-    ports:
-      - "80:5000"
-    build:
-      context: ../client_customer/BK-Service
-    env_file:
-      - ./.env
-    environment:
-      - REACT_APP_SOCKET_URI= http://3.104.91.35:8080
-      - REACT_APP_SOCKET_URI_DEV= http://localhost:8080
-      - REACT_APP_API_URL_DEV = http://localhost:3007
-      - REACT_APP_API_URL = http://3.104.91.35:3007
-      - TZ=Asia/Ho_Chi_Minh
-    stdin_open: true
-    tty: true
-  client-enterprise:
-    image: lv-client
-    ports:
-      - "81:4000"
-    build:
-      context: ../client_enterprise/BK-Service
-    env_file:
-      - ./.env
-    environment:
-      - REACT_APP_SOCKET_URI= http://3.104.91.35:8080
-      - REACT_APP_SOCKET_URI_DEV= http://localhost:8080
-      - REACT_APP_API_URL_DEV = http://localhost:3007
-      - REACT_APP_API_URL = http://3.104.91.35:3007
-      - TZ=Asia/Ho_Chi_Minh
-    stdin_open: true
-    tty: true
+
+
 volumes:
   db:

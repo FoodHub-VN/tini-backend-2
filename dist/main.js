@@ -8,10 +8,10 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, { cors: true });
     app.useGlobalPipes(new common_1.ValidationPipe({ transform: true, whitelist: true }));
     const config = new swagger_1.DocumentBuilder()
-        .setTitle("[BK Student APIs]")
-        .setDescription("The RESTful APIs from me")
+        .setTitle("[FoodHub APIs]")
+        .setDescription("The RESTful APIs from super dev")
         .setVersion('1.0')
-        .addTag('BK')
+        .addTag('FoodHub')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('api', app, document);
