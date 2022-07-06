@@ -1,21 +1,8 @@
-import {
-    CATEGORY_MODEL,
-    COMMENT_MODEL,
-    DB_CONNECTION,
-    ENTERPRISE_MODEL,
-    INTRODUCTION_MODEL,
-    NOTIFICATION_MODEL,
-    PREMIUM_MODEL,
-    PURCHASE_MODEL, PURCHASE_TEMP_MODEL,
-    SCHEDULE_HISTORY_MODEL,
-    SCHEDULE_MODEL, SCORE_MODEL,
-    SERVICE_MODEL,
-    USER_MODEL
-} from "./database.constants";
-import { ConfigType } from "@nestjs/config";
-import mongodbConfig from "../config/mongodb.config";
-import { Connection, createConnection } from "mongoose";
-import { User, UserSchema } from "./model/user.model";
+import { DB_CONNECTION, USER_MODEL } from './database.constants';
+import { ConfigType } from '@nestjs/config';
+import mongodbConfig from '../config/mongodb.config';
+import { Connection, createConnection } from 'mongoose';
+import { User, UserSchema } from './model/user.model';
 
 export const dbProviders = [
     {
