@@ -16,7 +16,7 @@ let AuthService = class AuthService {
     constructor(httpService) {
         this.httpService = httpService;
     }
-    sign(body) {
+    async sign(body) {
         const crypto = require("crypto");
         const client_key = "LV4EkhlTiHL7dIqfxaDrVHMEzkvElxFi";
         const client_secret = "zgnh0TK_XyH@:0NS5TQ90nlC:onqTeXtGWlILuiV~dO~Q6mnqImzHhvaZ_wgbCCm";
@@ -39,7 +39,7 @@ let AuthService = class AuthService {
         const signature = sign(client_secret, encodedPayload);
         console.log("signature: ", signature);
         let url = "https://api.tiki.vn/tiniapp-open-api/oauth/auth/token";
-        this.httpService.post(url, Object.assign({}, body), {
+        return this.httpService.post(url, Object.assign({}, body), {
             headers: {
                 "Content-Type": "application/json",
                 "X-Tiniapp-Client-Id": client_key,
@@ -47,8 +47,9 @@ let AuthService = class AuthService {
                 "X-Tiniapp-Timestamp": timestamp
             }
         }).toPromise().then((r) => {
-            console.log("success", r.data);
+            return r.data;
         }).catch(e => {
+            throw new common_1.BadRequestException("Auth code wrong!");
         });
     }
 };

@@ -10,8 +10,4 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-  @Get('/upload/:name')
-  getImage(@Res() res: Response, @Param('name') name: string) {
-    return res.sendFile(name, {root: "./upload"});
-  }
 }

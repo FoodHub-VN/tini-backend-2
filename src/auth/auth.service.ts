@@ -1,16 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { catchError, map } from 'rxjs';
+import { GetTokenDto } from './dto/get-token.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly httpService: HttpService
   ) {
-
   }
 
-  sign(body: any){
+  async sign(body: GetTokenDto){
     const crypto = require("crypto");
 
     const client_key = "LV4EkhlTiHL7dIqfxaDrVHMEzkvElxFi";
@@ -38,7 +37,7 @@ export class AuthService {
     const signature = sign(client_secret, encodedPayload);
     console.log("signature: ", signature);
     let url = "https://api.tiki.vn/tiniapp-open-api/oauth/auth/token";
-    this.httpService.post(url, {
+    return this.httpService.post(url, {
       ...body
     }, {
       headers: {
@@ -48,9 +47,9 @@ export class AuthService {
         "X-Tiniapp-Timestamp": timestamp
       }
     }).toPromise().then((r)=>{
-      console.log("success", r.data);
+      return r.data;
     }).catch(e=>{
-      // console.log("err");
+      throw new BadRequestException("Auth code wrong!");
     })
 // payload:  1620621619569.RLCKb7Ae9kx4DXtXsCWjnDXtggFnM43W.{"id":123}
 // encoded_payload:  MTYyMDYyMTYxOTU2OS5STENLYjdBZTlreDREWHRYc0NXam5EWHRnZ0ZuTTQzVy57ImlkIjoxMjN9

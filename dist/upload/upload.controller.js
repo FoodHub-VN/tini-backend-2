@@ -15,20 +15,41 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
+const upload_service_1 = require("./upload.service");
+const swagger_1 = require("@nestjs/swagger");
 let UploadController = class UploadController {
-    upload(file) {
+    constructor(uploadService) {
+        this.uploadService = uploadService;
+    }
+    async upload(file, res) {
+        let success = await this.uploadService.upload(file);
+        return res.status(success ? common_1.HttpStatus.OK : common_1.HttpStatus.BAD_REQUEST).send();
     }
 };
 __decorate([
     (0, common_1.Post)('/upload'),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
+    }),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     __param(0, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
 ], UploadController.prototype, "upload", null);
 UploadController = __decorate([
-    (0, common_1.Controller)()
+    (0, common_1.Controller)(),
+    __metadata("design:paramtypes", [upload_service_1.FileUploadService])
 ], UploadController);
 exports.UploadController = UploadController;
 //# sourceMappingURL=upload.controller.js.map

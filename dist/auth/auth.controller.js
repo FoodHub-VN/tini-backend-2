@@ -15,22 +15,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
+const get_token_dto_1 = require("./dto/get-token.dto");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    getToken(res, data) {
-        this.authService.sign(data);
-        return res.status(common_1.HttpStatus.OK).send({ hello: "hello" });
+    async getToken(res, data) {
+        let authCode = await this.authService.sign(data);
+        return res.status(common_1.HttpStatus.OK).send({ authCode });
     }
 };
 __decorate([
-    (0, common_1.Post)(''),
+    (0, common_1.Post)('/getAuthToken'),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object, get_token_dto_1.GetTokenDto]),
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getToken", null);
 AuthController = __decorate([
     (0, common_1.Controller)('auth'),
