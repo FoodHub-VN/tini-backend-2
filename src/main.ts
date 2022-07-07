@@ -2,12 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {readFileSync} from 'fs'
 
 async function bootstrap() {
-  let fs = require('fs');
   const httpsOptions = {
-    key: fs.readFileSync('./ssl/0000_key-certbot.pem'),
-    cert: fs.readFileSync('./ssl/0000_csr-certbot.pem'),
+    key: readFileSync('./ssl/0000_key-certbot.pem'),
+    cert: readFileSync('./ssl/0000_csr-certbot.pem'),
   };
   const app = await NestFactory.create(AppModule, {cors: true, httpsOptions});
   app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true}));
