@@ -6,8 +6,8 @@ import {readFileSync} from 'fs'
 
 async function bootstrap() {
   const httpsOptions = {
-    key: readFileSync('./ssl/0000_key-certbot.pem', 'utf8'),
-    cert: readFileSync('./ssl/0000_csr-certbot.pem', 'utf8'),
+    key: readFileSync('./ssl/private.key', 'utf8'),
+    cert: readFileSync('./ssl/public.crt', 'utf8'),
   };
   const app = await NestFactory.create(AppModule, {cors: true, httpsOptions});
   app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true}));
