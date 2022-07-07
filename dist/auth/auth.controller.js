@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const get_token_dto_1 = require("./dto/get-token.dto");
 const tini_guard_1 = require("./guard/tini.guard");
+const swagger_1 = require("@nestjs/swagger");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -39,6 +40,7 @@ __decorate([
 ], AuthController.prototype, "getToken", null);
 __decorate([
     (0, common_1.Post)('/testToken'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Req)()),
