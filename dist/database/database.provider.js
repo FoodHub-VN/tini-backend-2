@@ -5,6 +5,8 @@ const database_constants_1 = require("./database.constants");
 const mongodb_config_1 = require("../config/mongodb.config");
 const mongoose_1 = require("mongoose");
 const user_model_1 = require("./model/user.model");
+const post_model_1 = require("./model/post.model");
+const comment_model_1 = require("./model/comment.model");
 exports.dbProviders = [
     {
         provide: database_constants_1.DB_CONNECTION,
@@ -20,5 +22,19 @@ exports.dbProviders = [
         },
         inject: [database_constants_1.DB_CONNECTION]
     },
+    {
+        provide: database_constants_1.POST_MODEL,
+        useFactory: (conn) => {
+            return conn.model("Post", post_model_1.PostSchema, "posts");
+        },
+        inject: [database_constants_1.DB_CONNECTION]
+    },
+    {
+        provide: database_constants_1.COMMENT_MODEL,
+        useFactory: (conn) => {
+            return conn.model("Comment", comment_model_1.CommentSchema, "comments");
+        },
+        inject: [database_constants_1.DB_CONNECTION]
+    }
 ];
 //# sourceMappingURL=database.provider.js.map

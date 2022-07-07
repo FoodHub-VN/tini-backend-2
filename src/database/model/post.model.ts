@@ -1,38 +1,59 @@
 import { Document, Model, Schema, SchemaTypes } from 'mongoose';
 
-interface User extends Document {
-    readonly name: string;
-    readonly id: string;
-    readonly follower: string;
+interface Post extends Document {
+  readonly owner: string;
+  readonly title: string;
+  readonly description: string;
+  readonly hashtag: string[];
+  readonly upVotedBy: string[];
+  readonly downVotedBy: string[];
+  readonly numView: number;
+  readonly comment: string[];
+  readonly visitedTime: number;
 }
 
-type UserModel = Model<User>;
+type PostModel = Model<Post>;
 
-const UserSchema = new Schema<User>({
-    name: SchemaTypes.String,
-    id: SchemaTypes.String,
-    follower: [{
-        type: SchemaTypes.ObjectId,
-        ref: 'User'
-    }]
+const PostSchema = new Schema<Post>({
+  owner: {
+    type: SchemaTypes.ObjectId,
+    ref: 'User'
+  },
+  title: SchemaTypes.String,
+  description: SchemaTypes.String,
+  hashtag: [SchemaTypes.String],
+  upVotedBy: [{
+    type: SchemaTypes.ObjectId,
+    ref: 'User',
+  }],
+  downVotedBy: [{
+    type: SchemaTypes.ObjectId,
+    ref: 'User',
+  }],
+  numView: SchemaTypes.Number,
+  comment: [{
+    type: SchemaTypes.ObjectId,
+    ref: 'Comment',
+  }],
+  visitedTime: SchemaTypes.Number,
 }, {
-    timestamps: true,
+  timestamps: true,
 });
 
 // async function preSaveHook(next) {
-//     // Only run this function if password was modified
-//     if (!this.isModified('password')) return next();
+//   // Only run this function if password was modified
+//   if (!this.isModified('password')) return next();
 //
-//     // Hash the password
-//     const password = await hash(this.password, 12);
-//     this.set("password", password);
+//   // Hash the password
+//   const password = await hash(this.password, 12);
+//   this.set("password", password);
 //
-//     next();
+//   next();
 // }
 //
 // async function postDeleteHook(user) {
-//     //delete all comment
-//     const comments = this.model;
+//   //delete all comment
+//   const comments = this.model;
 // }
 //
 //
@@ -73,14 +94,14 @@ const UserSchema = new Schema<User>({
 //     return;
 // });
 // function comparePasswordMethod(password: string): Observable<boolean> {
-//     return from(compare(password, this.password));
+//   return from(compare(password, this.password));
 // }
 
 
 // UserSchema.methods.comparePassword = comparePasswordMethod;
 
 export {
-    User,
-    UserSchema,
-    UserModel,
+  Post,
+  PostModel,
+  PostSchema,
 };

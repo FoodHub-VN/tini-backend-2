@@ -1,8 +1,7 @@
-import { CanActivate, ExecutionContext } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import { Observable } from "rxjs";
+import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { AuthService } from '../auth.service';
 export declare class TiniGuard implements CanActivate {
-    private readonly reflector;
-    constructor(reflector: Reflector);
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean>;
+    private readonly authService;
+    constructor(authService: AuthService);
+    canActivate(context: ExecutionContext): Promise<boolean>;
 }

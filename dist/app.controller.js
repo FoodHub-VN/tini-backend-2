@@ -15,15 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 const app_service_1 = require("./app.service");
+const tini_guard_1 = require("./auth/guard/tini.guard");
 let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
     }
-    getHello() {
+    getHello(req) {
+        console.log(req.user);
         return this.appService.getHello();
     }
-    testPut(res) {
-        return res.status(common_1.HttpStatus.OK).send({ status: "Success!" });
+    testPut(res, req) {
+        return res.status(common_1.HttpStatus.OK).send({ status: "Success!", user: req.user });
     }
     testDelete(res) {
         return res.status(common_1.HttpStatus.OK).send({ status: "Success!" });
@@ -31,15 +33,19 @@ let AppController = class AppController {
 };
 __decorate([
     (0, common_1.Get)(),
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello", null);
 __decorate([
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
     (0, common_1.Put)('/testPut'),
     __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], AppController.prototype, "testPut", null);
 __decorate([

@@ -16,13 +16,17 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const get_token_dto_1 = require("./dto/get-token.dto");
+const tini_guard_1 = require("./guard/tini.guard");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
     async getToken(res, data) {
-        let authCode = await this.authService.sign(data);
+        let authCode = await this.authService.exchangeToAccessToken(data);
         return res.status(common_1.HttpStatus.OK).send({ authCode });
+    }
+    async testToken(res, req) {
+        return res.status(common_1.HttpStatus.OK).send({ user: req.user });
     }
 };
 __decorate([
@@ -33,6 +37,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, get_token_dto_1.GetTokenDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getToken", null);
+__decorate([
+    (0, common_1.Post)('/testToken'),
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "testToken", null);
 AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

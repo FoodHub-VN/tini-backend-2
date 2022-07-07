@@ -1,20 +1,22 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { GetTokenDto } from './dto/get-token.dto';
+import { bind } from 'lodash';
+import { AuthUserInterface } from './interface/auth-user.interface';
 
 @Injectable()
 export class AuthService {
+  private client_key: string;
+  private client_secret: string;
   constructor(
     private readonly httpService: HttpService
   ) {
+    this.client_key = "LV4EkhlTiHL7dIqfxaDrVHMEzkvElxFi";
+    this.client_secret = "zgnh0TK_XyH@:0NS5TQ90nlC:onqTeXtGWlILuiV~dO~Q6mnqImzHhvaZ_wgbCCm";
   }
 
-  async sign(body: GetTokenDto){
+  async sign(body: any){
     const crypto = require("crypto");
-
-    const client_key = "LV4EkhlTiHL7dIqfxaDrVHMEzkvElxFi";
-    const client_secret = "zgnh0TK_XyH@:0NS5TQ90nlC:onqTeXtGWlILuiV~dO~Q6mnqImzHhvaZ_wgbCCm";
-
     const timestamp = Date.now();
 
     function base64URLEncode(data) {
@@ -22,27 +24,38 @@ export class AuthService {
       return base64.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
     }
 
-    function sign(secret, payload) {
+    let sign = (secret, payload)=> {
       const signature = crypto
-        .createHmac("sha256", client_secret)
+        .createHmac("sha256", this.client_secret)
         .update(payload)
         .digest("hex");
       return signature;
     }
 
-    const payload = timestamp + '.' + client_key + '.' + JSON.stringify(body);
+    const payload = timestamp + '.' + this.client_key + '.' + JSON.stringify(body);
     console.log("payload: ", payload);
     const encodedPayload = base64URLEncode(payload);
     console.log("encoded_payload: ", encodedPayload);
-    const signature = sign(client_secret, encodedPayload);
+    const signature = sign(this.client_secret, encodedPayload);
     console.log("signature: ", signature);
+    return { signature, timestamp };
+
+// payload:  1620621619569.RLCKb7Ae9kx4DXtXsCWjnDXtggFnM43W.{"id":123}
+// encoded_payload:  MTYyMDYyMTYxOTU2OS5STENLYjdBZTlreDREWHRYc0NXam5EWHRnZ0ZuTTQzVy57ImlkIjoxMjN9
+// signature:  8ebd092b9df2cf90e8ccbcab2ba87ee14f2abb25eb8f18b4d7286d42adcd45c2
+
+
+  }
+
+  async exchangeToAccessToken(body: GetTokenDto){
+    let { signature, timestamp } = await this.sign(body);
     let url = "https://api.tiki.vn/tiniapp-open-api/oauth/auth/token";
     return this.httpService.post(url, {
       ...body
     }, {
       headers: {
         "Content-Type": "application/json",
-        "X-Tiniapp-Client-Id": client_key,
+        "X-Tiniapp-Client-Id": this.client_key,
         "X-Tiniapp-Signature": signature,
         "X-Tiniapp-Timestamp": timestamp
       }
@@ -51,11 +64,26 @@ export class AuthService {
     }).catch(e=>{
       throw new BadRequestException("Auth code wrong!");
     })
-// payload:  1620621619569.RLCKb7Ae9kx4DXtXsCWjnDXtggFnM43W.{"id":123}
-// encoded_payload:  MTYyMDYyMTYxOTU2OS5STENLYjdBZTlreDREWHRYc0NXam5EWHRnZ0ZuTTQzVy57ImlkIjoxMjN9
-// signature:  8ebd092b9df2cf90e8ccbcab2ba87ee14f2abb25eb8f18b4d7286d42adcd45c2
-
-
+  }
+  async validateToken(token: string): Promise<AuthUserInterface>{
+    //validate accessToken from tini
+    let obj = {
+      access_token: token.split("Bearer ")[1]
+    }
+    let { signature, timestamp } = await this.sign(obj);
+    let url = "https://api.tiki.vn/tiniapp-open-api/oauth/me";
+    return this.httpService.post(url, obj, {
+      headers: {
+        "Content-Type": "application/json",
+        "X-Tiniapp-Client-Id": this.client_key,
+        "X-Tiniapp-Signature": signature,
+        "X-Tiniapp-Timestamp": timestamp
+      }
+    }).toPromise().then((r)=>{
+      return r.data.data as AuthUserInterface;
+    }).catch(e=>{
+      throw new BadRequestException("Auth code wrong!");
+    })
   }
 
 }

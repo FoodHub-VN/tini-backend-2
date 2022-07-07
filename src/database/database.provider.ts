@@ -1,8 +1,10 @@
-import { DB_CONNECTION, USER_MODEL } from './database.constants';
+import { COMMENT_MODEL, DB_CONNECTION, POST_MODEL, USER_MODEL } from './database.constants';
 import { ConfigType } from '@nestjs/config';
 import mongodbConfig from '../config/mongodb.config';
 import { Connection, createConnection } from 'mongoose';
 import { User, UserSchema } from './model/user.model';
+import { Post, PostSchema } from './model/post.model';
+import { CommentSchema } from './model/comment.model';
 
 export const dbProviders = [
     {
@@ -19,5 +21,19 @@ export const dbProviders = [
         },
         inject: [DB_CONNECTION]
     },
+    {
+        provide: POST_MODEL,
+        useFactory: (conn: Connection) => {
+            return conn.model<Post>("Post", PostSchema, "posts");
+        },
+        inject: [DB_CONNECTION]
+    },
+    {
+        provide: COMMENT_MODEL,
+        useFactory: (conn: Connection) => {
+            return conn.model<Comment>("Comment", CommentSchema, "comments");
+        },
+        inject: [DB_CONNECTION]
+    }
 
 ];

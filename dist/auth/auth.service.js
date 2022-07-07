@@ -15,39 +15,62 @@ const axios_1 = require("@nestjs/axios");
 let AuthService = class AuthService {
     constructor(httpService) {
         this.httpService = httpService;
+        this.client_key = "LV4EkhlTiHL7dIqfxaDrVHMEzkvElxFi";
+        this.client_secret = "zgnh0TK_XyH@:0NS5TQ90nlC:onqTeXtGWlILuiV~dO~Q6mnqImzHhvaZ_wgbCCm";
     }
     async sign(body) {
         const crypto = require("crypto");
-        const client_key = "LV4EkhlTiHL7dIqfxaDrVHMEzkvElxFi";
-        const client_secret = "zgnh0TK_XyH@:0NS5TQ90nlC:onqTeXtGWlILuiV~dO~Q6mnqImzHhvaZ_wgbCCm";
         const timestamp = Date.now();
         function base64URLEncode(data) {
             const base64 = Buffer.from(data, "utf8").toString("base64");
             return base64.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
         }
-        function sign(secret, payload) {
+        let sign = (secret, payload) => {
             const signature = crypto
-                .createHmac("sha256", client_secret)
+                .createHmac("sha256", this.client_secret)
                 .update(payload)
                 .digest("hex");
             return signature;
-        }
-        const payload = timestamp + '.' + client_key + '.' + JSON.stringify(body);
+        };
+        const payload = timestamp + '.' + this.client_key + '.' + JSON.stringify(body);
         console.log("payload: ", payload);
         const encodedPayload = base64URLEncode(payload);
         console.log("encoded_payload: ", encodedPayload);
-        const signature = sign(client_secret, encodedPayload);
+        const signature = sign(this.client_secret, encodedPayload);
         console.log("signature: ", signature);
+        return { signature, timestamp };
+    }
+    async exchangeToAccessToken(body) {
+        let { signature, timestamp } = await this.sign(body);
         let url = "https://api.tiki.vn/tiniapp-open-api/oauth/auth/token";
         return this.httpService.post(url, Object.assign({}, body), {
             headers: {
                 "Content-Type": "application/json",
-                "X-Tiniapp-Client-Id": client_key,
+                "X-Tiniapp-Client-Id": this.client_key,
                 "X-Tiniapp-Signature": signature,
                 "X-Tiniapp-Timestamp": timestamp
             }
         }).toPromise().then((r) => {
             return r.data;
+        }).catch(e => {
+            throw new common_1.BadRequestException("Auth code wrong!");
+        });
+    }
+    async validateToken(token) {
+        let obj = {
+            access_token: token.split("Bearer ")[1]
+        };
+        let { signature, timestamp } = await this.sign(obj);
+        let url = "https://api.tiki.vn/tiniapp-open-api/oauth/me";
+        return this.httpService.post(url, obj, {
+            headers: {
+                "Content-Type": "application/json",
+                "X-Tiniapp-Client-Id": this.client_key,
+                "X-Tiniapp-Signature": signature,
+                "X-Tiniapp-Timestamp": timestamp
+            }
+        }).toPromise().then((r) => {
+            return r.data.data;
         }).catch(e => {
             throw new common_1.BadRequestException("Auth code wrong!");
         });

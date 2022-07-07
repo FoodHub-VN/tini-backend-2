@@ -1,38 +1,45 @@
 import { Document, Model, Schema, SchemaTypes } from 'mongoose';
+import { PostSchema } from './post.model';
 
-interface User extends Document {
-    readonly name: string;
-    readonly id: string;
-    readonly follower: string;
+interface Comment extends Document {
+  readonly owner: string;
+  readonly title: string;
+  readonly content: string;
+  readonly timeComment: number;
 }
 
-type UserModel = Model<User>;
+type CommentModel = Model<Comment>;
 
-const UserSchema = new Schema<User>({
-    name: SchemaTypes.String,
-    id: SchemaTypes.String,
-    follower: [{
-        type: SchemaTypes.ObjectId,
-        ref: 'User'
-    }]
+const CommentSchema = new Schema<Comment>({
+  owner: {
+    type: SchemaTypes.ObjectId,
+    ref: 'User'
+  },
+  post: {
+    type: SchemaTypes.ObjectId,
+    ref: 'Post'
+  },
+  title: SchemaTypes.String,
+  content: SchemaTypes.String,
+  timeComment: SchemaTypes.Number,
 }, {
-    timestamps: true,
+  timestamps: true,
 });
 
 // async function preSaveHook(next) {
-//     // Only run this function if password was modified
-//     if (!this.isModified('password')) return next();
+//   // Only run this function if password was modified
+//   if (!this.isModified('password')) return next();
 //
-//     // Hash the password
-//     const password = await hash(this.password, 12);
-//     this.set("password", password);
+//   // Hash the password
+//   const password = await hash(this.password, 12);
+//   this.set("password", password);
 //
-//     next();
+//   next();
 // }
 //
 // async function postDeleteHook(user) {
-//     //delete all comment
-//     const comments = this.model;
+//   //delete all comment
+//   const comments = this.model;
 // }
 //
 //
@@ -73,14 +80,14 @@ const UserSchema = new Schema<User>({
 //     return;
 // });
 // function comparePasswordMethod(password: string): Observable<boolean> {
-//     return from(compare(password, this.password));
+//   return from(compare(password, this.password));
 // }
 
 
 // UserSchema.methods.comparePassword = comparePasswordMethod;
 
 export {
-    User,
-    UserSchema,
-    UserModel,
+  Comment,
+  CommentModel,
+  CommentSchema,
 };

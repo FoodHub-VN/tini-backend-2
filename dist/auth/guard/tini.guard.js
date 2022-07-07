@@ -11,18 +11,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TiniGuard = void 0;
 const common_1 = require("@nestjs/common");
-const core_1 = require("@nestjs/core");
+const auth_service_1 = require("../auth.service");
 let TiniGuard = class TiniGuard {
-    constructor(reflector) {
-        this.reflector = reflector;
+    constructor(authService) {
+        this.authService = authService;
     }
-    canActivate(context) {
-        return true;
+    async canActivate(context) {
+        let req = context.switchToHttp().getRequest();
+        let token = req.headers.authorization;
+        if (!token)
+            return false;
+        try {
+            const user = await this.authService.validateToken(token);
+            req.user = user;
+            return true;
+        }
+        catch (e) {
+            throw e;
+        }
+        return false;
     }
 };
 TiniGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [core_1.Reflector])
+    __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], TiniGuard);
 exports.TiniGuard = TiniGuard;
 //# sourceMappingURL=tini.guard.js.map
