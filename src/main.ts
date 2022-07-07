@@ -16,6 +16,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle("[FoodHub APIs]")
     .setDescription("The RESTful APIs from super dev")
+    .addBearerAuth()
       .setVersion('1.0')
       .addTag('FoodHub')
       .build();
