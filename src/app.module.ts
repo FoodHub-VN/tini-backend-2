@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { UploadModule } from './upload/upload.module';
 import { PostModule } from './post/post.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { PostModule } from './post/post.module';
         DatabaseModule,
         UploadModule,
         PostModule,
+        SearchModule,
     ],
     controllers: [AppController],
     providers: [AppService],

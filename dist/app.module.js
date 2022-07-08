@@ -16,6 +16,7 @@ const database_module_1 = require("./database/database.module");
 const config_1 = require("@nestjs/config");
 const upload_module_1 = require("./upload/upload.module");
 const post_module_1 = require("./post/post.module");
+const search_module_1 = require("./search/search.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -29,6 +30,7 @@ AppModule = __decorate([
             database_module_1.DatabaseModule,
             upload_module_1.UploadModule,
             post_module_1.PostModule,
+            search_module_1.SearchModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
