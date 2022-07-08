@@ -18,7 +18,7 @@ type PostModel = Model<Post>;
 
 const PostSchema = new Schema<Post>({
   owner: {
-    type: SchemaTypes.String,
+    type: SchemaTypes.Number,
     ref: 'User'
   },
   title: SchemaTypes.String,
@@ -26,16 +26,16 @@ const PostSchema = new Schema<Post>({
   content: SchemaTypes.String,
   hashtag: [SchemaTypes.String],
   upVotedBy: [{
-    type: SchemaTypes.String,
+    type: SchemaTypes.Number,
     ref: 'User',
   }],
   downVotedBy: [{
-    type: SchemaTypes.String,
+    type: SchemaTypes.Number,
     ref: 'User',
   }],
   numView: SchemaTypes.Number,
   comment: [{
-    type: SchemaTypes.String,
+    type: SchemaTypes.ObjectId,
     ref: 'Comment',
   }],
   visitedTime: SchemaTypes.Number,

@@ -23,7 +23,12 @@ export class UploadController {
   })
   @UseInterceptors(FileInterceptor('file'))
   async upload(@UploadedFile() file: Express.Multer.File, @Res() res:Response): Promise<Response>{
-    let success = await this.uploadService.upload(file);
-    return res.status(success?HttpStatus.OK:HttpStatus.BAD_REQUEST).send();
+    try{
+      let fileUploaded = await this.uploadService.upload(file);
+      return res.status(HttpStatus.OK).send(fileUploaded);
+    }
+    catch (e){
+      throw e;
+    }
   }
 }

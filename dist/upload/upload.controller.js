@@ -22,8 +22,13 @@ let UploadController = class UploadController {
         this.uploadService = uploadService;
     }
     async upload(file, res) {
-        let success = await this.uploadService.upload(file);
-        return res.status(success ? common_1.HttpStatus.OK : common_1.HttpStatus.BAD_REQUEST).send();
+        try {
+            let fileUploaded = await this.uploadService.upload(file);
+            return res.status(common_1.HttpStatus.OK).send(fileUploaded);
+        }
+        catch (e) {
+            throw e;
+        }
     }
 };
 __decorate([

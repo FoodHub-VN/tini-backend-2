@@ -3,15 +3,11 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class PostUploadDto {
   @ApiProperty({
-    type: 'array',
-    items: {
-      type: 'string',
-      format: 'binary',
-    },
-    required: true,
+    type: Array,
+    required: false
   })
   @IsOptional()
-  readonly images: Array<Express.Multer.File>;
+  readonly images: string[];
   @ApiProperty({
     type: String,
     required: true,

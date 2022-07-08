@@ -1,4 +1,3 @@
-/// <reference types="multer" />
 import { PostModel } from '../database/model/post.model';
 import { PostUploadDto } from './dto/post-upload.dto';
 import { FileUploadService } from '../upload/upload.service';
@@ -7,6 +6,7 @@ export declare class PostService {
     private postModel;
     private readonly uploadService;
     constructor(postModel: PostModel, uploadService: FileUploadService);
-    uploadPost(body: PostUploadDto, _images: Array<Express.Multer.File>, req: AuthReqInterface): Promise<any>;
+    uploadPost(body: PostUploadDto, req: AuthReqInterface): Promise<any>;
     getAllPost(): Promise<any>;
+    upVote(req: AuthReqInterface, postId: string): Promise<void>;
 }
