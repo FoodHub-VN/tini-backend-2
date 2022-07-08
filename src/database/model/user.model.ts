@@ -1,35 +1,15 @@
 import { Document, Model, Schema, SchemaTypes } from 'mongoose';
 
 interface User extends Document {
-    readonly name: string;
-    readonly id: string;
-    readonly follower: string;
-    readonly post: string[];
-    readonly favoritePost: string[];
-    readonly likePost: string[];
+    readonly customerId: string;
+    readonly customerName: string;
 }
 
 type UserModel = Model<User>;
 
 const UserSchema = new Schema<User>({
-    name: SchemaTypes.String,
-    id: SchemaTypes.String,
-    follower: [{
-        type: SchemaTypes.ObjectId,
-        ref: 'User'
-    }],
-    post: [{
-        type: SchemaTypes.ObjectId,
-        ref: 'Post'
-    }],
-    favoritePost: [{
-        type: SchemaTypes.ObjectId,
-        ref: 'Post'
-    }],
-    likePost: [{
-        type: SchemaTypes.ObjectId,
-        ref: 'Post'
-    }]
+    customerId: SchemaTypes.String,
+    customerName: SchemaTypes.String
 }, {
     timestamps: true,
 });

@@ -72,7 +72,7 @@ let AuthService = class AuthService {
         }).toPromise().then((r) => {
             return r.data.data;
         }).catch(e => {
-            throw new common_1.BadRequestException("Auth code wrong!");
+            throw new common_1.UnauthorizedException("Lỗi xác thực!");
         });
     }
 };

@@ -1,9 +1,11 @@
 import { Document, Model, Schema, SchemaTypes } from 'mongoose';
+import { FileUploaded } from '../../upload/interface/upload.interface';
 
 interface Post extends Document {
   readonly owner: string;
   readonly title: string;
-  readonly description: string;
+  readonly content: string;
+  readonly images: FileUploaded[];
   readonly hashtag: string[];
   readonly upVotedBy: string[];
   readonly downVotedBy: string[];
@@ -20,7 +22,8 @@ const PostSchema = new Schema<Post>({
     ref: 'User'
   },
   title: SchemaTypes.String,
-  description: SchemaTypes.String,
+  image: [SchemaTypes.Mixed],
+  content: SchemaTypes.String,
   hashtag: [SchemaTypes.String],
   upVotedBy: [{
     type: SchemaTypes.ObjectId,

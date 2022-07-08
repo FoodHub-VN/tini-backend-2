@@ -18,35 +18,34 @@ const post_service_1 = require("./post.service");
 const platform_express_1 = require("@nestjs/platform-express");
 const swagger_1 = require("@nestjs/swagger");
 const post_upload_dto_1 = require("./dto/post-upload.dto");
+const tini_guard_1 = require("../auth/guard/tini.guard");
 let PostController = class PostController {
     constructor(postService) {
         this.postService = postService;
     }
-    uploadPost(res, files, data) {
+    async uploadPost(res, files, data, req) {
+        try {
+            await this.postService.uploadPost(data, files, req);
+            return res.status(200).send({ status: "success" });
+        }
+        catch (e) {
+            throw e;
+        }
     }
 };
 __decorate([
     (0, common_1.Post)('upload'),
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
-    (0, swagger_1.ApiBody)({
-        schema: {
-            type: 'object',
-            properties: {
-                images: {
-                    type: 'array',
-                    format: 'binary',
-                },
-            },
-        },
-    }),
     (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)("images")),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.UploadedFiles)()),
     __param(2, (0, common_1.Body)()),
+    __param(3, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Array,
-        post_upload_dto_1.PostUploadDto]),
-    __metadata("design:returntype", void 0)
+        post_upload_dto_1.PostUploadDto, Object]),
+    __metadata("design:returntype", Promise)
 ], PostController.prototype, "uploadPost", null);
 PostController = __decorate([
     (0, common_1.Controller)('post'),

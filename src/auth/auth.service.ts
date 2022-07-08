@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { GetTokenDto } from './dto/get-token.dto';
 import { bind } from 'lodash';
@@ -82,7 +82,7 @@ export class AuthService {
     }).toPromise().then((r)=>{
       return r.data.data as AuthUserInterface;
     }).catch(e=>{
-      throw new BadRequestException("Auth code wrong!");
+      throw new UnauthorizedException("Lỗi xác thực!");
     })
   }
 
