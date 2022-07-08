@@ -13,7 +13,7 @@ exports.FileUploadService = void 0;
 const common_1 = require("@nestjs/common");
 const aws_sdk_1 = require("aws-sdk");
 const config_1 = require("@nestjs/config");
-const bucketS3 = "bk-service";
+const bucketS3 = "foodhub-pro";
 let FileUploadService = class FileUploadService {
     constructor(configService) {
         this.configService = configService;
@@ -100,10 +100,15 @@ let FileUploadService = class FileUploadService {
     }
     getS3() {
         if (this.s3 == null) {
-            this.s3 = new aws_sdk_1.S3({
-                accessKeyId: this.configService.get("AWS_ACCESS_KEY_ID"),
-                secretAccessKey: this.configService.get("AWS_SECRET_ACCESS_KEY")
-            });
+            try {
+                this.s3 = new aws_sdk_1.S3({
+                    accessKeyId: this.configService.get("AWS_ACCESS_KEY_ID"),
+                    secretAccessKey: this.configService.get("AWS_SECRET_ACCESS_KEY")
+                });
+            }
+            catch (e) {
+                console.log("Loi", e);
+            }
         }
         return this.s3;
     }

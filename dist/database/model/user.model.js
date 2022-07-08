@@ -8,6 +8,18 @@ const UserSchema = new mongoose_1.Schema({
     follower: [{
             type: mongoose_1.SchemaTypes.ObjectId,
             ref: 'User'
+        }],
+    post: [{
+            type: mongoose_1.SchemaTypes.ObjectId,
+            ref: 'Post'
+        }],
+    favoritePost: [{
+            type: mongoose_1.SchemaTypes.ObjectId,
+            ref: 'Post'
+        }],
+    likePost: [{
+            type: mongoose_1.SchemaTypes.ObjectId,
+            ref: 'Post'
         }]
 }, {
     timestamps: true,

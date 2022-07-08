@@ -5,11 +5,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {readFileSync} from 'fs'
 
 async function bootstrap() {
-  const httpsOptions = {
-    key: readFileSync('./ssl/private.key', 'utf8'),
-    cert: readFileSync('./ssl/public.crt', 'utf8'),
-  };
-  const app = await NestFactory.create(AppModule, {cors: true, httpsOptions});
+  // const httpsOptions = {
+  //   key: readFileSync('./ssl/private.key', 'utf8'),
+  //   cert: readFileSync('./ssl/public.crt', 'utf8'),
+  // };
+  const app = await NestFactory.create(AppModule, {cors: true});
   app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true}));
   // app.useStaticAssets(join(__dirname, "..", "upload"));
   // add swagger module

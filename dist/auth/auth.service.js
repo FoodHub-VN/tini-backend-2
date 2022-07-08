@@ -15,8 +15,8 @@ const axios_1 = require("@nestjs/axios");
 let AuthService = class AuthService {
     constructor(httpService) {
         this.httpService = httpService;
-        this.client_key = "LV4EkhlTiHL7dIqfxaDrVHMEzkvElxFi";
-        this.client_secret = "zgnh0TK_XyH@:0NS5TQ90nlC:onqTeXtGWlILuiV~dO~Q6mnqImzHhvaZ_wgbCCm";
+        this.client_key = "cTYxTIahEP0vFXYMXuc4qjpQdTLd4w7m";
+        this.client_secret = "VADyWlmfsws:HRzIZsFear@WUyitMs:P1si+MzVSbVQgBnuyNemaJyp3GJlcFb4p";
     }
     async sign(body) {
         const crypto = require("crypto");

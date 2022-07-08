@@ -11,7 +11,7 @@ import {
 import { FileUploaded } from "./interface/upload.interface";
 import SendData = ManagedUpload.SendData;
 
-const bucketS3 = "bk-service";
+const bucketS3 = "foodhub-pro";
 
 @Injectable({scope: Scope.REQUEST})
 export class FileUploadService {
@@ -107,10 +107,16 @@ export class FileUploadService {
   }
   getS3() {
     if (this.s3 == null) {
-      this.s3 = new S3({
-        accessKeyId: this.configService.get<string>("AWS_ACCESS_KEY_ID"),
-        secretAccessKey: this.configService.get<string>("AWS_SECRET_ACCESS_KEY")
-      });
+      try{
+        this.s3 = new S3({
+          accessKeyId: this.configService.get<string>("AWS_ACCESS_KEY_ID"),
+          secretAccessKey: this.configService.get<string>("AWS_SECRET_ACCESS_KEY")
+        });
+      }
+      catch (e){
+        console.log("Loi", e);
+      }
+
     }
     return this.s3;
   }
