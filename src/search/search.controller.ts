@@ -4,6 +4,7 @@ import {SearchUserByNameDto} from "./dto/search-user-by-name.dto";
 import {SearchUserByIdDto} from "./dto/search-user-by-id.dto";
 import {SearchPostByKeywordsDto} from "./dto/search-post-by-keywords.dto";
 import {Response} from "express";
+import {SearchVendorByLatLngDto} from "./dto/search-vendor-by-lat-lng.dto";
 
 @Controller('search')
 export class SearchController {
@@ -44,7 +45,13 @@ export class SearchController {
     }
 
     @Post('/vendor/by-lat-lng')
-    async searchVendorByLatLng() {
-        return "hello";
+    async searchVendorByLatLng(@Res() res: Response,
+                               @Body() req: SearchVendorByLatLngDto) {
+        try {
+            const posts = await this.searchService.fetchVendorsNearLatLng(req.lat, req.lng, req.radius);
+            return res.status(HttpStatus.OK).send({posts});
+        } catch (e) {
+            throw new BadRequestException();
+        }
     }
 }
