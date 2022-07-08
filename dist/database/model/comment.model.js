@@ -4,11 +4,11 @@ exports.CommentSchema = void 0;
 const mongoose_1 = require("mongoose");
 const CommentSchema = new mongoose_1.Schema({
     owner: {
-        type: mongoose_1.SchemaTypes.ObjectId,
+        type: mongoose_1.SchemaTypes.String,
         ref: 'User'
     },
     post: {
-        type: mongoose_1.SchemaTypes.ObjectId,
+        type: mongoose_1.SchemaTypes.String,
         ref: 'Post'
     },
     title: mongoose_1.SchemaTypes.String,

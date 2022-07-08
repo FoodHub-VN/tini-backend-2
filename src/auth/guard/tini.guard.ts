@@ -22,9 +22,9 @@ export class TiniGuard implements CanActivate {
       const user: AuthUserInterface = await this.authService.validateToken(token);
       if (!user) throw new UnauthorizedException('Lỗi xác thực!');
       req.user = user;
-      const existUser = await this.userModel.exists({ customerId: user.customer_id.toString() });
+      const existUser = await this.userModel.exists({ _id: user.customer_id });
       if (!existUser) {
-        await this.userModel.create({ customerId: user.customer_id, customerName: user.customer_name });
+        await this.userModel.create({ _id: user.customer_id, customerName: user.customer_name });
       }
       return true;
     } catch (e) {

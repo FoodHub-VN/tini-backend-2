@@ -1,6 +1,6 @@
 import { Document, Model, Schema } from 'mongoose';
 interface User extends Document {
-    readonly customerId: string;
+    readonly _id: number;
     readonly customerName: string;
 }
 declare type UserModel = Model<User>;

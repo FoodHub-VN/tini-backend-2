@@ -8,4 +8,5 @@ export declare class PostService {
     private readonly uploadService;
     constructor(postModel: PostModel, uploadService: FileUploadService);
     uploadPost(body: PostUploadDto, _images: Array<Express.Multer.File>, req: AuthReqInterface): Promise<any>;
+    getAllPost(): Promise<any>;
 }

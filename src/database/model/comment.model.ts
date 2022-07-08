@@ -12,11 +12,11 @@ type CommentModel = Model<Comment>;
 
 const CommentSchema = new Schema<Comment>({
   owner: {
-    type: SchemaTypes.ObjectId,
+    type: SchemaTypes.String,
     ref: 'User'
   },
   post: {
-    type: SchemaTypes.ObjectId,
+    type: SchemaTypes.String,
     ref: 'Post'
   },
   title: SchemaTypes.String,

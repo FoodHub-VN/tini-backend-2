@@ -31,9 +31,9 @@ let TiniGuard = class TiniGuard {
             if (!user)
                 throw new common_1.UnauthorizedException('Lỗi xác thực!');
             req.user = user;
-            const existUser = await this.userModel.exists({ customerId: user.customer_id.toString() });
+            const existUser = await this.userModel.exists({ _id: user.customer_id });
             if (!existUser) {
-                await this.userModel.create({ customerId: user.customer_id, customerName: user.customer_name });
+                await this.userModel.create({ _id: user.customer_id, customerName: user.customer_name });
             }
             return true;
         }

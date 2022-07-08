@@ -7,4 +7,5 @@ export declare class PostController {
     private readonly postService;
     constructor(postService: PostService);
     uploadPost(res: Response, files: Array<Express.Multer.File>, data: PostUploadDto, req: AuthReqInterface): Promise<Response<any, Record<string, any>>>;
+    getAllPost(res: Response): Promise<any>;
 }

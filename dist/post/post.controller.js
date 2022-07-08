@@ -32,10 +32,20 @@ let PostController = class PostController {
             throw e;
         }
     }
+    async getAllPost(res) {
+        try {
+            let posts = await this.postService.getAllPost();
+            return res.status(common_1.HttpStatus.OK).send({ posts });
+        }
+        catch (e) {
+            throw new common_1.BadRequestException();
+        }
+    }
 };
 __decorate([
     (0, common_1.Post)('upload'),
     (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)("images")),
     __param(0, (0, common_1.Res)()),
@@ -47,6 +57,13 @@ __decorate([
         post_upload_dto_1.PostUploadDto, Object]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "uploadPost", null);
+__decorate([
+    (0, common_1.Post)('get-all-post'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getAllPost", null);
 PostController = __decorate([
     (0, common_1.Controller)('post'),
     __metadata("design:paramtypes", [post_service_1.PostService])

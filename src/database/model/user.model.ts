@@ -1,17 +1,17 @@
 import { Document, Model, Schema, SchemaTypes } from 'mongoose';
 
 interface User extends Document {
-    readonly customerId: string;
+    readonly _id: number;
     readonly customerName: string;
 }
 
 type UserModel = Model<User>;
 
 const UserSchema = new Schema<User>({
-    customerId: SchemaTypes.String,
-    customerName: SchemaTypes.String
+    _id: Number,
+    customerName: SchemaTypes.String,
 }, {
-    timestamps: true,
+    timestamps: true
 });
 
 // async function preSaveHook(next) {

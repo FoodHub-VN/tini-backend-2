@@ -43,12 +43,17 @@ let PostService = class PostService {
                 imageUploadeds = await Promise.all(promise);
             }
             let { images } = body, _body = __rest(body, ["images"]);
-            await this.postModel.create(Object.assign({ owner: req.user.customer_id }, _body));
+            await this.postModel.create(Object.assign(Object.assign({ owner: req.user.customer_id }, _body), { images: imageUploadeds }));
             return;
         }
         catch (e) {
+            console.log(e);
             throw new common_1.BadRequestException("Wrong!!");
         }
+    }
+    async getAllPost() {
+        let posts = await this.postModel.find().populate(['owner']).exec();
+        return posts;
     }
 };
 PostService = __decorate([

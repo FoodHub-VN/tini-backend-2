@@ -24,14 +24,20 @@ export class PostService {
         imageUploadeds = await Promise.all<FileUploaded>(promise);
       }
       let {images, ..._body} = body;
-      await this.postModel.create({owner: req.user.customer_id, ..._body});
+      await this.postModel.create({owner: req.user.customer_id, ..._body, images: imageUploadeds});
       return;
     }
     catch (e){
+      console.log(e);
       throw new BadRequestException("Wrong!!");
     }
 
     // let fileUploadeds: Array<FileUploaded> = await this.uploadService.upload(images);
     // this.uploadService.upload()
+  }
+
+  async getAllPost(): Promise<any>{
+    let posts = await this.postModel.find().populate(['owner']).exec();
+    return posts;
   }
 }
