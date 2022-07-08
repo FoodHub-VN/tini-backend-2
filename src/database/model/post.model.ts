@@ -5,7 +5,7 @@ interface Post extends Document {
   readonly owner: string;
   readonly title: string;
   readonly content: string;
-  readonly images: FileUploaded[];
+  readonly images: string[];
   readonly hashtag: string[];
   readonly upVotedBy: string[];
   readonly downVotedBy: string[];
@@ -22,7 +22,7 @@ const PostSchema = new Schema<Post>({
     ref: 'User'
   },
   title: SchemaTypes.String,
-  images: [SchemaTypes.Mixed],
+  images: [SchemaTypes.String],
   content: SchemaTypes.String,
   hashtag: [SchemaTypes.String],
   upVotedBy: [{
