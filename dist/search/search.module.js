@@ -10,10 +10,12 @@ exports.SearchModule = void 0;
 const common_1 = require("@nestjs/common");
 const search_controller_1 = require("./search.controller");
 const search_service_1 = require("./search.service");
+const database_module_1 = require("../database/database.module");
 let SearchModule = class SearchModule {
 };
 SearchModule = __decorate([
     (0, common_1.Module)({
+        imports: [database_module_1.DatabaseModule],
         controllers: [search_controller_1.SearchController],
         providers: [search_service_1.SearchService]
     })
