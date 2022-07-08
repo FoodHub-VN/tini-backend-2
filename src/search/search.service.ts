@@ -22,6 +22,9 @@ export class SearchService {
     async fetchBestPostsContainingKeywords(keywords: string, limit: number): Promise<Post[]> {
         return this.postModel.find({
             $text: {$search: keywords},
-        }, {_id: 0}).exec();
+        }, {_id: 0})
+            .sort({ score: { $meta: "textScore" } })
+            .limit(limit)
+            .exec();
     }
 }
