@@ -14,9 +14,9 @@ export class CommentService {
                 @Inject(COMMENT_MODEL) private readonly commentModel: CommentModel,) {
     }
 
-    async fetchManyComments(id: string, limit: number) {
+    async fetchManyComments(postId: string, limit: number) {
         return this.postModel
-            .findById(id)
+            .findById(postId)
             .populate({path: 'comment', select: {post: 0}})
             .map(post => post.comment)
             .limit(limit)
@@ -25,12 +25,14 @@ export class CommentService {
     }
 
     async createComment(owner: number, post: string, content: string) {
-        return this.postModel
+         const comment = this.commentModel
             .create({
                 owner,
                 post,
                 content,
                 timeComment: Date.now()
             });
+
+        return this.postModel.findByIdAndUpdate(post, {$push:{comment:await comment}});
     }
 }
