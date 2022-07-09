@@ -15,7 +15,7 @@ type MerchantModel = Model<Merchant>;
 
 const MerchantSchema = new Schema<Merchant>({
     merchantName: SchemaTypes.String,
-    locationAddress: string,
+    locationAddress: SchemaTypes.String,
     location: {
         type: {
             type : SchemaTypes.String,

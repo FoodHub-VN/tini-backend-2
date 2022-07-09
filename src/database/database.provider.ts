@@ -5,7 +5,7 @@ import { Connection, createConnection } from 'mongoose';
 import { User, UserSchema } from './model/user.model';
 import { Post, PostSchema } from './model/post.model';
 import { CommentSchema } from './model/comment.model';
-import {MerchantSchema} from "./model/merchant.model";
+import {Merchant, MerchantSchema} from "./model/merchant.model";
 
 export const dbProviders = [
     {
@@ -39,7 +39,7 @@ export const dbProviders = [
     {
         provide: MERCHANT_MODEL,
         useFactory: (conn: Connection) => {
-            return conn.model<Comment>("Merchant", MerchantSchema, "merchants");
+            return conn.model<Merchant>("Merchant", MerchantSchema, "merchants");
         },
         inject: [DB_CONNECTION]
     },
