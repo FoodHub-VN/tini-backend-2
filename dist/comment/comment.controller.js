@@ -16,6 +16,9 @@ exports.CommentController = void 0;
 const common_1 = require("@nestjs/common");
 const comment_service_1 = require("./comment.service");
 const get_all_comment_dto_1 = require("./dto/get-all-comment.dto");
+const post_comment_dto_1 = require("./dto/post-comment.dto");
+const tini_guard_1 = require("../auth/guard/tini.guard");
+const swagger_1 = require("@nestjs/swagger");
 let CommentController = class CommentController {
     constructor(commentService) {
         this.commentService = commentService;
@@ -32,6 +35,15 @@ let CommentController = class CommentController {
             throw new common_1.BadRequestException();
         }
     }
+    async postComment(res, req, body) {
+        try {
+            await this.commentService.createComment(req.user.customer_id, body.postId, body.title, body.content);
+            return res.status(common_1.HttpStatus.OK).send();
+        }
+        catch (e) {
+            throw new common_1.BadRequestException();
+        }
+    }
 };
 __decorate([
     (0, common_1.Post)('post/get-all-comment'),
@@ -41,6 +53,17 @@ __decorate([
     __metadata("design:paramtypes", [Object, get_all_comment_dto_1.GetAllCommentDto]),
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "getAllComments", null);
+__decorate([
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Post)('post/post-comment'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, post_comment_dto_1.PostCommentDto]),
+    __metadata("design:returntype", Promise)
+], CommentController.prototype, "postComment", null);
 CommentController = __decorate([
     (0, common_1.Controller)('comment'),
     __metadata("design:paramtypes", [comment_service_1.CommentService])
