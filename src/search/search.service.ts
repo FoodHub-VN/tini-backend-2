@@ -1,12 +1,14 @@
 import {Inject, Injectable} from '@nestjs/common';
-import {POST_MODEL, USER_MODEL} from "../database/database.constants";
+import {MERCHANT_MODEL, POST_MODEL, USER_MODEL} from "../database/database.constants";
 import {Post, PostModel} from "../database/model/post.model";
 import {User, UserModel} from "../database/model/user.model";
+import {Merchant, MerchantModel} from "../database/model/merchant.model";
 
 
 @Injectable()
 export class SearchService {
-    constructor(@Inject(USER_MODEL) private readonly userModel: UserModel,
+    constructor(@Inject(MERCHANT_MODEL) private readonly merchantModel: MerchantModel,
+                @Inject(USER_MODEL) private readonly userModel: UserModel,
                 @Inject(POST_MODEL) private readonly postModel: PostModel
     ) {
     }
@@ -27,17 +29,19 @@ export class SearchService {
             .exec();
     }
 
-    async fetchVendorsNearLatLng(lat: number, lng: number, radius: number): Promise<User[]> {
-        return this.userModel
+    async fetchMerchantsNearLatLng(lat: number, lng: number, radius: number): Promise<Merchant[]> {
+        return this.merchantModel
             .find({
+                location: {
                     $near: {
                         $geometry: {
                             type: "Point",
-                            coordinates: [lng, lat]
+                            coordinates: [lng, lat],
                         },
                         $maxDistance: radius,
                     },
-                })
+                }
+            })
             .exec();
     }
 }

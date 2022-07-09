@@ -2,3 +2,4 @@ export const DB_CONNECTION = 'DATABASE_CONNECTION';
 export const USER_MODEL = 'USER_MODEL';
 export const COMMENT_MODEL = 'COMMENT_MODEL';
 export const POST_MODEL = 'POST_MODEL';
+export const MERCHANT_MODEL = 'MERCHANT_MODEL';

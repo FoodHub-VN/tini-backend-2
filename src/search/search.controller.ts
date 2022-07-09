@@ -56,12 +56,12 @@ export class SearchController {
         }
     }
 
-    @Post('/vendor/by-lat-lng')
-    async searchVendorByLatLng(@Res() res: Response,
-                               @Body() req: SearchVendorByLatLngDto) {
+    @Post('/merchant/by-lat-lng')
+    async searchMerchantByLatLng(@Res() res: Response,
+                                 @Body() req: SearchVendorByLatLngDto) {
         try {
-            const posts = await this.searchService.fetchVendorsNearLatLng(req.lat, req.lng, req.radius);
-            return res.status(HttpStatus.OK).send({posts});
+            const merchants = await this.searchService.fetchMerchantsNearLatLng(req.lat, req.lng, req.radius);
+            return res.status(HttpStatus.OK).send({merchants});
         } catch (e) {
             throw new BadRequestException();
         }
