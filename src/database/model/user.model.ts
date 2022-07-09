@@ -6,6 +6,8 @@ interface User extends Document {
     readonly post: string[];
     readonly favoritePost: string[];
     readonly likePost: string[];
+    readonly follower: number[];
+    readonly following: number[];
 }
 
 type UserModel = Model<User>;
@@ -24,6 +26,14 @@ const UserSchema = new Schema<User>({
     likePost: [{
         type: SchemaTypes.ObjectId,
         ref: 'Post'
+    }],
+    following: [{
+        type: SchemaTypes.Number,
+        ref: 'User'
+    }],
+    follower: [{
+        type: SchemaTypes.Number,
+        ref: 'User'
     }]
 }, {
     timestamps: true

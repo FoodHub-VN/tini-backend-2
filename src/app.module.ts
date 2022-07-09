@@ -9,6 +9,7 @@ import { UploadModule } from './upload/upload.module';
 import { PostModule } from './post/post.module';
 import { SearchModule } from './search/search.module';
 import { CommentModule } from './comment/comment.module';
+import { UserModule } from './user/user.module';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { CommentModule } from './comment/comment.module';
         PostModule,
         SearchModule,
         CommentModule,
+        UserModule,
     ],
     controllers: [AppController],
     providers: [AppService],
