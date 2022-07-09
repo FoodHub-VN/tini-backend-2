@@ -24,12 +24,11 @@ export class CommentService {
             .exec();
     }
 
-    async createComment(owner: number, post: string, title: string, content: string) {
+    async createComment(owner: number, post: string, content: string) {
         return this.postModel
             .create({
                 owner,
                 post,
-                title,
                 content,
                 timeComment: Date.now()
             });

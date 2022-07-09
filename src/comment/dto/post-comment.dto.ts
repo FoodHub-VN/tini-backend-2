@@ -14,12 +14,5 @@ export class PostCommentDto {
     required: true,
   })
   @IsNotEmpty()
-  readonly title: string;
-
-  @ApiProperty({
-    type: String,
-    required: true,
-  })
-  @IsNotEmpty()
   readonly content: string;
 }

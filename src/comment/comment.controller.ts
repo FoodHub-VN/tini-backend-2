@@ -35,7 +35,7 @@ export class CommentController {
                       @Req() req: AuthReqInterface,
                       @Body() body: PostCommentDto) {
         try {
-            await this.commentService.createComment(req.user.customer_id, body.postId, body.title, body.content);
+            await this.commentService.createComment(req.user.customer_id, body.postId, body.content);
             return res.status(HttpStatus.OK).send();
         } catch (e) {
             throw new BadRequestException();
