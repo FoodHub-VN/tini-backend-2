@@ -1,24 +1,13 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  HttpStatus,
-  Post,
-  Req,
-  Res,
-  UploadedFiles,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { PostService } from './post.service';
-import { FilesInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { PostUploadDto } from './dto/post-upload.dto';
 import { TiniGuard } from '../auth/guard/tini.guard';
 import { AuthReqInterface } from '../auth/interface/auth-req.interface';
 import { UpVoteDto } from './dto/up-vote.dto';
 import { DownVoteDto } from './dto/down-vote.dto';
+import { FavoritePostDto } from './dto/favorite.dto';
 
 @Controller('post')
 export class PostController {
@@ -73,12 +62,26 @@ export class PostController {
   @UseGuards(TiniGuard)
   @ApiBearerAuth()
   @Post('down-vote')
-  async downVotePost(@Res() res: Response, @Req() req: AuthReqInterface, @Body() body: DownVoteDto){
-    try{
+  async downVotePost(@Res() res: Response, @Req() req: AuthReqInterface, @Body() body: DownVoteDto) {
+    try {
       let post = await this.postService.downVote(req, body.postId);
-      return res.status(HttpStatus.OK).send({post});
+      return res.status(HttpStatus.OK).send({ post });
+    } catch (e) {
+      throw e;
     }
-    catch (e){
+  }
+
+  @UseGuards(TiniGuard)
+  @ApiBearerAuth()
+  @Post('favorite')
+  async favoritePost(@Res() res: Response, @Req() req: AuthReqInterface, @Body() body: FavoritePostDto) {
+    try {
+      let success = await this.postService.favoritePost(req, body.postId);
+      if (success) {
+        return res.status(HttpStatus.OK).send({status: "success"});
+      }
+      throw new BadRequestException('Wrong!');
+    } catch (e) {
       throw e;
     }
   }

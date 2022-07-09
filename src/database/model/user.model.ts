@@ -3,6 +3,9 @@ import { Document, Model, Schema, SchemaTypes } from 'mongoose';
 interface User extends Document {
     readonly _id: number;
     readonly customerName: string;
+    readonly post: string[];
+    readonly favoritePost: string[];
+    readonly likePost: string[];
 }
 
 type UserModel = Model<User>;
@@ -10,6 +13,18 @@ type UserModel = Model<User>;
 const UserSchema = new Schema<User>({
     _id: Number,
     customerName: SchemaTypes.String,
+    post: [{
+        type: SchemaTypes.ObjectId,
+        ref: 'Post'
+    }],
+    favoritePost: [{
+        type: SchemaTypes.ObjectId,
+        ref: 'Post'
+    }],
+    likePost: [{
+        type: SchemaTypes.ObjectId,
+        ref: 'Post'
+    }]
 }, {
     timestamps: true
 });

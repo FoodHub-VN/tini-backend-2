@@ -5,6 +5,18 @@ const mongoose_1 = require("mongoose");
 const UserSchema = new mongoose_1.Schema({
     _id: Number,
     customerName: mongoose_1.SchemaTypes.String,
+    post: [{
+            type: mongoose_1.SchemaTypes.ObjectId,
+            ref: 'Post'
+        }],
+    favoritePost: [{
+            type: mongoose_1.SchemaTypes.ObjectId,
+            ref: 'Post'
+        }],
+    likePost: [{
+            type: mongoose_1.SchemaTypes.ObjectId,
+            ref: 'Post'
+        }]
 }, {
     timestamps: true
 });

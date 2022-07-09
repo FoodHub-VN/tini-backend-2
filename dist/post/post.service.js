@@ -17,23 +17,39 @@ const common_1 = require("@nestjs/common");
 const database_constants_1 = require("../database/database.constants");
 const upload_service_1 = require("../upload/upload.service");
 let PostService = class PostService {
-    constructor(postModel, uploadService) {
+    constructor(postModel, userModel, uploadService) {
         this.postModel = postModel;
+        this.userModel = userModel;
         this.uploadService = uploadService;
     }
     async uploadPost(body, req) {
         try {
-            await this.postModel.create(Object.assign({ owner: req.user.customer_id }, body));
+            let user = await this.userModel.findOne({ _id: req.user.customer_id }).exec();
+            if (!user) {
+                throw new common_1.NotFoundException('User not found!');
+            }
+            let post = await this.postModel.create(Object.assign({ owner: req.user.customer_id }, body));
+            let postId = user.post;
+            postId.push(post._id);
+            await user.update({ post: postId }).exec();
             return;
         }
         catch (e) {
             console.log(e);
-            throw new common_1.BadRequestException("Wrong!!");
+            throw new common_1.BadRequestException('Wrong!!');
         }
     }
     async getAllPost() {
-        let posts = await this.postModel.find().populate(['owner']).exec();
-        return posts;
+        try {
+            let posts = await this.postModel
+                .find({})
+                .populate('owner', 'customerName')
+                .exec();
+            return posts;
+        }
+        catch (e) {
+            console.log(e);
+        }
     }
     async upVote(req, postId) {
         try {
@@ -47,9 +63,16 @@ let PostService = class PostService {
                 update.downVotedBy = post.downVotedBy.filter((e) => e != req.user.customer_id);
                 isDirty = true;
             }
+            let user = await this.userModel.findOne({ _id: req.user.customer_id }).exec();
+            if (!user) {
+                throw new common_1.NotFoundException('User not found!');
+            }
             if (!post.upVotedBy.includes(req.user.customer_id)) {
                 update.upVotedBy = post.upVotedBy || [];
                 update.upVotedBy.push(req.user.customer_id);
+                let likePost = user.likePost.filter(p => p != post._id);
+                likePost.push(post._id);
+                await user.update({ likePost }).exec();
                 isDirty = true;
             }
             if (isDirty) {
@@ -73,7 +96,10 @@ let PostService = class PostService {
                 update.upVotedBy = post.upVotedBy.filter((e) => e != req.user.customer_id);
                 isDirty = true;
             }
+            let user = await this.userModel.findOne({ _id: req.user.customer_id }).exec();
             if (!post.downVotedBy.includes(req.user.customer_id)) {
+                let likePost = user.likePost.filter(p => p != post._id);
+                await user.update({ likePost }).exec();
                 update.downVotedBy = post.downVotedBy || [];
                 update.downVotedBy.push(req.user.customer_id);
                 isDirty = true;
@@ -87,11 +113,31 @@ let PostService = class PostService {
             throw e;
         }
     }
+    async favoritePost(req, postId) {
+        try {
+            let user = await this.userModel.findOne({ _id: req.user.customer_id }).exec();
+            if (!user) {
+                throw new common_1.NotFoundException('User not found!');
+            }
+            let post = await this.postModel.findOne({ _id: postId }).exec();
+            if (!post) {
+                throw new common_1.NotFoundException('Post not found!');
+            }
+            let favorite = user.favoritePost.filter(p => p != post._id);
+            favorite.push(post._id);
+            await user.update({ favoritePost: favorite }).exec();
+            return true;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
 };
 PostService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(database_constants_1.POST_MODEL)),
-    __metadata("design:paramtypes", [Object, upload_service_1.FileUploadService])
+    __param(1, (0, common_1.Inject)(database_constants_1.USER_MODEL)),
+    __metadata("design:paramtypes", [Object, Object, upload_service_1.FileUploadService])
 ], PostService);
 exports.PostService = PostService;
 //# sourceMappingURL=post.service.js.map
