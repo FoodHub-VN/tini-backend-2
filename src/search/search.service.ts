@@ -19,7 +19,7 @@ export class SearchService {
     }
 
     async fetchUserWithUsername(id: number): Promise<User> {
-        return this.userModel.findById(id).exec();
+        return this.userModel.findById(id, {_id: 1, customerName: 1, post: 1}).exec();
     }
 
     async fetchBestPostsContainingKeywords(keywords: string, limit: number): Promise<Post[]> {

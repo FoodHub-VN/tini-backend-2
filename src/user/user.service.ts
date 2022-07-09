@@ -10,6 +10,10 @@ export class UserService {
   ) {
   }
 
+  async fetchUserById(id: number) {
+    return this.userModel.findById(id).exec();
+  }
+
   async followUser(req: AuthReqInterface, userId: number) {
     try {
       let user = await this.userModel.findOne({ _id: req.user.customer_id }).exec();
