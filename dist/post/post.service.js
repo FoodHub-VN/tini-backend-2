@@ -36,9 +36,55 @@ let PostService = class PostService {
         return posts;
     }
     async upVote(req, postId) {
-        let post = await this.postModel.findOne({ _id: postId });
-        if (!post) {
-            throw new common_1.NotFoundException("Post not found!");
+        try {
+            let post = await this.postModel.findOne({ _id: postId });
+            if (!post) {
+                throw new common_1.NotFoundException('Post not found!');
+            }
+            var update = {};
+            let isDirty = false;
+            if (post.downVotedBy.includes(req.user.customer_id)) {
+                update.downVotedBy = post.downVotedBy.filter((e) => e != req.user.customer_id);
+                isDirty = true;
+            }
+            if (!post.upVotedBy.includes(req.user.customer_id)) {
+                update.upVotedBy = post.upVotedBy || [];
+                update.upVotedBy.push(req.user.customer_id);
+                isDirty = true;
+            }
+            if (isDirty) {
+                return await this.postModel.findOneAndUpdate({ _id: postId }, Object.assign({}, update), { new: true, lean: true }).exec();
+            }
+            return post;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+    async downVote(req, postId) {
+        try {
+            let post = await this.postModel.findOne({ _id: postId });
+            if (!post) {
+                throw new common_1.NotFoundException('Post not found!');
+            }
+            var update = {};
+            let isDirty = false;
+            if (post.upVotedBy.includes(req.user.customer_id)) {
+                update.upVotedBy = post.upVotedBy.filter((e) => e != req.user.customer_id);
+                isDirty = true;
+            }
+            if (!post.downVotedBy.includes(req.user.customer_id)) {
+                update.downVotedBy = post.downVotedBy || [];
+                update.downVotedBy.push(req.user.customer_id);
+                isDirty = true;
+            }
+            if (isDirty) {
+                return await this.postModel.findOneAndUpdate({ _id: postId }, Object.assign({}, update), { new: true, lean: true }).exec();
+            }
+            return post;
+        }
+        catch (e) {
+            throw e;
         }
     }
 };

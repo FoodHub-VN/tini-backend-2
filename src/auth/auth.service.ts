@@ -33,11 +33,11 @@ export class AuthService {
     }
 
     const payload = timestamp + '.' + this.client_key + '.' + JSON.stringify(body);
-    console.log("payload: ", payload);
+    // console.log("payload: ", payload);
     const encodedPayload = base64URLEncode(payload);
-    console.log("encoded_payload: ", encodedPayload);
+    // console.log("encoded_payload: ", encodedPayload);
     const signature = sign(this.client_secret, encodedPayload);
-    console.log("signature: ", signature);
+    // console.log("signature: ", signature);
     return { signature, timestamp };
 
 // payload:  1620621619569.RLCKb7Ae9kx4DXtXsCWjnDXtggFnM43W.{"id":123}

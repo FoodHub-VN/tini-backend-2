@@ -19,6 +19,7 @@ const swagger_1 = require("@nestjs/swagger");
 const post_upload_dto_1 = require("./dto/post-upload.dto");
 const tini_guard_1 = require("../auth/guard/tini.guard");
 const up_vote_dto_1 = require("./dto/up-vote.dto");
+const down_vote_dto_1 = require("./dto/down-vote.dto");
 let PostController = class PostController {
     constructor(postService) {
         this.postService = postService;
@@ -42,6 +43,22 @@ let PostController = class PostController {
         }
     }
     async upVotePost(res, req, body) {
+        try {
+            let post = await this.postService.upVote(req, body.postId);
+            return res.status(common_1.HttpStatus.OK).send({ post });
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+    async downVotePost(res, req, body) {
+        try {
+            let post = await this.postService.downVote(req, body.postId);
+            return res.status(common_1.HttpStatus.OK).send({ post });
+        }
+        catch (e) {
+            throw e;
+        }
     }
 };
 __decorate([
@@ -64,6 +81,8 @@ __decorate([
 ], PostController.prototype, "getAllPost", null);
 __decorate([
     (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Post)('up-vote'),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Req)()),
     __param(2, (0, common_1.Body)()),
@@ -71,6 +90,17 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, up_vote_dto_1.UpVoteDto]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "upVotePost", null);
+__decorate([
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Post)('down-vote'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, down_vote_dto_1.DownVoteDto]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "downVotePost", null);
 PostController = __decorate([
     (0, common_1.Controller)('post'),
     __metadata("design:paramtypes", [post_service_1.PostService])

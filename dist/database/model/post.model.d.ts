@@ -5,8 +5,8 @@ interface Post extends Document {
     readonly content: string;
     readonly images: string[];
     readonly hashtag: string[];
-    readonly upVotedBy: string[];
-    readonly downVotedBy: string[];
+    readonly upVotedBy: number[];
+    readonly downVotedBy: number[];
     readonly numView: number;
     readonly comment: string[];
     readonly visitedTime: number;

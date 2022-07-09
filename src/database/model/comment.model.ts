@@ -2,7 +2,7 @@ import { Document, Model, Schema, SchemaTypes } from 'mongoose';
 import { PostSchema } from './post.model';
 
 interface Comment extends Document {
-  readonly owner: string;
+  readonly owner: number;
   readonly title: string;
   readonly content: string;
   readonly timeComment: number;

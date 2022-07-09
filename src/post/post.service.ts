@@ -3,7 +3,6 @@ import { POST_MODEL } from '../database/database.constants';
 import { Post, PostModel } from '../database/model/post.model';
 import { PostUploadDto } from './dto/post-upload.dto';
 import { FileUploadService } from '../upload/upload.service';
-import { FileUploaded } from '../upload/interface/upload.interface';
 import { AuthReqInterface } from '../auth/interface/auth-req.interface';
 
 @Injectable()
@@ -42,10 +41,58 @@ export class PostService {
   }
 
   async upVote(req: AuthReqInterface, postId: string){
-    let post: Post = await this.postModel.findOne({_id: postId});
-    if(!post){
-      throw new NotFoundException("Post not found!");
+    try {
+      let post: Post = await this.postModel.findOne({ _id: postId });
+      if (!post) {
+        throw new NotFoundException('Post not found!');
+      }
+      var update: any = {};
+      let isDirty = false;
+
+      if (post.downVotedBy.includes(req.user.customer_id)) {
+        update.downVotedBy = post.downVotedBy.filter((e) => e != req.user.customer_id);
+        isDirty = true;
+      }
+      if (!post.upVotedBy.includes(req.user.customer_id)) {
+        update.upVotedBy = post.upVotedBy || [];
+        update.upVotedBy.push(req.user.customer_id);
+        isDirty = true;
+      }
+
+      if (isDirty) {
+        return await this.postModel.findOneAndUpdate({ _id: postId }, { ...update }, { new: true, lean: true }).exec();
+      }
+      return post;
+    } catch (e) {
+      throw  e;
     }
-    // if(post.downVotedBy.includes(req.user.customer_id))
+  }
+
+  async downVote(req: AuthReqInterface, postId: string){
+    try {
+      let post: Post = await this.postModel.findOne({ _id: postId });
+      if (!post) {
+        throw new NotFoundException('Post not found!');
+      }
+      var update: any = {};
+      let isDirty = false;
+
+      if (post.upVotedBy.includes(req.user.customer_id)) {
+        update.upVotedBy = post.upVotedBy.filter((e) => e != req.user.customer_id);
+        isDirty = true;
+      }
+      if (!post.downVotedBy.includes(req.user.customer_id)) {
+        update.downVotedBy = post.downVotedBy || [];
+        update.downVotedBy.push(req.user.customer_id);
+        isDirty = true;
+      }
+
+      if (isDirty) {
+        return await this.postModel.findOneAndUpdate({ _id: postId }, { ...update }, { new: true, lean: true }).exec();
+      }
+      return post;
+    } catch (e) {
+      throw  e;
+    }
   }
 }
