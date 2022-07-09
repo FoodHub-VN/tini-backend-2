@@ -2,13 +2,25 @@ import {BadRequestException, Body, Controller, HttpStatus, Post, Res} from '@nes
 import {SearchService} from "./search.service";
 import {SearchUserByNameDto} from "./dto/search-user-by-name.dto";
 import {SearchUserByIdDto} from "./dto/search-user-by-id.dto";
-import {SearchPostByKeywordsDto} from "./dto/search-post-by-keywords.dto";
 import {Response} from "express";
 import {SearchVendorByLatLngDto} from "./dto/search-vendor-by-lat-lng.dto";
+import {SearchByKeywordsDto} from "./dto/search-by-keywords.dto";
 
 @Controller('search')
 export class SearchController {
     constructor(private readonly searchService: SearchService) {
+    }
+
+    @Post('/by-keywords')
+    async searchByKeywords(@Res() res: Response,
+                           @Body() req: SearchByKeywordsDto) {
+        try {
+            const users = await this.searchService.fetchManyUsersWithName(req.keywords, req.limit || 5);
+            const posts = await this.searchService.fetchBestPostsContainingKeywords(req.keywords, req.limit || 5);
+            return res.status(HttpStatus.OK).send({users, posts});
+        } catch (e) {
+            throw new BadRequestException();
+        }
     }
 
     @Post('/user/by-name')
@@ -35,7 +47,7 @@ export class SearchController {
 
     @Post('/post/by-keyword')
     async searchPostByKeyword(@Res() res: Response,
-                              @Body() req: SearchPostByKeywordsDto) {
+                              @Body() req: SearchByKeywordsDto) {
         try {
             const posts = await this.searchService.fetchBestPostsContainingKeywords(req.keywords, req.limit || 5);
             return res.status(HttpStatus.OK).send({posts});

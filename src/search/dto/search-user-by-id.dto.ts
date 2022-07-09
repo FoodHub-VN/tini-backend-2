@@ -3,9 +3,9 @@ import { IsNotEmpty} from 'class-validator';
 
 export class SearchUserByIdDto {
   @ApiProperty({
-    type: String,
+    type: Number,
     required: true,
   })
   @IsNotEmpty()
-  readonly id: string;
+  readonly id: number;
 }

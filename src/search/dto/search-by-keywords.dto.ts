@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty} from 'class-validator';
 
-export class SearchPostByKeywordsDto {
+export class SearchByKeywordsDto {
   @ApiProperty({
     type: String,
     required: true,
