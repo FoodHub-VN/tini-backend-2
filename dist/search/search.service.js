@@ -25,7 +25,7 @@ let SearchService = class SearchService {
         return this.userModel.find({ customerName }).limit(limit).exec();
     }
     async fetchUserWithUsername(id) {
-        return this.userModel.findById(id).exec();
+        return this.userModel.findById(id, { _id: 1, customerName: 1, post: 1 }).exec();
     }
     async fetchBestPostsContainingKeywords(keywords, limit) {
         return this.postModel

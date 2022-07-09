@@ -9,10 +9,10 @@ export declare class PostService {
     private readonly uploadService;
     constructor(postModel: PostModel, userModel: UserModel, uploadService: FileUploadService);
     uploadPost(body: PostUploadDto, req: AuthReqInterface): Promise<any>;
-    getAllPost(): Promise<any>;
+    getAllPost(userId: number): Promise<any>;
     upVote(req: AuthReqInterface, postId: string): Promise<Post>;
     downVote(req: AuthReqInterface, postId: string): Promise<Post>;
     unVote(req: AuthReqInterface, postId: string): Promise<Post>;
     favoritePost(req: AuthReqInterface, postId: string): Promise<boolean>;
-    getPostById(postId: string): Promise<Post>;
+    getPostById(userId: number, postId: string): Promise<any>;
 }

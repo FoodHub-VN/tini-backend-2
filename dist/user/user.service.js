@@ -19,6 +19,9 @@ let UserService = class UserService {
     constructor(userModel) {
         this.userModel = userModel;
     }
+    async fetchUserById(id) {
+        return this.userModel.findById(id).exec();
+    }
     async followUser(req, userId) {
         try {
             let user = await this.userModel.findOne({ _id: req.user.customer_id }).exec();

@@ -39,12 +39,15 @@ let PostService = class PostService {
             throw new common_1.BadRequestException('Wrong!!');
         }
     }
-    async getAllPost() {
+    async getAllPost(userId) {
         try {
-            let posts = await this.postModel
+            const favoritesPromise = this.userModel.findById(userId).map(user => user.favoritePost);
+            const posts = await this.postModel
                 .find({})
                 .populate('owner', 'customerName')
                 .exec();
+            const favorites = await favoritesPromise;
+            posts.forEach(post => post.isFavorited = favorites.includes(post._id));
             return posts;
         }
         catch (e) {
@@ -152,15 +155,17 @@ let PostService = class PostService {
             throw e;
         }
     }
-    async getPostById(postId) {
+    async getPostById(userId, postId) {
         try {
-            let post = await this.postModel
+            const favorites = this.userModel.findById(userId).map(user => user.favoritePost);
+            const post = await this.postModel
                 .findOne({ _id: postId })
                 .populate('owner', 'customerName')
                 .exec();
             if (!post) {
                 throw new common_1.NotFoundException('Post not found!');
             }
+            post.isFavorited = (await favorites).includes(postId);
             return post;
         }
         catch (e) {

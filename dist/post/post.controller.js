@@ -34,9 +34,9 @@ let PostController = class PostController {
             throw e;
         }
     }
-    async getAllPost(res) {
+    async getAllPost(res, req) {
         try {
-            let posts = await this.postService.getAllPost();
+            let posts = await this.postService.getAllPost(req.user.customer_id);
             return res.status(common_1.HttpStatus.OK).send({ posts });
         }
         catch (e) {
@@ -76,15 +76,15 @@ let PostController = class PostController {
             if (success) {
                 return res.status(common_1.HttpStatus.OK).send({ status: 'success' });
             }
-            throw new common_1.BadRequestException('Wrong!');
         }
         catch (e) {
             throw e;
         }
+        throw new common_1.BadRequestException('Wrong!');
     }
-    async getPostById(res, body) {
+    async getPostById(res, req, body) {
         try {
-            let post = await this.postService.getPostById(body.postId);
+            let post = await this.postService.getPostById(req.user.customer_id, body.postId);
             return res.status(common_1.HttpStatus.OK).send({ post });
         }
         catch (e) {
@@ -104,10 +104,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "uploadPost", null);
 __decorate([
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Post)('get-all-post'),
     __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "getAllPost", null);
 __decorate([
@@ -155,11 +158,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "favoritePost", null);
 __decorate([
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Post)('get-post-by-id'),
     __param(0, (0, common_1.Res)()),
-    __param(1, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, get_post_by_id_dto_1.GetPostByIdDto]),
+    __metadata("design:paramtypes", [Object, Object, get_post_by_id_dto_1.GetPostByIdDto]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "getPostById", null);
 PostController = __decorate([

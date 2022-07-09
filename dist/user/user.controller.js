@@ -22,6 +22,15 @@ let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
+    async getUserById(res, req) {
+        try {
+            const user = await this.userService.fetchUserById(req.user.customer_id);
+            return res.status(common_1.HttpStatus.OK).send({ user });
+        }
+        catch (e) {
+            throw new common_1.BadRequestException();
+        }
+    }
     async followUser(res, body, req) {
         try {
             let success = await this.userService.followUser(req, body.userId);
@@ -41,6 +50,16 @@ let UserController = class UserController {
         }
     }
 };
+__decorate([
+    (0, common_1.Post)('get-info'),
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getUserById", null);
 __decorate([
     (0, common_1.Post)('follow'),
     (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
