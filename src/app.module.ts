@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UploadModule } from './upload/upload.module';
 import { PostModule } from './post/post.module';
 import { SearchModule } from './search/search.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { SearchModule } from './search/search.module';
         UploadModule,
         PostModule,
         SearchModule,
+        CommentModule,
     ],
     controllers: [AppController],
     providers: [AppService],
