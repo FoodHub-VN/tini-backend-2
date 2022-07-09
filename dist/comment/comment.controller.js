@@ -37,7 +37,7 @@ let CommentController = class CommentController {
     }
     async postComment(res, req, body) {
         try {
-            await this.commentService.createComment(req.user.customer_id, body.postId, body.title, body.content);
+            await this.commentService.createComment(req.user.customer_id, body.postId, body.content);
             return res.status(common_1.HttpStatus.OK).send();
         }
         catch (e) {

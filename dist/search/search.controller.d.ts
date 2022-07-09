@@ -12,4 +12,5 @@ export declare class SearchController {
     searchUserById(res: Response, req: SearchUserByIdDto): Promise<Response<any, Record<string, any>>>;
     searchPostByKeyword(res: Response, req: SearchByKeywordsDto): Promise<Response<any, Record<string, any>>>;
     searchMerchantByLatLng(res: Response, req: SearchVendorByLatLngDto): Promise<Response<any, Record<string, any>>>;
+    searchFoodUsingFoodMatcher(res: Response, req: SearchVendorByLatLngDto): Promise<Response<any, Record<string, any>>>;
 }

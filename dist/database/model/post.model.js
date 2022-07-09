@@ -7,9 +7,15 @@ const PostSchema = new mongoose_1.Schema({
         type: mongoose_1.SchemaTypes.Number,
         ref: 'User'
     },
-    title: mongoose_1.SchemaTypes.String,
+    title: {
+        type: mongoose_1.SchemaTypes.String,
+        text: true
+    },
+    content: {
+        type: mongoose_1.SchemaTypes.String,
+        text: true
+    },
     images: [mongoose_1.SchemaTypes.String],
-    content: mongoose_1.SchemaTypes.String,
     hashtag: [mongoose_1.SchemaTypes.String],
     upVotedBy: [{
             type: mongoose_1.SchemaTypes.Number,

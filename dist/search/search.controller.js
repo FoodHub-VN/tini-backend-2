@@ -69,6 +69,15 @@ let SearchController = class SearchController {
             throw new common_1.BadRequestException();
         }
     }
+    async searchFoodUsingFoodMatcher(res, req) {
+        try {
+            const dishes = await this.searchService.fetchFoodUsingFoodMatcher(req.lat, req.lng, req.radius);
+            return res.status(common_1.HttpStatus.OK).send({ dishes });
+        }
+        catch (e) {
+            throw new common_1.BadRequestException();
+        }
+    }
 };
 __decorate([
     (0, common_1.Post)('/by-keywords'),
@@ -110,6 +119,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, search_vendor_by_lat_lng_dto_1.SearchVendorByLatLngDto]),
     __metadata("design:returntype", Promise)
 ], SearchController.prototype, "searchMerchantByLatLng", null);
+__decorate([
+    (0, common_1.Post)('/food-matcher'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, search_vendor_by_lat_lng_dto_1.SearchVendorByLatLngDto]),
+    __metadata("design:returntype", Promise)
+], SearchController.prototype, "searchFoodUsingFoodMatcher", null);
 SearchController = __decorate([
     (0, common_1.Controller)('search'),
     __metadata("design:paramtypes", [search_service_1.SearchService])

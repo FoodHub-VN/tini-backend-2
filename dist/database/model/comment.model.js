@@ -11,7 +11,6 @@ const CommentSchema = new mongoose_1.Schema({
         type: mongoose_1.SchemaTypes.ObjectId,
         ref: 'Post'
     },
-    title: mongoose_1.SchemaTypes.String,
     content: mongoose_1.SchemaTypes.String,
     timeComment: mongoose_1.SchemaTypes.Number,
 }, {

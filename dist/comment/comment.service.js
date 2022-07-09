@@ -30,12 +30,11 @@ let CommentService = class CommentService {
             .populate({ path: 'owner', select: 'customerName' })
             .exec();
     }
-    async createComment(owner, post, title, content) {
+    async createComment(owner, post, content) {
         return this.postModel
             .create({
             owner,
             post,
-            title,
             content,
             timeComment: Date.now()
         });

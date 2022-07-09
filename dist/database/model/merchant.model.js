@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MerchantSchema = void 0;
 const mongoose_1 = require("mongoose");
+const dish_model_1 = require("./dish.model");
 const MerchantSchema = new mongoose_1.Schema({
     merchantName: mongoose_1.SchemaTypes.String,
     location: {
@@ -10,6 +11,7 @@ const MerchantSchema = new mongoose_1.Schema({
         },
         coordinates: [mongoose_1.SchemaTypes.Number, mongoose_1.SchemaTypes.Number],
     },
+    dishes: [dish_model_1.DishSchema],
 }, {
     timestamps: true
 });

@@ -1,7 +1,6 @@
 import { Document, Model, Schema } from 'mongoose';
 interface Comment extends Document {
     readonly owner: number;
-    readonly title: string;
     readonly content: string;
     readonly timeComment: number;
 }
