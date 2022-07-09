@@ -7,6 +7,7 @@ const mongoose_1 = require("mongoose");
 const user_model_1 = require("./model/user.model");
 const post_model_1 = require("./model/post.model");
 const comment_model_1 = require("./model/comment.model");
+const merchant_model_1 = require("./model/merchant.model");
 exports.dbProviders = [
     {
         provide: database_constants_1.DB_CONNECTION,
@@ -35,6 +36,13 @@ exports.dbProviders = [
             return conn.model("Comment", comment_model_1.CommentSchema, "comments");
         },
         inject: [database_constants_1.DB_CONNECTION]
-    }
+    },
+    {
+        provide: database_constants_1.MERCHANT_MODEL,
+        useFactory: (conn) => {
+            return conn.model("Merchant", merchant_model_1.MerchantSchema, "merchants");
+        },
+        inject: [database_constants_1.DB_CONNECTION]
+    },
 ];
 //# sourceMappingURL=database.provider.js.map

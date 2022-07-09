@@ -16,7 +16,8 @@ exports.SearchService = void 0;
 const common_1 = require("@nestjs/common");
 const database_constants_1 = require("../database/database.constants");
 let SearchService = class SearchService {
-    constructor(userModel, postModel) {
+    constructor(merchantModel, userModel, postModel) {
+        this.merchantModel = merchantModel;
         this.userModel = userModel;
         this.postModel = postModel;
     }
@@ -33,25 +34,28 @@ let SearchService = class SearchService {
             .limit(limit)
             .exec();
     }
-    async fetchVendorsNearLatLng(lat, lng, radius) {
-        return this.userModel
+    async fetchMerchantsNearLatLng(lat, lng, radius) {
+        return this.merchantModel
             .find({
-            $near: {
-                $geometry: {
-                    type: "Point",
-                    coordinates: [lng, lat]
+            location: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [lng, lat],
+                    },
+                    $maxDistance: radius,
                 },
-                $maxDistance: radius,
-            },
+            }
         })
             .exec();
     }
 };
 SearchService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(database_constants_1.USER_MODEL)),
-    __param(1, (0, common_1.Inject)(database_constants_1.POST_MODEL)),
-    __metadata("design:paramtypes", [Object, Object])
+    __param(0, (0, common_1.Inject)(database_constants_1.MERCHANT_MODEL)),
+    __param(1, (0, common_1.Inject)(database_constants_1.USER_MODEL)),
+    __param(2, (0, common_1.Inject)(database_constants_1.POST_MODEL)),
+    __metadata("design:paramtypes", [Object, Object, Object])
 ], SearchService);
 exports.SearchService = SearchService;
 //# sourceMappingURL=search.service.js.map

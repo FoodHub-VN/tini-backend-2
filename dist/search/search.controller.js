@@ -60,10 +60,10 @@ let SearchController = class SearchController {
             throw new common_1.BadRequestException();
         }
     }
-    async searchVendorByLatLng(res, req) {
+    async searchMerchantByLatLng(res, req) {
         try {
-            const posts = await this.searchService.fetchVendorsNearLatLng(req.lat, req.lng, req.radius);
-            return res.status(common_1.HttpStatus.OK).send({ posts });
+            const merchants = await this.searchService.fetchMerchantsNearLatLng(req.lat, req.lng, req.radius);
+            return res.status(common_1.HttpStatus.OK).send({ merchants });
         }
         catch (e) {
             throw new common_1.BadRequestException();
@@ -103,13 +103,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SearchController.prototype, "searchPostByKeyword", null);
 __decorate([
-    (0, common_1.Post)('/vendor/by-lat-lng'),
+    (0, common_1.Post)('/merchant/by-lat-lng'),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, search_vendor_by_lat_lng_dto_1.SearchVendorByLatLngDto]),
     __metadata("design:returntype", Promise)
-], SearchController.prototype, "searchVendorByLatLng", null);
+], SearchController.prototype, "searchMerchantByLatLng", null);
 SearchController = __decorate([
     (0, common_1.Controller)('search'),
     __metadata("design:paramtypes", [search_service_1.SearchService])
