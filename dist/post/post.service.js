@@ -113,6 +113,26 @@ let PostService = class PostService {
             throw e;
         }
     }
+    async unVote(req, postId) {
+        const post = await this.postModel.findOne({ _id: postId });
+        if (!post) {
+            throw new common_1.NotFoundException('Post not found!');
+        }
+        const update = {};
+        let isDirty = false;
+        if (post.upVotedBy.includes(req.user.customer_id)) {
+            update.upVotedBy = post.upVotedBy.filter((e) => e != req.user.customer_id);
+            isDirty = true;
+        }
+        if (post.downVotedBy.includes(req.user.customer_id)) {
+            update.downVotedBy = post.downVotedBy.filter((e) => e != req.user.customer_id);
+            isDirty = true;
+        }
+        if (isDirty) {
+            return await this.postModel.findOneAndUpdate({ _id: postId }, Object.assign({}, update), { new: true, lean: true }).exec();
+        }
+        return post;
+    }
     async favoritePost(req, postId) {
         try {
             let user = await this.userModel.findOne({ _id: req.user.customer_id }).exec();

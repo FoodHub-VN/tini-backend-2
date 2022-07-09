@@ -18,10 +18,9 @@ const post_service_1 = require("./post.service");
 const swagger_1 = require("@nestjs/swagger");
 const post_upload_dto_1 = require("./dto/post-upload.dto");
 const tini_guard_1 = require("../auth/guard/tini.guard");
-const up_vote_dto_1 = require("./dto/up-vote.dto");
-const down_vote_dto_1 = require("./dto/down-vote.dto");
 const favorite_dto_1 = require("./dto/favorite.dto");
 const get_post_by_id_dto_1 = require("./dto/get-post-by-id.dto");
+const vote_dto_1 = require("./dto/vote.dto");
 let PostController = class PostController {
     constructor(postService) {
         this.postService = postService;
@@ -56,6 +55,15 @@ let PostController = class PostController {
     async downVotePost(res, req, body) {
         try {
             let post = await this.postService.downVote(req, body.postId);
+            return res.status(common_1.HttpStatus.OK).send({ post });
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+    async unVotePost(res, req, body) {
+        try {
+            let post = await this.postService.unVote(req, body.postId);
             return res.status(common_1.HttpStatus.OK).send({ post });
         }
         catch (e) {
@@ -110,7 +118,7 @@ __decorate([
     __param(1, (0, common_1.Req)()),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, up_vote_dto_1.UpVoteDto]),
+    __metadata("design:paramtypes", [Object, Object, vote_dto_1.VoteDto]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "upVotePost", null);
 __decorate([
@@ -121,9 +129,20 @@ __decorate([
     __param(1, (0, common_1.Req)()),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, down_vote_dto_1.DownVoteDto]),
+    __metadata("design:paramtypes", [Object, Object, vote_dto_1.VoteDto]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "downVotePost", null);
+__decorate([
+    (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Post)('un-vote'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, vote_dto_1.VoteDto]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "unVotePost", null);
 __decorate([
     (0, common_1.UseGuards)(tini_guard_1.TiniGuard),
     (0, swagger_1.ApiBearerAuth)(),

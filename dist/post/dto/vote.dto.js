@@ -9,10 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DownVoteDto = void 0;
+exports.VoteDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-class DownVoteDto {
+class VoteDto {
 }
 __decorate([
     (0, swagger_1.ApiProperty)({
@@ -22,6 +22,6 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], DownVoteDto.prototype, "postId", void 0);
-exports.DownVoteDto = DownVoteDto;
-//# sourceMappingURL=down-vote.dto.js.map
+], VoteDto.prototype, "postId", void 0);
+exports.VoteDto = VoteDto;
+//# sourceMappingURL=vote.dto.js.map
