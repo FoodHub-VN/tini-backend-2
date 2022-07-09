@@ -17,11 +17,21 @@ const common_1 = require("@nestjs/common");
 const search_service_1 = require("./search.service");
 const search_user_by_name_dto_1 = require("./dto/search-user-by-name.dto");
 const search_user_by_id_dto_1 = require("./dto/search-user-by-id.dto");
-const search_post_by_keywords_dto_1 = require("./dto/search-post-by-keywords.dto");
 const search_vendor_by_lat_lng_dto_1 = require("./dto/search-vendor-by-lat-lng.dto");
+const search_by_keywords_dto_1 = require("./dto/search-by-keywords.dto");
 let SearchController = class SearchController {
     constructor(searchService) {
         this.searchService = searchService;
+    }
+    async searchByKeywords(res, req) {
+        try {
+            const users = await this.searchService.fetchManyUsersWithName(req.keywords, req.limit || 5);
+            const posts = await this.searchService.fetchBestPostsContainingKeywords(req.keywords, req.limit || 5);
+            return res.status(common_1.HttpStatus.OK).send({ users, posts });
+        }
+        catch (e) {
+            throw new common_1.BadRequestException();
+        }
     }
     async searchUserByName(res, req) {
         try {
@@ -61,6 +71,14 @@ let SearchController = class SearchController {
     }
 };
 __decorate([
+    (0, common_1.Post)('/by-keywords'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, search_by_keywords_dto_1.SearchByKeywordsDto]),
+    __metadata("design:returntype", Promise)
+], SearchController.prototype, "searchByKeywords", null);
+__decorate([
     (0, common_1.Post)('/user/by-name'),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Body)()),
@@ -81,7 +99,7 @@ __decorate([
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, search_post_by_keywords_dto_1.SearchPostByKeywordsDto]),
+    __metadata("design:paramtypes", [Object, search_by_keywords_dto_1.SearchByKeywordsDto]),
     __metadata("design:returntype", Promise)
 ], SearchController.prototype, "searchPostByKeyword", null);
 __decorate([

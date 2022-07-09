@@ -9,10 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchPostByKeywordsDto = void 0;
+exports.SearchByKeywordsDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-class SearchPostByKeywordsDto {
+class SearchByKeywordsDto {
 }
 __decorate([
     (0, swagger_1.ApiProperty)({
@@ -21,13 +21,13 @@ __decorate([
     }),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], SearchPostByKeywordsDto.prototype, "keywords", void 0);
+], SearchByKeywordsDto.prototype, "keywords", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         type: Number,
         default: 5,
     }),
     __metadata("design:type", Number)
-], SearchPostByKeywordsDto.prototype, "limit", void 0);
-exports.SearchPostByKeywordsDto = SearchPostByKeywordsDto;
-//# sourceMappingURL=search-post-by-keywords.dto.js.map
+], SearchByKeywordsDto.prototype, "limit", void 0);
+exports.SearchByKeywordsDto = SearchByKeywordsDto;
+//# sourceMappingURL=search-by-keywords.dto.js.map

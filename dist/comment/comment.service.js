@@ -12,46 +12,39 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchService = void 0;
+exports.CommentService = void 0;
 const common_1 = require("@nestjs/common");
 const database_constants_1 = require("../database/database.constants");
-let SearchService = class SearchService {
-    constructor(userModel, postModel) {
+let CommentService = class CommentService {
+    constructor(userModel, postModel, commentModel) {
         this.userModel = userModel;
         this.postModel = postModel;
+        this.commentModel = commentModel;
     }
-    async fetchManyUsersWithName(customerName, limit) {
-        return this.userModel.find({ customerName }).limit(limit).exec();
-    }
-    async fetchUserWithUsername(id) {
-        return this.userModel.findById(id).exec();
-    }
-    async fetchBestPostsContainingKeywords(keywords, limit) {
+    async fetchManyComments(id, limit) {
+        console.log(await this.postModel
+            .findById(id, { _id: 0, comment: 1 })
+            .populate('comment')
+            .populate('comment.owner')
+            .projection({ owner: 1, title: 1, content: 1, timeComment: 1 })
+            .exec());
         return this.postModel
-            .find({ $text: { $search: keywords } })
-            .sort({ score: { $meta: "textScore" } })
+            .findById(id, { _id: 0, comment: 1 })
+            .populate('comment')
+            .map(post => post.comment)
+            .projection({ owner: 1, title: 1, content: 1, timeComment: 1 })
+            .populate('owner')
+            .projection({ owner: { _id: 0 } })
             .limit(limit)
             .exec();
     }
-    async fetchVendorsNearLatLng(lat, lng, radius) {
-        return this.userModel
-            .find({
-            $near: {
-                $geometry: {
-                    type: "Point",
-                    coordinates: [lng, lat]
-                },
-                $maxDistance: radius,
-            },
-        })
-            .exec();
-    }
 };
-SearchService = __decorate([
+CommentService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(database_constants_1.USER_MODEL)),
     __param(1, (0, common_1.Inject)(database_constants_1.POST_MODEL)),
-    __metadata("design:paramtypes", [Object, Object])
-], SearchService);
-exports.SearchService = SearchService;
-//# sourceMappingURL=search.service.js.map
+    __param(2, (0, common_1.Inject)(database_constants_1.COMMENT_MODEL)),
+    __metadata("design:paramtypes", [Object, Object, Object])
+], CommentService);
+exports.CommentService = CommentService;
+//# sourceMappingURL=comment.service.js.map

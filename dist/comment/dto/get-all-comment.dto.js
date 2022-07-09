@@ -9,18 +9,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchUserByIdDto = void 0;
+exports.GetAllCommentDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-class SearchUserByIdDto {
+class GetAllCommentDto {
 }
 __decorate([
     (0, swagger_1.ApiProperty)({
-        type: Number,
+        type: String,
         required: true,
     }),
     (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], GetAllCommentDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: Number,
+        default: 5,
+    }),
     __metadata("design:type", Number)
-], SearchUserByIdDto.prototype, "id", void 0);
-exports.SearchUserByIdDto = SearchUserByIdDto;
-//# sourceMappingURL=search-user-by-id.dto.js.map
+], GetAllCommentDto.prototype, "limit", void 0);
+exports.GetAllCommentDto = GetAllCommentDto;
+//# sourceMappingURL=get-all-comment.dto.js.map
