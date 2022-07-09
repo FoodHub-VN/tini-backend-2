@@ -33,12 +33,12 @@ export class PostController {
     }
   }
 
+  @UseGuards(TiniGuard)
+  @ApiBearerAuth()
   @Post('get-all-post')
-  async getAllPost(
-    @Res() res: Response
-  ): Promise<any>{
+  async getAllPost(@Res() res: Response, @Req() req: AuthReqInterface): Promise<any>{
     try{
-      let posts = await this.postService.getAllPost();
+      let posts = await this.postService.getAllPost(req.user.customer_id);
       return res.status(HttpStatus.OK).send({posts})
     }
     catch (e) {
@@ -92,20 +92,22 @@ export class PostController {
       if (success) {
         return res.status(HttpStatus.OK).send({ status: 'success' });
       }
-      throw new BadRequestException('Wrong!');
     } catch (e) {
       throw e;
     }
+    
+    throw new BadRequestException('Wrong!');
   }
 
+  @UseGuards(TiniGuard)
+  @ApiBearerAuth()
   @Post('get-post-by-id')
-  async getPostById(@Res() res: Response, @Body() body: GetPostByIdDto) {
+  async getPostById(@Res() res: Response, @Req() req: AuthReqInterface, @Body() body: GetPostByIdDto) {
     try {
-      let post = await this.postService.getPostById(body.postId);
+      let post = await this.postService.getPostById(req.user.customer_id, body.postId);
       return res.status(HttpStatus.OK).send({ post });
     } catch (e) {
       throw e;
     }
   }
-
 }

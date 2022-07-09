@@ -43,17 +43,21 @@ export class PostService {
     // this.uploadService.upload()
   }
 
-  async getAllPost(): Promise<any> {
+  async getAllPost(userId: number): Promise<any> {
     try {
-      let posts = await this.postModel
+      const favoritesPromise = this.userModel.findById(userId).map(user => user.favoritePost);
+      const posts: any[] = await this.postModel
         .find({})
         .populate('owner', 'customerName')
         .exec();
+
+      const favorites = await favoritesPromise;
+      posts.forEach(post => post.isFavorited = favorites.includes(post._id))
+
       return posts;
     } catch (e) {
       console.log(e);
     }
-
   }
 
   async upVote(req: AuthReqInterface, postId: string) {
@@ -166,15 +170,19 @@ export class PostService {
     }
   }
 
-  async getPostById(postId: string) {
+  async getPostById(userId: number, postId: string) {
     try {
-      let post = await this.postModel
+      const favorites = this.userModel.findById(userId).map(user => user.favoritePost);
+      const post: any = await this.postModel
         .findOne({ _id: postId })
         .populate('owner', 'customerName')
         .exec();
       if (!post) {
         throw new NotFoundException('Post not found!');
       }
+
+      post.isFavorited = (await favorites).includes(postId);
+
       return post;
     } catch (e) {
       throw e;
