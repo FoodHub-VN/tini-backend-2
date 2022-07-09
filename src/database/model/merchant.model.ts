@@ -3,6 +3,7 @@ import {Dish, DishSchema} from "./dish.model";
 
 interface Merchant extends Document {
     readonly merchantName: string;
+    readonly locationAddress: string;
     readonly location: {
         type: string,
         coordinates: [number, number],
@@ -14,6 +15,7 @@ type MerchantModel = Model<Merchant>;
 
 const MerchantSchema = new Schema<Merchant>({
     merchantName: SchemaTypes.String,
+    locationAddress: string,
     location: {
         type: {
             type : SchemaTypes.String,
