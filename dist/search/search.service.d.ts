@@ -9,6 +9,7 @@ export declare class SearchService {
     constructor(merchantModel: MerchantModel, userModel: UserModel, postModel: PostModel);
     fetchManyUsersWithName(customerName: string, limit: number): Promise<User[]>;
     fetchUserWithUsername(id: number): Promise<User>;
+    fetchBestDishesContainingKeywords(keywords: string, limit: number): Promise<Dish[]>;
     fetchBestPostsContainingKeywords(keywords: string, limit: number): Promise<Post[]>;
     fetchMerchantsNearLatLng(lat: number, lng: number, radius: number): Promise<Merchant[]>;
     fetchFoodUsingFoodMatcher(lat: number, lng: number, radius: number): Promise<Dish[]>;

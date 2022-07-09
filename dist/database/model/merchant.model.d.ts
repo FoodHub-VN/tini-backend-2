@@ -2,6 +2,7 @@ import { Document, Model, Schema } from 'mongoose';
 import { Dish } from "./dish.model";
 interface Merchant extends Document {
     readonly merchantName: string;
+    readonly locationAddress: string;
     readonly location: {
         type: string;
         coordinates: [number, number];

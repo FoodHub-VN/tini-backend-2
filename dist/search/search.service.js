@@ -27,12 +27,44 @@ let SearchService = class SearchService {
     async fetchUserWithUsername(id) {
         return this.userModel.findById(id, { _id: 1, customerName: 1, post: 1 }).exec();
     }
+    async fetchBestDishesContainingKeywords(keywords, limit) {
+        const merchants = await this.merchantModel.find();
+        const setKeyword = new Set(keywords.split(/\s/).map(s => s.toLowerCase()));
+        const dishes = [];
+        for (let merchant of merchants) {
+            for (let dish of merchant.dishes) {
+                let score = 0;
+                for (let keyword of setKeyword) {
+                    if (dish.dishName.includes(keyword))
+                        score += dish.dishName.length;
+                }
+                const dishDescriptiveWords = dish.description.split(/\s/).map(s => s.toLowerCase());
+                for (let keyword of setKeyword) {
+                    score += 0.1 * Math.max(0, ...dishDescriptiveWords.filter(word => word.includes(keyword)).map(word => word.length));
+                }
+                dishes.push({ dish, score });
+            }
+        }
+        dishes.sort((a, b) => b.score - a.score);
+        return dishes.slice(0, limit);
+    }
     async fetchBestPostsContainingKeywords(keywords, limit) {
-        return this.postModel
-            .find({ $text: { $search: keywords } })
-            .sort({ score: { $meta: "textScore" } })
-            .limit(limit)
-            .exec();
+        const posts = await this.postModel.find();
+        const setKeyword = new Set(keywords.split(/\s/).map(s => s.toLowerCase()));
+        for (let post of posts) {
+            let score = 0;
+            for (let keyword of setKeyword) {
+                if (post.title.includes(keyword))
+                    score += post.title.length;
+            }
+            const dishDescriptiveWords = post.content.split(/\s/).map(s => s.toLowerCase());
+            for (let keyword of setKeyword) {
+                score += 0.1 * Math.max(0, ...dishDescriptiveWords.filter(word => word.includes(keyword)).map(word => word.length));
+            }
+            post._score = score;
+        }
+        posts.sort((a, b) => b._score - a._score);
+        return posts.slice(0, limit);
     }
     async fetchMerchantsNearLatLng(lat, lng, radius) {
         return this.merchantModel

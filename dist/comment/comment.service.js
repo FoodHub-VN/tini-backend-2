@@ -21,9 +21,9 @@ let CommentService = class CommentService {
         this.postModel = postModel;
         this.commentModel = commentModel;
     }
-    async fetchManyComments(id, limit) {
+    async fetchManyComments(postId, limit) {
         return this.postModel
-            .findById(id)
+            .findById(postId)
             .populate({ path: 'comment', select: { post: 0 } })
             .map(post => post.comment)
             .limit(limit)
@@ -31,13 +31,14 @@ let CommentService = class CommentService {
             .exec();
     }
     async createComment(owner, post, content) {
-        return this.postModel
+        const comment = this.commentModel
             .create({
             owner,
             post,
             content,
             timeComment: Date.now()
         });
+        return this.postModel.findByIdAndUpdate(post, { $push: { comment: await comment } });
     }
 };
 CommentService = __decorate([

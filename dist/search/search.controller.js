@@ -27,7 +27,8 @@ let SearchController = class SearchController {
         try {
             const users = await this.searchService.fetchManyUsersWithName(req.keywords, req.limit || 5);
             const posts = await this.searchService.fetchBestPostsContainingKeywords(req.keywords, req.limit || 5);
-            return res.status(common_1.HttpStatus.OK).send({ users, posts });
+            const dishes = await this.searchService.fetchBestDishesContainingKeywords(req.keywords, req.limit || 5);
+            return res.status(common_1.HttpStatus.OK).send({ users, posts, dishes });
         }
         catch (e) {
             throw new common_1.BadRequestException();
