@@ -66,4 +66,15 @@ export class SearchController {
             throw new BadRequestException();
         }
     }
+
+    @Post('/food-matcher')
+    async searchFoodUsingFoodMatcher(@Res() res: Response,
+                                     @Body() req: SearchVendorByLatLngDto) {
+        try {
+            const dishes = await this.searchService.fetchFoodUsingFoodMatcher(req.lat, req.lng, req.radius);
+            return res.status(HttpStatus.OK).send({dishes});
+        } catch (e) {
+            throw new BadRequestException();
+        }
+    }
 }

@@ -1,4 +1,5 @@
 import { Document, Model, Schema, SchemaTypes } from 'mongoose';
+import {Dish, DishSchema} from "./dish.model";
 
 interface Merchant extends Document {
     readonly merchantName: string;
@@ -6,6 +7,7 @@ interface Merchant extends Document {
         type: string,
         coordinates: [number, number],
     };
+    readonly dishes: Dish[],
 }
 
 type MerchantModel = Model<Merchant>;
@@ -18,6 +20,7 @@ const MerchantSchema = new Schema<Merchant>({
         },
         coordinates: [SchemaTypes.Number, SchemaTypes.Number],
     },
+    dishes: [DishSchema],
 }, {
     timestamps: true
 });

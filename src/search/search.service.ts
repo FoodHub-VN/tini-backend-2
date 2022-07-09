@@ -3,6 +3,7 @@ import {MERCHANT_MODEL, POST_MODEL, USER_MODEL} from "../database/database.const
 import {Post, PostModel} from "../database/model/post.model";
 import {User, UserModel} from "../database/model/user.model";
 import {Merchant, MerchantModel} from "../database/model/merchant.model";
+import {Dish} from "../database/model/dish.model";
 
 
 @Injectable()
@@ -43,5 +44,20 @@ export class SearchService {
                 }
             })
             .exec();
+    }
+
+    async fetchFoodUsingFoodMatcher(lat: number, lng: number, radius: number): Promise<Dish[]> {
+        const merchants = await this.fetchMerchantsNearLatLng(lat, lng, radius);
+        const dishes = merchants.map(merchant => merchant.dishes).flat();
+        const results = [];
+        for (let i = Math.min(dishes.length, 10); i > 0; i--) {
+            const idx = Math.floor(Math.random() * dishes.length);
+            const temp = dishes[idx];
+            dishes[idx] = dishes[dishes.length - 1];
+            dishes[dishes.length - 1] = temp;
+            results.push(dishes.pop());
+        }
+
+        return results;
     }
 }
