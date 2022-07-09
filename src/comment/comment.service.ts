@@ -1,9 +1,10 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {COMMENT_MODEL, POST_MODEL, USER_MODEL} from "../database/database.constants";
 import {PostModel} from "../database/model/post.model";
-import {CommentModel} from "../database/model/comment.model";
+import {CommentModel, Comment} from "../database/model/comment.model";
 import {UserModel} from "../database/model/user.model";
 import {Types} from "mongoose";
+
 import ObjectId = Types
 
 @Injectable()
@@ -21,5 +22,16 @@ export class CommentService {
             .limit(limit)
             .populate({path: 'owner', select: 'customerName'})
             .exec();
+    }
+
+    async createComment(owner: number, post: string, title: string, content: string) {
+        return this.postModel
+            .insertMany({
+                owner,
+                post,
+                title,
+                content,
+                timeComment: Date.now()
+            });
     }
 }
