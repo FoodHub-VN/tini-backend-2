@@ -26,7 +26,7 @@ export class CommentService {
 
     async createComment(owner: number, post: string, title: string, content: string) {
         return this.postModel
-            .insertMany({
+            .create({
                 owner,
                 post,
                 title,
