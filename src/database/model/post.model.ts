@@ -12,6 +12,11 @@ interface Post extends Document {
   readonly numView: number;
   readonly comment: string[];
   readonly visitedTime: number;
+  readonly rating: number;
+  readonly lat: string;
+  readonly lng: string;
+  readonly locationName: string;
+  readonly locationId: string;
 }
 
 type PostModel = Model<Post>;
@@ -39,6 +44,11 @@ const PostSchema = new Schema<Post>({
     ref: 'Comment',
   }],
   visitedTime: SchemaTypes.Number,
+  rating: SchemaTypes.Number,
+  lat: SchemaTypes.String,
+  lng: SchemaTypes.String,
+  locationName: SchemaTypes.String,
+  locationId: SchemaTypes.String
 }, {
   timestamps: true,
 });

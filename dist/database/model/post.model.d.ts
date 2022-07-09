@@ -10,6 +10,11 @@ interface Post extends Document {
     readonly numView: number;
     readonly comment: string[];
     readonly visitedTime: number;
+    readonly rating: number;
+    readonly lat: string;
+    readonly lng: string;
+    readonly locationName: string;
+    readonly locationId: string;
 }
 declare type PostModel = Model<Post>;
 declare const PostSchema: Schema<Post, Model<Post, any, any>, undefined, {}>;

@@ -47,5 +47,50 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
 ], PostUploadDto.prototype, "hashtag", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: Number,
+        required: true
+    }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], PostUploadDto.prototype, "rating", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: String,
+        required: true
+    }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PostUploadDto.prototype, "lat", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: String,
+        required: true
+    }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PostUploadDto.prototype, "lng", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: String,
+        required: true
+    }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PostUploadDto.prototype, "locationName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: String,
+        required: true
+    }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PostUploadDto.prototype, "locationId", void 0);
 exports.PostUploadDto = PostUploadDto;
 //# sourceMappingURL=post-upload.dto.js.map

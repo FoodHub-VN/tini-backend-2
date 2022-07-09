@@ -25,6 +25,11 @@ const PostSchema = new mongoose_1.Schema({
             ref: 'Comment',
         }],
     visitedTime: mongoose_1.SchemaTypes.Number,
+    rating: mongoose_1.SchemaTypes.Number,
+    lat: mongoose_1.SchemaTypes.String,
+    lng: mongoose_1.SchemaTypes.String,
+    locationName: mongoose_1.SchemaTypes.String,
+    locationId: mongoose_1.SchemaTypes.String
 }, {
     timestamps: true,
 });
