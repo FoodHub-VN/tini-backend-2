@@ -122,6 +122,31 @@ export class PostService {
     }
   }
 
+  async unVote(req: AuthReqInterface, postId: string) {
+    const post: Post = await this.postModel.findOne({_id: postId});
+    if (!post) {
+      throw new NotFoundException('Post not found!');
+    }
+
+    const update: any = {};
+    let isDirty = false;
+
+    if (post.upVotedBy.includes(req.user.customer_id)) {
+      update.upVotedBy = post.upVotedBy.filter((e) => e != req.user.customer_id);
+      isDirty = true;
+    }
+
+    if (post.downVotedBy.includes(req.user.customer_id)) {
+      update.downVotedBy = post.downVotedBy.filter((e) => e != req.user.customer_id);
+      isDirty = true;
+    }
+
+    if (isDirty) {
+      return await this.postModel.findOneAndUpdate({_id: postId}, {...update}, {new: true, lean: true}).exec();
+    }
+    return post;
+  }
+
   async favoritePost(req: AuthReqInterface, postId: string) {
     try {
       let user = await this.userModel.findOne({ _id: req.user.customer_id }).exec();

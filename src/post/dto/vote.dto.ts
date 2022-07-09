@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class DownVoteDto {
+export class VoteDto {
   @ApiProperty({
     type: String,
     required: true

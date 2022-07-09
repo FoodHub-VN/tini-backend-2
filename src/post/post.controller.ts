@@ -5,10 +5,9 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { PostUploadDto } from './dto/post-upload.dto';
 import { TiniGuard } from '../auth/guard/tini.guard';
 import { AuthReqInterface } from '../auth/interface/auth-req.interface';
-import { UpVoteDto } from './dto/up-vote.dto';
-import { DownVoteDto } from './dto/down-vote.dto';
 import { FavoritePostDto } from './dto/favorite.dto';
 import { GetPostByIdDto } from './dto/get-post-by-id.dto';
+import {VoteDto} from "./dto/vote.dto";
 
 @Controller('post')
 export class PostController {
@@ -50,7 +49,7 @@ export class PostController {
   @UseGuards(TiniGuard)
   @ApiBearerAuth()
   @Post('up-vote')
-  async upVotePost(@Res() res: Response, @Req() req: AuthReqInterface, @Body() body: UpVoteDto){
+  async upVotePost(@Res() res: Response, @Req() req: AuthReqInterface, @Body() body: VoteDto){
       try{
         let post = await this.postService.upVote(req, body.postId);
         return res.status(HttpStatus.OK).send({post});
@@ -63,9 +62,21 @@ export class PostController {
   @UseGuards(TiniGuard)
   @ApiBearerAuth()
   @Post('down-vote')
-  async downVotePost(@Res() res: Response, @Req() req: AuthReqInterface, @Body() body: DownVoteDto) {
+  async downVotePost(@Res() res: Response, @Req() req: AuthReqInterface, @Body() body: VoteDto) {
     try {
       let post = await this.postService.downVote(req, body.postId);
+      return res.status(HttpStatus.OK).send({ post });
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  @UseGuards(TiniGuard)
+  @ApiBearerAuth()
+  @Post('un-vote')
+  async unVotePost(@Res() res: Response, @Req() req: AuthReqInterface, @Body() body: VoteDto) {
+    try {
+      let post = await this.postService.unVote(req, body.postId);
       return res.status(HttpStatus.OK).send({ post });
     } catch (e) {
       throw e;
