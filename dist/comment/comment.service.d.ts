@@ -6,5 +6,5 @@ export declare class CommentService {
     private readonly postModel;
     private readonly commentModel;
     constructor(userModel: UserModel, postModel: PostModel, commentModel: CommentModel);
-    fetchManyComments(id: string, limit: number): Promise<any>;
+    fetchManyComments(id: string, limit: number): Promise<string[]>;
 }
