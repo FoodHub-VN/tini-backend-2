@@ -21,6 +21,7 @@ const tini_guard_1 = require("../auth/guard/tini.guard");
 const up_vote_dto_1 = require("./dto/up-vote.dto");
 const down_vote_dto_1 = require("./dto/down-vote.dto");
 const favorite_dto_1 = require("./dto/favorite.dto");
+const get_post_by_id_dto_1 = require("./dto/get-post-by-id.dto");
 let PostController = class PostController {
     constructor(postService) {
         this.postService = postService;
@@ -65,9 +66,18 @@ let PostController = class PostController {
         try {
             let success = await this.postService.favoritePost(req, body.postId);
             if (success) {
-                return res.status(common_1.HttpStatus.OK).send({ status: "success" });
+                return res.status(common_1.HttpStatus.OK).send({ status: 'success' });
             }
             throw new common_1.BadRequestException('Wrong!');
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+    async getPostById(res, body) {
+        try {
+            let post = await this.postService.getPostById(body.postId);
+            return res.status(common_1.HttpStatus.OK).send({ post });
         }
         catch (e) {
             throw e;
@@ -125,6 +135,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, favorite_dto_1.FavoritePostDto]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "favoritePost", null);
+__decorate([
+    (0, common_1.Post)('get-post-by-id'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, get_post_by_id_dto_1.GetPostByIdDto]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getPostById", null);
 PostController = __decorate([
     (0, common_1.Controller)('post'),
     __metadata("design:paramtypes", [post_service_1.PostService])

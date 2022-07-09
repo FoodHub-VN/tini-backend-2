@@ -8,6 +8,7 @@ import { AuthReqInterface } from '../auth/interface/auth-req.interface';
 import { UpVoteDto } from './dto/up-vote.dto';
 import { DownVoteDto } from './dto/down-vote.dto';
 import { FavoritePostDto } from './dto/favorite.dto';
+import { GetPostByIdDto } from './dto/get-post-by-id.dto';
 
 @Controller('post')
 export class PostController {
@@ -78,9 +79,19 @@ export class PostController {
     try {
       let success = await this.postService.favoritePost(req, body.postId);
       if (success) {
-        return res.status(HttpStatus.OK).send({status: "success"});
+        return res.status(HttpStatus.OK).send({ status: 'success' });
       }
       throw new BadRequestException('Wrong!');
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  @Post('get-post-by-id')
+  async getPostById(@Res() res: Response, @Body() body: GetPostByIdDto) {
+    try {
+      let post = await this.postService.getPostById(body.postId);
+      return res.status(HttpStatus.OK).send({ post });
     } catch (e) {
       throw e;
     }

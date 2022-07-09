@@ -140,4 +140,19 @@ export class PostService {
       throw e;
     }
   }
+
+  async getPostById(postId: string) {
+    try {
+      let post = await this.postModel
+        .findOne({ _id: postId })
+        .populate('owner', 'customerName')
+        .exec();
+      if (!post) {
+        throw new NotFoundException('Post not found!');
+      }
+      return post;
+    } catch (e) {
+      throw e;
+    }
+  }
 }

@@ -13,4 +13,5 @@ export declare class PostService {
     upVote(req: AuthReqInterface, postId: string): Promise<Post>;
     downVote(req: AuthReqInterface, postId: string): Promise<Post>;
     favoritePost(req: AuthReqInterface, postId: string): Promise<boolean>;
+    getPostById(postId: string): Promise<Post>;
 }

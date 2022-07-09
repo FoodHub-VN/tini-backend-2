@@ -132,6 +132,21 @@ let PostService = class PostService {
             throw e;
         }
     }
+    async getPostById(postId) {
+        try {
+            let post = await this.postModel
+                .findOne({ _id: postId })
+                .populate('owner', 'customerName')
+                .exec();
+            if (!post) {
+                throw new common_1.NotFoundException('Post not found!');
+            }
+            return post;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
 };
 PostService = __decorate([
     (0, common_1.Injectable)(),
